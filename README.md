@@ -10,3 +10,4 @@ Lập trình GIS, ứng dụng GIS trong quản lý đăng tin phòng trọ tạ
 
 # Lưu ý: Mở PostgreSQL trước khi run code
 Lệnh run: python manage.py runserver
+Tạo user để test trang login: python manage.py createsuperuser
