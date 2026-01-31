@@ -15,7 +15,6 @@ class House(models.Model):
     name = models.CharField(max_length=200, verbose_name="Tên Căn Nhà / Tòa nhà")
     address = models.TextField(verbose_name="Địa chỉ nhà")
     
-    # Tọa độ (phục vụ bản đồ sau này)
     lat = models.FloatField(verbose_name="Vĩ độ", default=0.0)
     long = models.FloatField(verbose_name="Kinh độ", default=0.0)
     
