@@ -20,14 +20,14 @@ class House(models.Model):
         ('phong_tro', 'Phòng Trọ'),
     ]
 
-    STATUS_CHOISE = [
+    STATUS_CHOICES = [
         ('pending', 'Chờ duyệt'),
         ('approved', 'Đã duyệt'),
         ('hidden', 'Đã ẩn'),
         ('rejected', 'Bị từ chối'),
     ]
 
-    DISTRICT_CHOPCES = [
+    DISTRICT_CHOICES = [
         ('q1', 'Quận 1'),
         ('q2', 'Quận 2'),
         ('q3', 'Quận 3'),
