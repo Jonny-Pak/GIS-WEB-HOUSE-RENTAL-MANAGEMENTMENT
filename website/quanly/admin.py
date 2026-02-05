@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import House, Room, Furniture, RoomImage, Contract
+from .models import House, Room, Furniture, HouseImage, Contract
 # Register your models here.
 
 # Duyệt bài đăng thuê nhà
 @admin.action(description='Duyệt bài đăng')
 def make_approved(modeladmin, request, queryset):
-    queryset.update(is_approved=True)
+    queryset.update(status='approved')
 
 # Cấu hình nhập phòng
 class RoomInline(admin.TabularInline):
@@ -13,29 +13,29 @@ class RoomInline(admin.TabularInline):
     extra = 1
     fields = ('room_number', 'area')
 
+# Cấu hình nhập ảnh trực tiếp trong nhà
+class HouseImageInline(admin.TabularInline):
+    model = HouseImage
+    extra = 1
+
 # Cấu hình quản lý nhà
 class HouseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'price', 'address', 'is_approved', 'is_rented') # Hiển thị cột
-    search_fields = ('name', 'address') # Thanh tìm kiếm
-    list_filter = ('is_approved', 'owner', 'is_rented') # Bộ lọc
-    inlines = [RoomInline] # Nhúng form
+    list_display = ('name', 'owner', 'price', 'district', 'status', 'create_at') # Hiển thị cột
+    search_fields = ('name', 'address', 'owner__username', 'owner_phone') # Thanh tìm kiếm
+    list_filter = ('status', 'district', 'house_type') # Bộ lọc
+    inlines = [HouseImageInline, RoomInline] # Nhúng form
     actions = [make_approved] # Nút chức năng
-
-# Cấu hình thêm ảnh nhà
-class RoomImageInline(admin.TabularInline):
-    model = RoomImage
-    extra = 1
 
 # Cấu hình quản lý phòng
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('room_name', 'house', 'area')
-    search_fields = ('room_name', 'house__name')
-    inlines = [RoomImageInline] 
+    list_display = ('room_number', 'house', 'area')
+    search_fields = ('room_number', 'house__name')
     filter_horizontal = ('furnitures',)
 
 # Cấu hình hợp đồng
 class ContractAdmin(admin.ModelAdmin):
-    list_display = ('tenant_name', 'house', 'start_date', 'end_date')
+    list_display = ('tenant_name', 'house', 'start_date', 'end_date', 'total_value')
+    search_fields = ('tenant_name', 'tenant_phone', 'house__name')
 
 admin.site.register(House, HouseAdmin)
 admin.site.register(Room, RoomAdmin)
