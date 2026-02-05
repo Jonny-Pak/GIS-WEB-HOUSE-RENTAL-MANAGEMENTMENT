@@ -31,7 +31,7 @@ def api_polygon_search(request):
             return JsonResponse(data, safe=False)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
-    return JsonResponse({"error": "Method not allowed"}, status=405)
+    return JsonResponse({"error": "Phương thức không được phép"}, status=405)
     
 def home(request):
     return render(request, 'quanly/home.html')
