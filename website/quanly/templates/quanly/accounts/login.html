@@ -1,0 +1,63 @@
+{% extends 'quanly/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Đăng nhập - Thuê Nhà Nhanh{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="section login-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8" data-aos="fade-up">
+                
+                <h1 class="login-heading">ĐĂNG NHẬP</h1>
+                
+                <div class="card login-card">
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger small mb-3">
+                                Tên đăng nhập hoặc mật khẩu không đúng!
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label" for="username">Tên đăng nhập</label>
+                            <input type="text" class="form-control custom-input" id="username" name="username" placeholder="Nhập tên đăng nhập..." required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" for="password">Mật khẩu</label>
+                            <input type="password" class="form-control custom-input" id="password" name="password" placeholder="********" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <button type="submit" class="btn btn-primary btn-custom-login">
+                                Đăng nhập
+                            </button>
+                        </div>
+
+                        <div class="separator-wrapper">
+                            <span class="separator-text">Hoặc</span>
+                            <hr class="separator-line">
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <p class="mb-0">Chưa có tài khoản? 
+                                <a href="{% url 'register' %}" class="link-register">Đăng ký ngay</a>
+                            </p>
+                            <small class="text-muted">Hệ thống cho thuê nhà</small>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

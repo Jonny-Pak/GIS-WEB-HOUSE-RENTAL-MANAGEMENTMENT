@@ -1,0 +1,221 @@
+.property-item .img img {
+    height: 250px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.property-item, .testimonial {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+}
+
+.property-item:hover, .testimonial:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.property-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.property-content .btn {
+    margin-top: auto;
+    width: 100%;
+}
+
+.hero {
+    background-image: url('../images/hero_bg_3.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 150px 0;
+    position: relative;
+    margin-bottom: 50px;
+}
+
+.hero .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+}
+
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero .heading {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.form-search {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 50px;
+    max-width: 700px;
+    margin: 0 auto;
+    backdrop-filter: blur(5px);
+}
+
+.form-search .form-control {
+    border: none;
+    height: 55px;
+    border-top-left-radius: 40px;
+    border-bottom-left-radius: 40px;
+    padding-left: 30px;
+    font-size: 16px;
+}
+
+.form-search .btn-primary {
+    height: 55px;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+    padding-left: 25px;
+    padding-right: 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #005555;
+    border-color: #005555;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 130px;
+}
+
+.form-search .btn-primary:hover {
+    background-color: #004444;
+    transform: translateY(-2px);
+}
+
+.filter-box {
+    background-color: #f8f9fa !important;
+    border-radius: 15px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.filter-box:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    transform: translateY(-2px);
+}
+
+.filter-box .form-select {
+    height: 45px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    cursor: pointer;
+}
+
+.filter-box .form-select:focus {
+    border-color: #005555;
+    box-shadow: 0 0 0 0.2rem rgba(0, 85, 85, 0.25);
+}
+
+.filter-box .btn-primary {
+    height: 45px;
+    border-radius: 8px;
+    background-color: #005555;
+    border-color: #005555;
+    font-weight: bold;
+}
+
+.filter-box .btn-primary:hover {
+    background-color: #004444;
+}
+
+.logo-wrapper {
+    display: flex !important;
+    align-items: center;
+    text-decoration: none !important;
+}
+
+.logo-img {
+    height: 40px;
+    margin-right: 10px;
+    object-fit: contain;
+}
+
+.logo-wrapper span {
+    font-weight: bold;
+    color: #000;
+}
+
+.btn-post-news {
+    background-color: #ffc107;
+    color: #000 !important;
+    font-weight: bold;
+    border-radius: 30px;
+    padding: 10px 20px !important;
+    transition: all 0.3s;
+    margin-right: 15px; 
+}
+
+.btn-post-news:hover {
+    background-color: #ffca2c;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+.user-avatar-nav {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.box-feature {
+    background: #fff;
+    padding: 40px 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.box-feature:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.box-feature span[class^="flaticon-"] {
+    font-size: 60px;
+    color: #005555;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.box-feature h3 {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.testimonial {
+    padding: 30px !important;
+    text-align: center;
+}
+
+.testimonial img {
+    margin: 0 auto 15px auto;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}

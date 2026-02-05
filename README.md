@@ -8,6 +8,6 @@ Lập trình GIS, ứng dụng GIS trong quản lý đăng tin phòng trọ tạ
 4. Tiến hành các thay đổi: python manage.py migrate
 5. Áp dụng thay đổi: python manage.py migrate
 
-# Lưu ý: Mở PostgreSQL trước khi run code
+# Lưu ý: Mở PostgreSQL trước khi run code để đảm bảo code chạy
 Lệnh run: python manage.py runserver
 Tạo user để test trang admin: python manage.py createsuperuser

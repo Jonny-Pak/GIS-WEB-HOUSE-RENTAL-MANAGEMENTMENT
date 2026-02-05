@@ -17,6 +17,7 @@ def api_houses(request):
         return JsonResponse({"error": "Tham số không hợp lệ"}, status=400)
 
 # Create your views here.
+<<<<<<< HEAD
 @csrf_exempt
 def api_polygon_search(request):
     """API tìm kiếm theo vùng vẽ (POST)"""
@@ -32,3 +33,22 @@ def api_polygon_search(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Method not allowed"}, status=405)
+=======
+def home(request):
+    return render(request, 'quanly/home.html')
+
+def register(request):
+    return render(request, 'quanly/accounts/register.html')
+
+def house_detail(request):
+    return render(request, 'quanly/houses/house_detail.html')
+
+def dashboard(request):
+    return render(request, 'quanly/dashboard/overview.html')
+
+def post_house(request):
+    return render(request, 'quanly/dashboard/post_house.html')
+
+def manage_post(request):
+    return render(request, 'quanly/dashboard/manage_post.html')
+>>>>>>> 084be26d7cf00dc62dc17e5d0f9df260e737ec06

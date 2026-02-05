@@ -103,3 +103,4 @@ class Contract(models.Model):
 
     def __str__(self):
         return f"Hợp đồng: {self.tenant_name} thuê {self.house.name}"
+
