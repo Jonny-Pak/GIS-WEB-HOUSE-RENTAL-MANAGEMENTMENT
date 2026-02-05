@@ -1,0 +1,59 @@
+{% extends 'quanly/base.html' %}
+{% load static %}
+
+{% block title %}Đăng nhập - Thuê Nhà Nhanh{% endblock %}
+
+{% block content %}
+
+<div class="section" style="background-color: #f8f9fa; padding: 120px 0 80px 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8" data-aos="fade-up">
+                <h1 class="text-center mb-4"
+                    style="color: #005555; font-weight: 700; font-size: 2.5rem; text-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);">
+                    ĐĂNG NHẬP
+                </h1>
+                <div class="card border-0 shadow-lg"
+                    style="border-radius: 20px; background: #ffffff; padding: 2.5rem 2rem;">
+                    <form action="#" style="width: 100%;">
+                        <div class="mb-3">
+                            <label class="text-black fw-bold mb-2" for="username">Tên đăng nhập hoặc Email/SĐT</label>
+                            <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập..."
+                                style="border-radius: 10px; padding: 0.75rem;">
+                        </div>
+                        <div class="mb-4">
+                            <label class="text-black fw-bold mb-2" for="password">Mật khẩu</label>
+                            <input type="password" class="form-control" id="password" placeholder="********"
+                                style="border-radius: 10px; padding: 0.75rem;">
+                        </div>
+                        <div class="form-group mb-4">
+                            <input type="submit" value="Đăng nhập" class="btn btn-primary w-100 py-3"
+                                style="border-radius: 30px; background-color: #005555; border: none; font-weight: 600; transition: 0.3s;">
+                        </div>
+
+                        <div style="text-align: center; margin: 1.5rem 0; position: relative;">
+                            <span style="background: white; padding: 0 10px; color: #999;">Hoặc</span>
+                            <hr
+                                style="position: absolute; top: 50%; left: 0; right: 0; margin: 0; border: none; border-top: 1px solid #ddd; z-index: -1;">
+                        </div>
+
+                        <div class="mb-4">
+                            <button type="button" class="btn w-100 py-3"
+                                style="background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 10px; color: #000; font-weight: 600;">
+                                <i class="icon-google" style="margin-right: 8px;"></i> Đăng nhập với Google
+                            </button>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <p class="mb-0">Chưa có tài khoản? <a href="{% url 'register' %}"
+                                    style="color: #005555; font-weight: 700; text-decoration: none;">Đăng ký ngay</a>
+                            </p>
+                            <small class="text-muted">Hệ thống quản lý nhà trọ GIS</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
