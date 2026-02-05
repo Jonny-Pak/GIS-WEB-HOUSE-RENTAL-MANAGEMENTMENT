@@ -1,5 +1,6 @@
 import math
 from .models import House
+from shapely.geometry import Point, Polygon as ShapePolygon
 
 def get_nearby_houses_json(user_lat, user_long, radius_km=5):
     # Lọc những nhà ở trạng thái 'approved' (Đã duyệt)
@@ -41,3 +42,34 @@ def get_nearby_houses_json(user_lat, user_long, radius_km=5):
 #         if distance <= radius_km:
 #             nearby_houses.append(house)
 #     return nearby_houses
+
+def get_houses_in_polygon(polygon_coords):
+    """
+    Input: List các tuple tọa độ [(lat1, lng1), (lat2, lng2), ...]
+    Output: Danh sách các dict nhà nằm trong vùng
+    """
+    # 1. Tạo đối tượng Đa giác từ tọa độ người dùng vẽ
+    poly = ShapePolygon(polygon_coords)
+    
+    # 2. Lấy danh sách nhà đã duyệt
+    houses = House.objects.filter(status='approved')
+    results = []
+
+    for house in houses:
+        # 3. Tạo điểm từ tọa độ của căn nhà
+        pnt = Point(house.lat, house.long)
+        
+        # 4. Kiểm tra điểm có nằm TRONG đa giác không
+        if poly.contains(pnt):
+            image_url = house.main_image.url if house.main_image else "/static/images/default.jpg"
+            results.append({
+                "id": house.id,
+                "name": house.name,
+                "price": house.price,
+                "address": house.address,
+                "district": house.get_district_display(),
+                "image": image_url,
+                "coords": {"lat": house.lat, "lng": house.long}
+            })
+            
+    return results

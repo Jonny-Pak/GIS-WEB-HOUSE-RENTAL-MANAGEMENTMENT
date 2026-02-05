@@ -14,12 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from quanly.views import api_houses
+from quanly.views import api_houses, api_polygon_search
 from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/houses/', api_houses, name='api_houses')
+    path('api/houses/', api_houses, name='api_houses'),
+    path('api/polygon-search/', api_polygon_search, name='api_polygon_search'),
 ]
