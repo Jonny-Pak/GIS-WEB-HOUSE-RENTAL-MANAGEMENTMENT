@@ -1,0 +1,95 @@
+{% extends 'quanly/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Đăng ký tài khoản - Thuê Nhà Nhanh{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="section register-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7" data-aos="fade-up">
+                
+                <div class="card register-card shadow-lg">
+                    <div class="text-center mb-4">
+                        <h2 class="register-title">Đăng ký</h2>
+                        <p class="text-muted mb-0">Tạo tài khoản mới</p>
+                    </div>
+
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                Vui lòng kiểm tra lại thông tin nhập.
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên đăng nhập</label>
+                            <input type="text" name="username" class="form-control register-input" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control register-input" placeholder="example@gmail.com" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" name="phone" class="form-control register-input" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" name="password" class="form-control register-input" placeholder="Mật khẩu" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Nhập lại mật khẩu</label>
+                            <input type="password" name="confirm_password" class="form-control register-input" placeholder="Nhập lại mật khẩu" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" style="cursor: pointer;" required>
+                                <label class="form-check-label text-muted terms-label" for="terms">
+                                    Tôi đã đọc và đồng ý với <a href="#" class="terms-link">Điều khoản sử dụng</a>. 
+                                    <a href="#" class="terms-link">Chính sách</a> của chúng tôi
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <button type="submit" class="btn w-100 py-3 btn-register">
+                                Tiếp tục
+                            </button>
+                        </div>
+
+                        <div class="separator-wrapper">
+                            <span class="separator-text">Hoặc</span>
+                            <hr class="separator-line">
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Bạn đã có tài khoản?
+                                <a href="{% url 'login' %}" class="link-login">Đăng nhập tại đây</a>
+                            </p>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <small class="text-muted">Hệ thống quản lý nhà trọ GIS</small>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

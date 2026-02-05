@@ -1,0 +1,102 @@
+/* website/quanly/static/css/login.css */
+
+/* Màu chủ đạo */
+:root {
+    --primary-color: #005555;
+    --text-color: #000000;
+}
+
+.login-section {
+    background-color: #f8f9fa;
+    padding: 120px 0 80px 0;
+}
+
+.login-heading {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-card {
+    border-radius: 20px;
+    background: #ffffff;
+    padding: 2.5rem 2rem;
+    border: none;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important; /* shadow-lg */
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.custom-input {
+    border-radius: 10px;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    width: 100%;
+}
+
+.custom-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 85, 85, 0.25);
+}
+
+.btn-custom-login {
+    border-radius: 30px;
+    background-color: var(--primary-color);
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: #fff;
+    width: 100%;
+    padding: 1rem;
+}
+
+.btn-custom-login:hover {
+    background-color: #004444;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 85, 85, 0.3);
+}
+
+/* Đường gạch ngang "Hoặc" */
+.separator-wrapper {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.separator-text {
+    background: white;
+    padding: 0 10px;
+    color: #999;
+    position: relative;
+    z-index: 1;
+}
+
+.separator-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border: none;
+    border-top: 1px solid #ddd;
+    z-index: 0;
+}
+
+.link-register {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.link-register:hover {
+    color: #003333;
+    text-decoration: underline;
+}

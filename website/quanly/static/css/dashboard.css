@@ -1,0 +1,140 @@
+:root {
+    --primary-red: #005555; 
+    --bg-gray: #F4F5F7;
+    --text-dark: #2C2C2C;
+    --sidebar-width: 240px;
+}
+
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: var(--bg-gray);
+    color: var(--text-dark);
+}
+
+/* --- SIDEBAR (CỘT TRÁI) --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background: #fff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-right: 1px solid #eee;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+}
+
+.brand-logo {
+    font-size: 20px;       
+    font-weight: 800;      
+    color: #005555;        
+    padding: 25px 24px;    
+    display: flex;         
+    align-items: center;   
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    border-bottom: 1px solid #f0f0f0; 
+}
+
+
+.brand-logo i {
+    font-size: 24px;
+    margin-right: 10px !important; 
+}
+
+.nav-item {
+    list-style: none;
+}
+
+.nav-link {
+    color: #555;
+    font-weight: 600;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.nav-link i {
+    font-size: 20px;
+    margin-right: 12px;
+    width: 24px;
+    text-align: center;
+}
+
+.nav-link:hover {
+    color: var(--primary-red);
+    background-color: #FFF5F5;
+}
+
+.nav-link.active {
+    color: var(--primary-red);
+    background-color: #FFF5F5;
+    border-left-color: var(--primary-red);
+}
+
+.btn-post-new {
+    margin: 0 20px 20px;
+    background: var(--primary-red);
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-post-new:hover {
+    background: #005555;
+    color: white;
+}
+
+/* --- MAIN CONTENT (CỘT PHẢI) --- */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 20px 30px;
+}
+
+/* Top Header */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #eee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Card Styles */
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    background: white;
+    height: 100%;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 24px;
+}

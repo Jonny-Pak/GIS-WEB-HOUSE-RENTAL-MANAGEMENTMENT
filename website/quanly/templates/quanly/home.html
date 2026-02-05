@@ -1,329 +1,322 @@
-{% extends 'quanly/base.html' %}
+{% extends 'quanly/layouts/base.html' %}
 {% load static %}
 
 {% block title %}Trang chủ - Thuê Nhà Nhanh{% endblock %}
 
 {% block content %}
-<div class="hero">
-  <div class="overlay"></div>
-  <div class="container">
-    <div class="row justify-content-center align-items-center">
-      <div class="col-lg-9 text-center">
-        <h1 class="heading text-white">
-          Tìm ngôi nhà mơ ước của bạn
-        </h1>
+    <div class="hero">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center">
+            <h1 class="heading text-white" data-aos="fade-up">
+              Tìm ngôi nhà mơ ước của bạn
+            </h1>
+            
+            <form action="#" class="narrow-w form-search d-flex align-items-stretch mb-3" data-aos="fade-up" data-aos-delay="200">
+              <input type="text" class="form-control px-4" placeholder="Nhập tên quận, đường hoặc thành phố..." />
+              <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
 
-        <form action="#" class="narrow-w form-search d-flex align-items-stretch mb-3">
-          <input type="text" class="form-control px-4" placeholder="Nhập tên quận, đường hoặc thành phố..." />
-          <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-        </form>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <div class="container">
-
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-12">
-        <div class="filter-box p-4 bg-white shadow-sm rounded border">
-          <form action="#" method="GET">
-            <div class="row g-3 align-items-center">
-              <div class="col-md-12 mb-2">
-                <h5 class="text-primary fw-bold"><span class="flaticon-search me-2"></span>Bộ lọc tìm kiếm</h5>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold text-muted">Khu vực</label>
-                <select class="form-select" name="quan">
-                  <option value="">-- Tất cả Quận --</option>
-                  <option value="Q1">Quận 1</option>
-                  <option value="Q2">Quận 2</option>
-                  <option value="Q3">Quận 3</option>
-                  <option value="Q4">Quận 4</option>
-                  <option value="Q5">Quận 5</option>
-                  <option value="Q6">Quận 6</option>
-                  <option value="Q7">Quận 7</option>
-                  <option value="Q8">Quận 8</option>
-                  <option value="Q9">Quận 9</option>
-                  <option value="Q10">Quận 10</option>
-                  <option value="BinhThanh">Bình Thạnh</option>
-                  <option value="BinhTan">Bình Tân</option>
-                  <option value="TanBinh">Tân Bình</option>
-                  <option value="TanPhu">Tân Phú</option>
-                  <option value="Gò Vấp">Gò Vấp</option>
-                  <option value="ThuDuc">TP. Thủ Đức</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold text-muted">Mức giá</label>
-                <select class="form-select" name="gia">
-                  <option value="">-- Tất cả mức giá --</option>
-                  <option value="1-5">1 - 5 triệu</option>
-                  <option value="5-10">5 - 10 triệu</option>
-                  <option value="10-500">Trên 10 triệu</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold text-muted">Loại nhà</label>
-                <select class="form-select" name="loai">
-                  <option value="">-- Tất cả loại hình --</option>
-                  <option value="nguyen_can">Nhà nguyên căn</option>
-                  <option value="chung_cu">Căn hộ chung cư</option>
-                  <option value="phong_tro">Phòng trọ</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label d-none d-md-block">&nbsp;</label>
-                <button type="submit" class="btn btn-primary w-100">
-                  <span class="icon-filter me-1"></span> Lọc Tin
-                </button>
-              </div>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="row mb-5 align-items-center">
-      <div class="col-lg-6">
-        <h2 class="font-weight-bold text-primary heading">Nhà đang cho thuê</h2>
-      </div>
-      <div class="col-lg-6 text-lg-end">
-        <a href="#" class="btn btn-primary text-white py-3 px-4">Xem tất cả</a>
+    <div class="section">
+      <div class="container">
+        
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-12">
+                <div class="filter-box p-4 bg-white shadow-sm rounded border">
+                    <form action="#" method="GET">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-12 mb-2">
+                                <h5 class="text-primary fw-bold"><span class="flaticon-search me-2"></span>Bộ lọc tìm kiếm</h5>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Khu vực</label>
+                                <select class="form-select" name="quan">
+                                    <option value="">-- Tất cả Quận --</option>
+                                    <option value="Q1">Quận 1</option>
+                                    <option value="Q2">Quận 2</option>
+                                    <option value="Q3">Quận 3</option>
+                                    <option value="Q4">Quận 4</option>
+                                    <option value="Q5">Quận 5</option>
+                                    <option value="Q6">Quận 6</option>
+                                    <option value="Q7">Quận 7</option>
+                                    <option value="Q8">Quận 8</option>
+                                    <option value="Q9">Quận 9</option>
+                                    <option value="Q10">Quận 10</option>
+                                    <option value="QTB">Quận Tân Bình</option>
+                                    <option value="QBT">Quận Bình Thạnh</option>
+                                    <option value="TPTD">TP. Thủ Đức</option>
+                                    <option value="QTP">Quận Tân Phú</option>
+                                    </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Mức giá</label>
+                                <select class="form-select" name="gia">
+                                    <option value="">-- Tất cả mức giá --</option>
+                                    <option value="1-5">1 - 5 triệu</option>
+                                    <option value="5-10">5 - 10 triệu</option>
+                                    <option value="10-plus">Trên 10 triệu</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Loại nhà</label>
+                                <select class="form-select" name="loai">
+                                    <option value="">-- Tất cả loại hình --</option>
+                                    <option value="nguyen_can">Nhà nguyên căn</option>
+                                    <option value="chung_cu">Căn hộ chung cư</option>
+                                    <option value="phong_tro">Phòng trọ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label d-none d-md-block">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <span class="icon-filter me-1"></span> Lọc Tin
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5 align-items-center">
+          <div class="col-lg-6">
+            <h2 class="font-weight-bold text-primary heading">Nhà đang cho thuê</h2>
+          </div>
+          <div class="col-lg-6 text-lg-end">
+            <a href="#" class="btn btn-primary text-white py-3 px-4">Xem tất cả</a>
+          </div>
+        </div>
+
+        <div class="row">
+          
+          <div class="col-md-6 col-lg-4 mb-4 h-100"> 
+            <div class="property-item">
+              <a href="{% url 'house_detail' %}" class="img">
+                <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid" />
+              </a>
+              <div class="property-content">
+                <div class="price mb-2"><span>12,000,000 VNĐ</span></div>
+                <div>
+                  <span class="d-block mb-2 text-black-50">5232 Nguyễn Văn Cừ</span>
+                  <span class="city d-block mb-3">Quận 5, TP.HCM</span>
+                  <div class="specs d-flex mb-4">
+                    <span class="d-block d-flex align-items-center me-3">
+                      <span class="icon-bed me-2"></span><span class="caption">2 ngủ</span>
+                    </span>
+                    <span class="d-block d-flex align-items-center">
+                      <span class="icon-bath me-2"></span><span class="caption">2 tắm</span>
+                    </span>
+                  </div>
+                  <a href="{% url 'house_detail' %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="property-item">
+              <a href="{% url 'house_detail' %}" class="img">
+                <img src="{% static 'images/img_2.jpg' %}" alt="Image" class="img-fluid" />
+              </a>
+              <div class="property-content">
+                <div class="price mb-2"><span>8,500,000 VNĐ</span></div>
+                <div>
+                  <span class="d-block mb-2 text-black-50">123 Lê Lợi</span>
+                  <span class="city d-block mb-3">Quận 1, TP.HCM</span>
+                  <div class="specs d-flex mb-4">
+                    <span class="d-block d-flex align-items-center me-3">
+                      <span class="icon-bed me-2"></span><span class="caption">1 ngủ</span>
+                    </span>
+                    <span class="d-block d-flex align-items-center">
+                      <span class="icon-bath me-2"></span><span class="caption">1 tắm</span>
+                    </span>
+                  </div>
+                  <a href="{% url 'house_detail' %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="property-item">
+              <a href="{% url 'house_detail' %}" class="img">
+                <img src="{% static 'images/img_3.jpg' %}" alt="Image" class="img-fluid" />
+              </a>
+              <div class="property-content">
+                <div class="price mb-2"><span>25,000,000 VNĐ</span></div>
+                <div>
+                  <span class="d-block mb-2 text-black-50">Biệt thự Thảo Điền</span>
+                  <span class="city d-block mb-3">Thủ Đức, TP.HCM</span>
+                  <div class="specs d-flex mb-4">
+                    <span class="d-block d-flex align-items-center me-3">
+                      <span class="icon-bed me-2"></span><span class="caption">4 ngủ</span>
+                    </span>
+                    <span class="d-block d-flex align-items-center">
+                      <span class="icon-bath me-2"></span><span class="caption">4 tắm</span>
+                    </span>
+                  </div>
+                  <a href="{% url 'house_detail' %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="property-item">
+              <a href="{% url 'house_detail' %}" class="img">
+                <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid" />
+              </a>
+              <div class="property-content">
+                <div class="price mb-2"><span>5,000,000 VNĐ</span></div>
+                <div>
+                  <span class="d-block mb-2 text-black-50">Chung cư Mini</span>
+                  <span class="city d-block mb-3">Bình Thạnh, TP.HCM</span>
+                  <div class="specs d-flex mb-4">
+                    <span class="d-block d-flex align-items-center me-3">
+                      <span class="icon-bed me-2"></span><span class="caption">1 ngủ</span>
+                    </span>
+                    <span class="d-block d-flex align-items-center">
+                      <span class="icon-bath me-2"></span><span class="caption">1 tắm</span>
+                    </span>
+                  </div>
+                  <a href="{% url 'house_detail' %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+           <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="property-item">
+              <a href="{% url 'house_detail' %}" class="img">
+                <img src="{% static 'images/img_5.jpg' %}" alt="Image" class="img-fluid" />
+              </a>
+              <div class="property-content">
+                <div class="price mb-2"><span>15,000,000 VNĐ</span></div>
+                <div>
+                  <span class="d-block mb-2 text-black-50">Nhà phố mặt tiền</span>
+                  <span class="city d-block mb-3">Gò Vấp, TP.HCM</span>
+                  <div class="specs d-flex mb-4">
+                    <span class="d-block d-flex align-items-center me-3">
+                      <span class="icon-bed me-2"></span><span class="caption">3 ngủ</span>
+                    </span>
+                    <span class="d-block d-flex align-items-center">
+                      <span class="icon-bath me-2"></span><span class="caption">2 tắm</span>
+                    </span>
+                  </div>
+                  <a href="{% url 'house_detail' %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+           <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="property-item">
+              <a href="{% url 'house_detail' %}" class="img">
+                <img src="{% static 'images/img_6.jpg' %}" alt="Image" class="img-fluid" />
+              </a>
+              <div class="property-content">
+                <div class="price mb-2"><span>9,000,000 VNĐ</span></div>
+                <div>
+                  <span class="d-block mb-2 text-black-50">Căn hộ dịch vụ</span>
+                  <span class="city d-block mb-3">Tân Bình, TP.HCM</span>
+                  <div class="specs d-flex mb-4">
+                    <span class="d-block d-flex align-items-center me-3">
+                      <span class="icon-bed me-2"></span><span class="caption">1 ngủ</span>
+                    </span>
+                    <span class="d-block d-flex align-items-center">
+                      <span class="icon-bath me-2"></span><span class="caption">1 tắm</span>
+                    </span>
+                  </div>
+                  <a href="{% url 'house_detail' %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="property-item">
-          <a href="#" class="img">
-            <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid" />
-          </a>
-          <div class="property-content">
-            <div class="price mb-2"><span>12,000,000 VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50">5232 Nguyễn Văn Cừ</span>
-              <span class="city d-block mb-3">Quận 5, TP.HCM</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="icon-bed me-2"></span><span class="caption">2 ngủ</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-bath me-2"></span><span class="caption">2 tắm</span>
-                </span>
-              </div>
-              <a href="#" class="btn btn-primary py-2 px-3">Chi tiết</a>
+    <section class="features-1 mt-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-6 col-lg-3 mb-4">
+            <div class="box-feature">
+              <span class="flaticon-house"></span>
+              <h3 class="mb-3">Nhà chất lượng</h3>
+              <p>Thông tin minh bạch.</p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3 mb-4">
+            <div class="box-feature">
+              <span class="flaticon-building"></span>
+              <h3 class="mb-3">Chính chủ</h3>
+              <p>Kết nối trực tiếp.</p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3 mb-4">
+            <div class="box-feature">
+              <span class="flaticon-house-3"></span>
+              <h3 class="mb-3">Hỗ trợ 24/7</h3>
+              <p>Tư vấn nhiệt tình.</p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3 mb-4">
+            <div class="box-feature">
+              <span class="flaticon-house-1"></span>
+              <h3 class="mb-3">An toàn</h3>
+              <p>Bảo mật tuyệt đối.</p>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="property-item">
-          <a href="#" class="img">
-            <img src="{% static 'images/img_2.jpg' %}" alt="Image" class="img-fluid" />
-          </a>
-          <div class="property-content">
-            <div class="price mb-2"><span>8,500,000 VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50">123 Lê Lợi</span>
-              <span class="city d-block mb-3">Quận 1, TP.HCM</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="icon-bed me-2"></span><span class="caption">1 ngủ</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-bath me-2"></span><span class="caption">1 tắm</span>
-                </span>
-              </div>
-              <a href="#" class="btn btn-primary py-2 px-3">Chi tiết</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="property-item">
-          <a href="#" class="img">
-            <img src="{% static 'images/img_3.jpg' %}" alt="Image" class="img-fluid" />
-          </a>
-          <div class="property-content">
-            <div class="price mb-2"><span>25,000,000 VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50">Biệt thự Thảo Điền</span>
-              <span class="city d-block mb-3">Thủ Đức, TP.HCM</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="icon-bed me-2"></span><span class="caption">4 ngủ</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-bath me-2"></span><span class="caption">4 tắm</span>
-                </span>
-              </div>
-              <a href="#" class="btn btn-primary py-2 px-3">Chi tiết</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="property-item">
-          <a href="#" class="img">
-            <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid" />
-          </a>
-          <div class="property-content">
-            <div class="price mb-2"><span>5,000,000 VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50">Chung cư Mini</span>
-              <span class="city d-block mb-3">Bình Thạnh, TP.HCM</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="icon-bed me-2"></span><span class="caption">1 ngủ</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-bath me-2"></span><span class="caption">1 tắm</span>
-                </span>
-              </div>
-              <a href="#" class="btn btn-primary py-2 px-3">Chi tiết</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="property-item">
-          <a href="#" class="img">
-            <img src="{% static 'images/img_5.jpg' %}" alt="Image" class="img-fluid" />
-          </a>
-          <div class="property-content">
-            <div class="price mb-2"><span>15,000,000 VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50">Nhà phố mặt tiền</span>
-              <span class="city d-block mb-3">Gò Vấp, TP.HCM</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="icon-bed me-2"></span><span class="caption">3 ngủ</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-bath me-2"></span><span class="caption">2 tắm</span>
-                </span>
-              </div>
-              <a href="#" class="btn btn-primary py-2 px-3">Chi tiết</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="property-item">
-          <a href="#" class="img">
-            <img src="{% static 'images/img_6.jpg' %}" alt="Image" class="img-fluid" />
-          </a>
-          <div class="property-content">
-            <div class="price mb-2"><span>9,000,000 VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50">Căn hộ dịch vụ</span>
-              <span class="city d-block mb-3">Tân Bình, TP.HCM</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="icon-bed me-2"></span><span class="caption">1 ngủ</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-bath me-2"></span><span class="caption">1 tắm</span>
-                </span>
-              </div>
-              <a href="#" class="btn btn-primary py-2 px-3">Chi tiết</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<section class="features-1 mt-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature">
-          <span class="flaticon-house"></span>
-          <h3 class="mb-3">Nhà chất lượng</h3>
-          <p>Thông tin minh bạch.</p>
+    <div class="section sec-testimonials">
+      <div class="container">
+        <div class="row mb-5 align-items-center">
+          <div class="col-md-6">
+            <h2 class="font-weight-bold heading text-primary mb-4 mb-md-0">Đánh giá</h2>
+          </div>
         </div>
-      </div>
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature">
-          <span class="flaticon-building"></span>
-          <h3 class="mb-3">Chính chủ</h3>
-          <p>Kết nối trực tiếp.</p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature">
-          <span class="flaticon-house-3"></span>
-          <h3 class="mb-3">Hỗ trợ 24/7</h3>
-          <p>Tư vấn nhiệt tình.</p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature">
-          <span class="flaticon-house-1"></span>
-          <h3 class="mb-3">An toàn</h3>
-          <p>Bảo mật tuyệt đối.</p>
+        <div class="row">
+          <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="testimonial">
+                <img src="{% static 'images/tinh.jpg' %}" alt="Image" class="img-fluid rounded-circle" />
+                <div class="rate">
+                  <span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span>
+                </div>
+                <h3 class="h5 text-primary mb-4">Lê Thanh Tính</h3>
+                <blockquote><p>&ldquo;Dịch vụ rất tốt!&rdquo;</p></blockquote>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="testimonial">
+                <img src="{% static 'images/thuan.jpg' %}" alt="Image" class="img-fluid rounded-circle" />
+                <div class="rate">
+                  <span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span>
+                </div>
+                <h3 class="h5 text-primary mb-4">Lê Ngọc Thuận</h3>
+                <blockquote><p>&ldquo;Giao diện web đẹp!&rdquo;</p></blockquote>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 mb-4 h-100">
+            <div class="testimonial">
+                <img src="{% static 'images/triet.jpg' %}" alt="Image" class="img-fluid rounded-circle" />
+                <div class="rate">
+                  <span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span class="icon-star text-warning"></span>
+                </div>
+                <h3 class="h5 text-primary mb-4">Dương Minh Triết</h3>
+                <blockquote><p>&ldquo;Hỗ trợ nhiệt tình.&rdquo;</p></blockquote>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<div class="section sec-testimonials">
-  <div class="container">
-    <div class="row mb-5 align-items-center">
-      <div class="col-md-6">
-        <h2 class="font-weight-bold heading text-primary mb-4 mb-md-0">Đánh giá</h2>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="testimonial">
-          <img src="{% static 'images/tinh.jpg' %}" alt="Image" class="img-fluid rounded-circle" />
-          <div class="rate">
-            <span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span
-              class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span
-              class="icon-star text-warning"></span>
-          </div>
-          <h3 class="h5 text-primary mb-4">Lê Thanh Tính</h3>
-          <blockquote>
-            <p>&ldquo;Dịch vụ rất tốt!&rdquo;</p>
-          </blockquote>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="testimonial">
-          <img src="{% static 'images/thuan.jpg' %}" alt="Image" class="img-fluid rounded-circle" />
-          <div class="rate">
-            <span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span
-              class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span
-              class="icon-star text-warning"></span>
-          </div>
-          <h3 class="h5 text-primary mb-4">Lê Ngọc Thuận</h3>
-          <blockquote>
-            <p>&ldquo;Giao diện web đẹp!&rdquo;</p>
-          </blockquote>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 h-100">
-        <div class="testimonial">
-          <img src="{% static 'images/triet.jpg' %}" alt="Image" class="img-fluid rounded-circle" />
-          <div class="rate">
-            <span class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span
-              class="icon-star text-warning"></span><span class="icon-star text-warning"></span><span
-              class="icon-star text-warning"></span>
-          </div>
-          <h3 class="h5 text-primary mb-4">Dương Minh Triết</h3>
-          <blockquote>
-            <p>&ldquo;Hỗ trợ nhiệt tình.&rdquo;</p>
-          </blockquote>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}

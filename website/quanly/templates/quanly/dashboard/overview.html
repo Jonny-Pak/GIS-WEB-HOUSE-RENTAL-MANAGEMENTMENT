@@ -1,0 +1,87 @@
+{% extends 'quanly/layouts/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Tổng quan - Quản lý tin{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    
+    <div class="row g-4">
+        
+        <div class="col-lg-6">
+            <div class="card-custom h-100 border-warning" style="border-left: 5px solid #ffc107;">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-hourglass-split text-warning me-2"></i>Chờ duyệt
+                    </h5>
+                    <span class="badge bg-warning text-dark rounded-pill">2 tin</span>
+                </div>
+                <div class="card-body">
+                    {% if True %} <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center bg-light p-2 rounded">
+                                <img src="{% static 'images/img_4.jpg' %}" class="rounded" style="width: 80px; height: 60px; object-fit: cover;">
+                                <div class="ms-3">
+                                    <h6 class="mb-1 fw-bold text-dark small">Chung cư Mini Bình Thạnh</h6>
+                                    <small class="text-muted d-block mb-1">5 triệu/tháng</small>
+                                    <span class="badge bg-warning text-dark" style="font-size: 10px;">Đang kiểm tra</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center bg-light p-2 rounded">
+                                <img src="{% static 'images/img_6.jpg' %}" class="rounded" style="width: 80px; height: 60px; object-fit: cover;">
+                                <div class="ms-3">
+                                    <h6 class="mb-1 fw-bold text-dark small">Nhà trọ sinh viên Gò Vấp</h6>
+                                    <small class="text-muted d-block mb-1">3 triệu/tháng</small>
+                                    <span class="badge bg-warning text-dark" style="font-size: 10px;">Đang kiểm tra</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small text-center mt-4">Không có tin nào đang chờ duyệt.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card-custom h-100 border-success" style="border-left: 5px solid #198754;">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>Đã hiển thị
+                    </h5>
+                    <span class="badge bg-success rounded-pill">3 tin</span>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center border p-2 rounded">
+                            <img src="{% static 'images/img_1.jpg' %}" class="rounded" style="width: 80px; height: 60px; object-fit: cover;">
+                            <div class="ms-3 w-100">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1 fw-bold text-dark small">Nhà phố Quận 5</h6>
+                                    <small class="text-success fw-bold">Hoạt động</small>
+                                </div>
+                                <small class="text-primary fw-bold">12 triệu/tháng</small>
+                                <div class="text-muted small mt-1"><i class="bi bi-eye"></i> 125 lượt xem</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center border p-2 rounded">
+                            <img src="{% static 'images/img_3.jpg' %}" class="rounded" style="width: 80px; height: 60px; object-fit: cover;">
+                            <div class="ms-3 w-100">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1 fw-bold text-dark small">Biệt thự Thảo Điền</h6>
+                                    <small class="text-success fw-bold">Hoạt động</small>
+                                </div>
+                                <small class="text-primary fw-bold">25 triệu/tháng</small>
+                                <div class="text-muted small mt-1"><i class="bi bi-eye"></i> 840 lượt xem</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3 text-center">
+                    <a href="{% url 'manage_post' %}" class="text-decoration-none small fw-bold text-primary">Xem tất cả tin đăng <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
