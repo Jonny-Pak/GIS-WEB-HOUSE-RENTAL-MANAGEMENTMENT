@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Môi trường ảo (Virtual Environment)
+.venv/
+venv/
+env/
+ENV/
+
+# Database (Local)
+db.sqlite3
+
+# Django media & static (Tùy chọn)
+# Các file ảnh user upload lên thường không đẩy lên Git
+/media/
+
+# IDE Settings
+.vscode/
+.idea/
