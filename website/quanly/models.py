@@ -53,7 +53,7 @@ class House(models.Model):
     deposit = models.IntegerField(verbose_name="Tiền cọc (VNĐ)")
     area = models.IntegerField(verbose_name="Diện tích nhà (m2)", default=20)
 
-    district = models.CharField(max_length=10, choices= DISTRICT_CHOPCES, verbose_name= "Chọn Quận")
+    district = models.CharField(max_length=10, choices= DISTRICT_CHOICES, verbose_name= "Chọn Quận")
     address = models.TextField(verbose_name="Địa chỉ nhà")
     lat = models.FloatField(verbose_name="Vĩ độ", default=0.0)
     long = models.FloatField(verbose_name="Kinh độ", default=0.0)
@@ -63,10 +63,10 @@ class House(models.Model):
     description = models.TextField(blank=True, verbose_name="Mô tả căn nhà")
 
     main_image = models.ImageField(upload_to= 'house/', null = True, blank= True, verbose_name= "Ảnh đại diện phòng")
-    status = models.CharField(max_length=20, choices= STATUS_CHOISE, verbose_name= "Trạng thái")
+    status = models.CharField(max_length=20, choices= STATUS_CHOICES, verbose_name= "Trạng thái")
     
-    create_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày đăng")
-    update_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày đăng")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
 
     
     def __str__(self):
