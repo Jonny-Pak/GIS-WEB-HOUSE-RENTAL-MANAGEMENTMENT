@@ -14,7 +14,8 @@ db.sqlite3
 
 # Django media & static (Tùy chọn)
 # Các file ảnh user upload lên thường không đẩy lên Git
-/media/
+/media/*
+!/media/.gitignore
 
 # IDE Settings
 .vscode/
