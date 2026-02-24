@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -75,7 +76,7 @@ WSGI_APPLICATION = 'website.wsgi.application'
 
 DATABASES = { 
     'default': { 
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', 
         'NAME': 'quanlythuenha', 
         'USER': 'postgres', 
         'PASSWORD': '123456', 
@@ -124,3 +125,6 @@ STATIC_URL = '/static/'
 # Cấu hình đường dẫn chứa file upload
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
+
+GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"
+GEOS_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgeos_c.dll"
