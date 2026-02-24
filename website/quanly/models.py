@@ -1,6 +1,5 @@
+from django.db import models
 from django.core.validators import MinValueValidator
-from django.contrib.gis.db import models
-
 from django.conf import settings
 
 # Create your models here.
@@ -76,8 +75,9 @@ class House(models.Model):
     district = models.CharField(max_length=10, choices=DISTRICT_CHOICES, verbose_name="Khu vực Quận/Huyện")
     address = models.TextField(verbose_name="Địa chỉ chi tiết (Số nhà, Ngõ/Hẻm, Đường)")
     
-    # Bản đồ và vị trí (Đã chuyển sang PointField cho truy vấn GIS)
-    location = models.PointField(srid=4326, geography=True,verbose_name="Tọa độ vị trí (Point)", null=True, blank=True)
+    # Bản đồ và vị trí (Đã chuyển sang FloatField thay vì PointField của PostGIS)
+    lat = models.FloatField(verbose_name="Vĩ độ (Latitude)", null=True, blank=True)
+    lng = models.FloatField(verbose_name="Kinh độ (Longitude)", null=True, blank=True)
 
     description = models.TextField(blank=True, verbose_name="Mô tả chi tiết")
     main_image = models.ImageField(upload_to='house/', null=True, blank=True, verbose_name="Ảnh đại diện")
