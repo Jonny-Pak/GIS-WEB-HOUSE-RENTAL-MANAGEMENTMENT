@@ -1,75 +1,78 @@
-import math
+from django.contrib.gis.geos import Point, Polygon
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 from .models import House
-from shapely.geometry import Point, Polygon as ShapePolygon
 
 def get_nearby_houses_json(user_lat, user_long, radius_km=5):
-    # Lọc những nhà ở trạng thái 'approved' (Đã duyệt)
-    houses = House.objects.filter(status='approved') 
+    # Lọc những nhà ở trạng thái 'available' (Đang cho thuê)
+    # Sử dụng Point(longitude, latitude) - Chú ý thứ tự chuẩn GIS
+    user_location = Point(user_long, user_lat, srid=4326)
+    
+    # Tìm kiếm không gian bằng PostGIS (distance_lte = DWithin)
+    houses = House.objects.filter(
+        status='available',
+        location__distance_lte=(user_location, D(km=radius_km))
+    ).annotate(
+        distance_to_user=Distance('location', user_location)
+    )
+    
     nearby_houses = []
-
     for house in houses:
-        # Thuật toán Haversine tính khoảng cách
-        R = 6371 
-        dlat = math.radians(house.lat - user_lat)
-        dlong = math.radians(house.long - user_long)
+        # Lấy khoảng cách chính xác từ DB đã annotate (trả về km)
+        distance = house.distance_to_user.km if getattr(house, 'distance_to_user', None) else 0
         
-        a = (math.sin(dlat / 2) ** 2 +
-             math.cos(math.radians(user_lat)) * math.cos(math.radians(house.lat)) *
-             math.sin(dlong / 2) ** 2)
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        distance = R * c
-
-        if distance <= radius_km:
-            nearby_houses.append({
-                "id": house.id,
-                "name": house.name,
-                "price": house.price,
-                "district": house.get_district_display(), # Lấy tên Quận hiển thị
-                "image": house.main_image.url if house.main_image else None,
-                "distance": round(distance, 2),
-                "coords": {"lat": house.lat, "lng": house.long}
-            })
+        nearby_houses.append({
+            "id": house.id,
+            "name": house.name,
+            "price": house.price,
+            "district": house.get_district_display(),
+            "image": house.main_image.url if house.main_image else None,
+            "distance": round(distance, 2),
+            "coords": {"lat": house.location.y, "lng": house.location.x}
+        })
     return nearby_houses
 
-    # Gợi ý thêm logic tính khoảng cách đơn giản trong models.py hoặc views.py
-# from geopy.distance import geodesic
-
-# def get_houses_nearby(user_lat, user_long, radius_km=5):
-#     houses = House.objects.all()
-#     nearby_houses = []
-#     for house in houses:
-#         distance = geodesic((user_lat, user_long), (house.lat, house.long)).km
-#         if distance <= radius_km:
-#             nearby_houses.append(house)
-#     return nearby_houses
 
 def get_houses_in_polygon(polygon_coords):
     """
-    Input: List các tuple tọa độ [(lat1, lng1), (lat2, lng2), ...]
+    Input: List các tuple tọa độ [(lng1, lat1), (lng2, lat2), ...] hoặc format tương tự
     Output: Danh sách các dict nhà nằm trong vùng
     """
-    # 1. Tạo đối tượng Đa giác từ tọa độ người dùng vẽ
-    poly = ShapePolygon(polygon_coords)
-    
-    # 2. Lấy danh sách nhà đã duyệt
-    houses = House.objects.filter(status='approved')
-    results = []
+    if len(polygon_coords) >= 3:
+        # Chuyển đổi thành dạng tuple x, y (lng, lat)
+        formatted_coords = [(float(pt.get('lng', 0)), float(pt.get('lat', 0))) for pt in polygon_coords]
 
-    for house in houses:
-        # 3. Tạo điểm từ tọa độ của căn nhà
-        pnt = Point(house.lat, house.long)
-        
-        # 4. Kiểm tra điểm có nằm TRONG đa giác không
-        if poly.contains(pnt):
-            image_url = house.main_image.url if house.main_image else "/static/images/default.jpg"
-            results.append({
-                "id": house.id,
-                "name": house.name,
-                "price": house.price,
-                "address": house.address,
-                "district": house.get_district_display(),
-                "image": image_url,
-                "coords": {"lat": house.lat, "lng": house.long}
-            })
+        # Nếu polygon không khép kín (điểm đầu != điểm cuối), tự động khép kín
+        if formatted_coords[0] != formatted_coords[-1]:
+            formatted_coords.append(formatted_coords[0])
             
+        # Một polygon hợp lệ trong GEOS yêu cầu tối thiểu 4 điểm (bao gồm cả điểm khép kín)
+        if len(formatted_coords) < 4:
+            return []
+            
+        # Tạo GEOSGeometry Polygon (Lưu ý: Input của Polygon trong GEOS là tuple của các tuple)
+        poly = Polygon(tuple(formatted_coords), srid=4326)
+        
+        # Truy vấn nhà nằm trong (within) Đa giác
+        houses = House.objects.filter(
+            status='available',
+            location__within=poly
+        )
+    else:
+        # Trả về rỗng nếu không đủ điểm tạo đa giác
+        return []
+
+    results = []
+    for house in houses:
+        image_url = house.main_image.url if house.main_image else "/static/images/default.jpg"
+        results.append({
+            "id": house.id,
+            "name": house.name,
+            "price": house.price,
+            "address": house.address,
+            "district": house.get_district_display(),
+            "image": image_url,
+            "coords": {"lat": house.location.y, "lng": house.location.x}
+        })
+        
     return results
