@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.gis.admin import GISModelAdmin
 from .models import House, Furniture, HouseImage, Contract, Tenant
 # Register your models here.
 
@@ -13,8 +12,8 @@ class HouseImageInline(admin.TabularInline):
     model = HouseImage
     extra = 1
 
-# Cấu hình quản lý nhà (Sử dụng GISModelAdmin cho bản đồ)
-class HouseAdmin(GISModelAdmin):
+# Cấu hình quản lý nhà (Sử dụng ModelAdmin thông thường)
+class HouseAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'price', 'district', 'status', 'created_at') # Hiển thị cột
     search_fields = ('name', 'address', 'owner__username', 'owner_phone') # Thanh tìm kiếm
     list_filter = ('status', 'district', 'house_type') # Bộ lọc
