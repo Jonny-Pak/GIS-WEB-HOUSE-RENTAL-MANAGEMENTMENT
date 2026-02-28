@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+</head>
+
+<body class="admin-page">
+    <header class="admin-topbar">
+        <div class="admin-topbar-title">
+            <h1>{{ page_title }}</h1>
+            <p>Quản trị dữ liệu hệ thống</p>
+        </div>
+        <div class="admin-topbar-actions">
+            <a href="{% url 'custom_admin_dashboard' %}" class="outline-btn">Dashboard</a>
+            <a href="{% url 'custom_admin_logout' %}" class="primary-btn">Đăng xuất</a>
+        </div>
+    </header>
+
+    <nav class="admin-nav">
+        <div class="admin-main-inner admin-nav-inner">
+            <a href="{% url 'custom_admin_dashboard' %}"
+                class="admin-nav-link {% if request.path == '/admin/' %}active{% endif %}">Tổng quan</a>
+            <a href="{% url 'custom_admin_users' %}"
+                class="admin-nav-link {% if '/admin/users/' in request.path %}active{% endif %}">User</a>
+            <a href="{% url 'custom_admin_groups' %}"
+                class="admin-nav-link {% if '/admin/groups/' in request.path %}active{% endif %}">Group</a>
+            <a href="{% url 'custom_admin_houses' %}"
+                class="admin-nav-link {% if '/admin/houses/' in request.path %}active{% endif %}">Nhà</a>
+
+            <a href="{% url 'custom_admin_contracts' %}"
+                class="admin-nav-link {% if '/admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
+            <a href="{% url 'custom_admin_furnitures' %}"
+                class="admin-nav-link {% if '/admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
+            <a href="{% url 'custom_admin_house_images' %}"
+                class="admin-nav-link {% if '/admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
+        </div>
+    </nav>
+
+    <main class="admin-main">
+        <div class="admin-main-inner">
+            {% if messages %}
+            <section class="admin-messages">
+                {% for message in messages %}
+                <div class="admin-message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <section class="admin-list-toolbar">
+                <form method="get" class="admin-search-form">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Tìm kiếm...">
+                    <button type="submit" class="secondary-btn">Tìm</button>
+                </form>
+                <a href="{% url create_url %}" class="primary-btn">+ Tạo mới</a>
+            </section>
+
+            <section class="panel-card">
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                {% for head in headers %}
+                                <th>{{ head }}</th>
+                                {% endfor %}
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                            <tr>
+                                {% for col in row.columns %}
+                                <td>{{ col }}</td>
+                                {% endfor %}
+                                <td class="actions-cell">
+                                    {% for action in row.extra_actions %}
+                                    <form method="post" action="{% url action.url_name row.id %}"
+                                        onsubmit="return confirm('Xác nhận thao tác này?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">{{
+                                            action.label }}</button>
+                                    </form>
+                                    {% endfor %}
+                                    <a href="{% url edit_url_name row.id %}" class="mini-btn">Sửa</a>
+                                    <form method="post" action="{% url delete_url_name row.id %}"
+                                        onsubmit="return confirm('Xác nhận xóa dữ liệu này?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="mini-btn danger-btn">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="{{ headers|length|add:'1' }}" class="empty-cell">Không có dữ liệu.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>

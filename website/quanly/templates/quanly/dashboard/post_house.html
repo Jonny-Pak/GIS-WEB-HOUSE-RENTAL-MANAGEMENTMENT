@@ -7,37 +7,31 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        
+
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
+
             <div class="card-custom mb-4">
                 <div class="card-body">
                     <h5 class="fw-bold text-primary mb-4 border-bottom pb-2">
                         <i class="bi bi-info-circle me-2"></i>Thông tin cơ bản
                     </h5>
-                    
+
                     <div class="mb-4">
                         <label class="fw-bold mb-2 text-dark">Tiêu đề tin <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control py-2" name="name" placeholder="Ví dụ: Cho thuê phòng trọ cao cấp gần ĐH Bách Khoa..." required>
+                        {{ form.name }}
                         <div class="form-text">Tiêu đề ngắn gọn, đầy đủ thu hút người xem hơn.</div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <label class="fw-bold mb-2 text-dark">Loại hình <span class="text-danger">*</span></label>
-                            <select class="form-select py-2" name="house_type">
-                                <option value="" selected>-- Chọn loại hình --</option>
-                                <option value="phong_tro">Phòng trọ</option>
-                                <option value="chungcu">Căn hộ chung cư</option>
-                                <option value="nguyencan">Nhà nguyên căn</option>
-                                <option value="van_phong">Văn phòng</option>
-                            </select>
+                            {{ form.house_type }}
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="fw-bold mb-2 text-dark">Diện tích chung (m²)</label>
                             <div class="input-group">
-                                <input type="number" class="form-control py-2" name="area" placeholder="Ví dụ: 30">
+                                {{ form.area }}
                                 <span class="input-group-text bg-light">m²</span>
                             </div>
                         </div>
@@ -45,16 +39,24 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-4">
-                            <label class="fw-bold mb-2 text-dark">Giá cho thuê <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="number" class="form-control py-2" name="price" placeholder="Nhập số tiền...">
+                            <label class="fw-bold mb-2 text-dark">Giá cho thuê <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group mb-2">
+                                {{ form.price }}
                                 <span class="input-group-text bg-light fw-bold text-success">VNĐ</span>
+                            </div>
+                            <div class="form-check">
+                                {{ form.is_negotiable }}
+                                <label class="form-check-label fw-bold text-muted small"
+                                    for="{{ form.is_negotiable.id_for_label }}">
+                                    Cho phép thương lượng giá
+                                </label>
                             </div>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="fw-bold mb-2 text-dark">Tiền cọc (nếu có)</label>
                             <div class="input-group">
-                                <input type="number" class="form-control py-2" name="deposit" placeholder="Nhập tiền cọc...">
+                                {{ form.deposit }}
                                 <span class="input-group-text bg-light">VNĐ</span>
                             </div>
                         </div>
@@ -69,21 +71,14 @@
                     </h5>
                     <div class="row">
                         <div class="col-md-4 mb-4">
-                            <label class="fw-bold mb-2 text-dark">Quận / Huyện <span class="text-danger">*</span></label>
-                            <select class="form-select py-2" name="district">
-                                <option value="">-- Chọn Quận --</option>
-                                <option value="q1">Quận 1</option>
-                                <option value="q3">Quận 3</option>
-                                <option value="q5">Quận 5</option>
-                                <option value="q10">Quận 10</option>
-                                <option value="qbt">Bình Thạnh</option>
-                                <option value="gv">Gò Vấp</option>
-                                <option value="td">TP. Thủ Đức</option>
-                                </select>
+                            <label class="fw-bold mb-2 text-dark">Quận / Huyện <span
+                                    class="text-danger">*</span></label>
+                            {{ form.district }}
                         </div>
                         <div class="col-md-8 mb-4">
-                            <label class="fw-bold mb-2 text-dark">Địa chỉ chi tiết <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control py-2" name="address" placeholder="Số nhà, tên đường, phường/xã...">
+                            <label class="fw-bold mb-2 text-dark">Địa chỉ chi tiết <span
+                                    class="text-danger">*</span></label>
+                            {{ form.address }}
                         </div>
                     </div>
                 </div>
@@ -97,7 +92,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-4">
                             <label class="fw-bold mb-2 text-dark">Số người ở tối đa</label>
-                            <input type="number" class="form-control py-2" name="max_people" value="4">
+                            {{ form.max_people }}
                         </div>
                         <div class="col-md-4 mb-4">
                             <label class="fw-bold mb-2 text-dark">Đang ở hiện tại</label>
@@ -105,48 +100,40 @@
                         </div>
                         <div class="col-md-4 mb-4">
                             <label class="fw-bold mb-2 text-dark">SĐT Liên hệ</label>
-                            <input type="text" class="form-control py-2" name="owner_phone" value="{{ user.profile.phone_number }}" placeholder="09xxxx...">
+                            {{ form.owner_phone }}
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="fw-bold mb-2 text-dark">Mô tả chi tiết</label>
-                        <textarea class="form-control" name="description" rows="6" placeholder="Mô tả chi tiết về nội thất, tiện ích xung quanh, giờ giấc..."></textarea>
+                        {{ form.description }}
                     </div>
                 </div>
             </div>
 
             <div class="card-custom mb-4">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                        <h5 class="fw-bold text-primary m-0">
-                            <i class="bi bi-door-open me-2"></i>Danh sách phòng
-                        </h5>
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" onclick="addRoom()">
-                            <i class="bi bi-plus-lg me-1"></i> Thêm phòng
-                        </button>
-                    </div>
+                    <h5 class="fw-bold text-primary mb-4 border-bottom pb-2">
+                        <i class="bi bi-tag me-2"></i>Quy mô & Tiện ích bổ sung
+                    </h5>
 
-                    <div class="alert alert-light border small text-muted mb-3">
-                        <i class="bi bi-info-circle me-1"></i> Khai báo các phòng ngủ/phòng khách (nếu có) để khách dễ hình dung.
-                    </div>
-
-                    <div id="room-list-container">
-                        <div class="room-item bg-light p-3 rounded mb-3 border position-relative">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-md-5">
-                                    <label class="fw-bold small mb-1">Tên/Số phòng <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" name="room_number[]" placeholder="VD: Phòng 101, Phòng ngủ Master...">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="fw-bold small mb-1">Diện tích (m²)</label>
-                                    <input type="number" class="form-control form-control-sm" name="room_area[]" placeholder="20">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="fw-bold small mb-1">Nội thất (cách nhau dấu phẩy)</label>
-                                    <input type="text" class="form-control form-control-sm" name="room_furniture[]" placeholder="Giường, Tủ, Máy lạnh...">
-                                </div>
-                            </div>
-                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close" onclick="removeRoom(this)" style="font-size: 10px;"></button>
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <label class="fw-bold mb-2 text-dark">Số lượng căn <span
+                                    class="text-danger">*</span></label>
+                            {{ form.unit_count }}
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <label class="fw-bold mb-2 text-dark">Số phòng/căn <span
+                                    class="text-danger">*</span></label>
+                            {{ form.room_count }}
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <label class="fw-bold mb-2 text-dark">Giá điện</label>
+                            {{ form.electricity_price }}
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <label class="fw-bold mb-2 text-dark">Giá nước</label>
+                            {{ form.water_price }}
                         </div>
                     </div>
                 </div>
@@ -157,13 +144,16 @@
                     <h5 class="fw-bold text-primary mb-4 border-bottom pb-2">
                         <i class="bi bi-images me-2"></i>Hình ảnh & Video
                     </h5>
-                    
+
                     <div class="mb-4">
-                        <label class="fw-bold mb-2 text-dark">1. Ảnh đại diện (Ảnh bìa) <span class="text-danger">*</span></label>
-                        <input type="file" class="form-control" name="main_image" accept="image/*" onchange="previewMainImage(event)">
-                        
+                        <label class="fw-bold mb-2 text-dark">1. Ảnh đại diện (Ảnh bìa) <span
+                                class="text-danger">*</span></label>
+                        <input type="file" class="form-control" name="main_image" accept="image/*"
+                            onchange="previewMainImage(event)">
+
                         <div class="mt-2" id="main-image-preview-box" style="display: none;">
-                            <img id="main-img-preview" src="#" alt="Ảnh bìa" class="rounded shadow-sm border" style="max-height: 200px; width: auto;">
+                            <img id="main-img-preview" src="#" alt="Ảnh bìa" class="rounded shadow-sm border"
+                                style="max-height: 200px; width: auto;">
                         </div>
                     </div>
 
@@ -171,19 +161,23 @@
 
                     <div class="mb-4">
                         <label class="fw-bold mb-2 text-dark">2. Ảnh chi tiết (Chọn nhiều ảnh)</label>
-                        <input type="file" class="form-control" name="detail_images" accept="image/*" multiple onchange="previewGalleryImages(event)">
-                        <div class="form-text">Giữ phím <strong>Ctrl</strong> (Windows) hoặc <strong>Command</strong> (Mac) để chọn nhiều ảnh.</div>
+                        <input type="file" class="form-control" name="detail_images" accept="image/*" multiple
+                            onchange="previewGalleryImages(event)">
+                        <div class="form-text">Giữ phím <strong>Ctrl</strong> (Windows) hoặc <strong>Command</strong>
+                            (Mac) để chọn nhiều ảnh.</div>
                     </div>
 
-                    <div class="p-3 border border-dashed rounded bg-light" style="min-height: 200px; border-style: dashed !important; border-color: #ccc;">
-                        
-                        <div id="gallery-empty-state" class="d-flex flex-column align-items-center justify-content-center pt-5">
+                    <div class="p-3 border border-dashed rounded bg-light"
+                        style="min-height: 200px; border-style: dashed !important; border-color: #ccc;">
+
+                        <div id="gallery-empty-state"
+                            class="d-flex flex-column align-items-center justify-content-center pt-5">
                             <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-2"></i>
                             <span class="text-muted">Ảnh chi tiết sẽ hiển thị tại đây</span>
                         </div>
 
                         <div id="gallery-preview-container" class="row g-3">
-                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,17 +195,18 @@
     </div>
 </div>
 
-{% comment %} <script>
+{% comment %}
+<script>
     // --- 1. Xử lý xem trước Ảnh đại diện (Main Image) ---
     function previewMainImage(event) {
         var reader = new FileReader();
-        reader.onload = function(){
+        reader.onload = function () {
             var output = document.getElementById('main-img-preview');
             var box = document.getElementById('main-image-preview-box');
             output.src = reader.result;
             box.style.display = 'block';
         };
-        if(event.target.files[0]) {
+        if (event.target.files[0]) {
             reader.readAsDataURL(event.target.files[0]);
         }
     }
@@ -232,8 +227,8 @@
                 var file = files[i];
                 var reader = new FileReader();
 
-                reader.onload = (function(f) {
-                    return function(e) {
+                reader.onload = (function (f) {
+                    return function (e) {
                         // Tạo khung col-3
                         var div = document.createElement('div');
                         div.className = 'col-6 col-md-3 position-relative';
@@ -256,42 +251,6 @@
         } else {
             emptyState.style.display = 'flex';
         }
-    }
-
-    // --- 3. Xử lý Thêm/Xóa Phòng (Dynamic Room) ---
-    function addRoom() {
-        var container = document.getElementById('room-list-container');
-        
-        // Tạo div dòng mới
-        var newRoom = document.createElement('div');
-        newRoom.className = 'room-item bg-light p-3 rounded mb-3 border position-relative';
-        
-        // HTML cho dòng mới
-        newRoom.innerHTML = `
-            <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="fw-bold small mb-1">Tên/Số phòng <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" name="room_number[]" placeholder="VD: Phòng khách...">
-                </div>
-                <div class="col-md-3">
-                    <label class="fw-bold small mb-1">Diện tích (m²)</label>
-                    <input type="number" class="form-control form-control-sm" name="room_area[]">
-                </div>
-                <div class="col-md-4">
-                    <label class="fw-bold small mb-1">Nội thất</label>
-                    <input type="text" class="form-control form-control-sm" name="room_furniture[]" placeholder="Trống...">
-                </div>
-            </div>
-            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Close" onclick="removeRoom(this)" style="font-size: 10px;"></button>
-        `;
-
-        container.appendChild(newRoom);
-    }
-
-    function removeRoom(button) {
-        var roomItem = button.closest('.room-item');
-        // Kiểm tra nếu còn nhiều hơn 1 dòng thì mới cho xóa, hoặc xóa thoải mái tùy logic
-        roomItem.remove();
     }
 </script> {% endcomment %}
 {% endblock %}

@@ -1,9 +1,8 @@
-from django.shortcuts import render
-from .service import get_nearby_houses_qs, get_houses_in_polygon_qs
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import HouseSerializer
+from quanly.service import get_nearby_houses_qs, get_houses_in_polygon_qs
+from quanly.serializers import HouseSerializer
 
 @api_view(['GET'])
 def api_houses(request):
@@ -42,21 +41,3 @@ def api_polygon_search(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Lỗi máy chủ: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-def home(request):
-    return render(request, 'quanly/home.html')
-
-def register(request):
-    return render(request, 'quanly/accounts/register.html')
-
-def house_detail(request):
-    return render(request, 'quanly/houses/house_detail.html')
-
-def dashboard(request):
-    return render(request, 'quanly/dashboard/overview.html')
-
-def post_house(request):
-    return render(request, 'quanly/dashboard/post_house.html')
-
-def manage_post(request):
-    return render(request, 'quanly/dashboard/manage_post.html')

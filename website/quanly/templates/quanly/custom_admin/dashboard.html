@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard quản trị</title>
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+</head>
+
+<body class="admin-page">
+    <header class="admin-topbar">
+        <div class="admin-topbar-title">
+            <h1>Dashboard quản trị</h1>
+            <p>Xin chào {{ request.user.username }}</p>
+        </div>
+        <div class="admin-topbar-actions">
+            <a href="/" class="outline-btn">Trang chủ</a>
+            <a href="{% url 'custom_admin_logout' %}" class="primary-btn">Đăng xuất</a>
+        </div>
+    </header>
+
+    <nav class="admin-nav">
+        <div class="admin-main-inner admin-nav-inner">
+            <a href="{% url 'custom_admin_dashboard' %}" class="admin-nav-link active">Tổng quan</a>
+            <a href="{% url 'custom_admin_users' %}" class="admin-nav-link">User</a>
+            <a href="{% url 'custom_admin_groups' %}" class="admin-nav-link">Group</a>
+            <a href="{% url 'custom_admin_houses' %}" class="admin-nav-link">Nhà</a>
+
+            <a href="{% url 'custom_admin_contracts' %}" class="admin-nav-link">Hợp đồng</a>
+            <a href="{% url 'custom_admin_furnitures' %}" class="admin-nav-link">Nội thất</a>
+            <a href="{% url 'custom_admin_house_images' %}" class="admin-nav-link">Ảnh nhà</a>
+        </div>
+    </nav>
+
+    <main class="admin-main">
+        <div class="admin-main-inner">
+            {% if messages %}
+            <section class="admin-messages">
+                {% for message in messages %}
+                <div class="admin-message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <section class="admin-section-title">
+                <h2>Tổng quan hệ thống</h2>
+                <p>Cập nhật dữ liệu theo thời gian thực từ cơ sở dữ liệu.</p>
+            </section>
+
+            <section class="stat-grid">
+                <article class="stat-card users">
+                    <h3>Người dùng</h3>
+                    <p>{{ total_users }}</p>
+                </article>
+                <article class="stat-card houses">
+                    <h3>Nhà</h3>
+                    <p>{{ total_houses }}</p>
+                </article>
+
+                <article class="stat-card contracts">
+                    <h3>Hợp đồng</h3>
+                    <p>{{ total_contracts }}</p>
+                </article>
+                <article class="stat-card warning">
+                    <h3>Nhà chờ duyệt</h3>
+                    <p>{{ pending_houses }}</p>
+                </article>
+            </section>
+
+            <section class="panel-grid">
+                <article class="panel-card">
+                    <h2>Người dùng mới</h2>
+                    <ul>
+                        {% for user in latest_users %}
+                        <li><strong>{{ user.username }}</strong> <span>{{ user.date_joined|date:"d/m/Y H:i" }}</span>
+                        </li>
+                        {% empty %}
+                        <li>Chưa có dữ liệu</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+
+                <article class="panel-card">
+                    <h2>Nhà mới đăng</h2>
+                    <ul>
+                        {% for house in latest_houses %}
+                        <li><strong>{{ house.name }}</strong> <span>{{ house.create_at|date:"d/m/Y" }}</span></li>
+                        {% empty %}
+                        <li>Chưa có dữ liệu</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>

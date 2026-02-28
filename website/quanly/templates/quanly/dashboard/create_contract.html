@@ -1,0 +1,137 @@
+{% extends 'quanly/layouts/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Tạo mới hợp đồng đính kèm{% endblock %}
+{% block header_title %}Tạo mới Hợp Đồng{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <div class="alert alert-info border-info mb-4">
+            <h5 class="alert-heading fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>Đang tạo hợp đồng cho nhà:
+                {{ house.name }}</h5>
+            <p class="mb-0 small">Bằng việc lưu biểu mẫu này, hệ thống sẽ ghi nhận Thông tin Khách hàng, lưu trữ Hợp
+                đồng và tự động thay đổi Trạng thái của căn nhà này thành <strong>"Đã cho thuê"</strong>.</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Section 1: Tenant Information -->
+            <div class="card-custom mb-4 border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">
+                        <i class="bi bi-person-badge me-2"></i>1. Thông tin Khách Thuê (Người đại diện)
+                    </h5>
+                </div>
+                <div class="card-body px-4 pb-4 pt-0">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark">Họ và Tên <span class="text-danger">*</span></label>
+                            {{ tenant_form.full_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark">Số Điện Thoại <span
+                                    class="text-danger">*</span></label>
+                            {{ tenant_form.phone }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark">Số CCCD / CMND <span
+                                    class="text-danger">*</span></label>
+                            {{ tenant_form.cccd }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="fw-bold mb-2 text-dark">Giới tính</label>
+                            {{ tenant_form.gender }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="fw-bold mb-2 text-dark">Ngày sinh</label>
+                            {{ tenant_form.dob }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="fw-bold mb-2 text-dark">Nơi thường trú (Theo CCCD)</label>
+                        {{ tenant_form.address }}
+                    </div>
+
+                    <div class="row bg-light rounded-3 p-3 border mb-2">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="fw-bold mb-2 text-dark small"><i class="bi bi-camera me-1"></i>Ảnh thẻ CCCD
+                                Mặt Trước</label>
+                            <input type="file" class="form-control form-control-sm" name="id_front_image"
+                                accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark small"><i class="bi bi-camera me-1"></i>Ảnh thẻ CCCD
+                                Mặt Sau</label>
+                            <input type="file" class="form-control form-control-sm" name="id_back_image"
+                                accept="image/*">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Contract Information -->
+            <div class="card-custom mb-4 border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                    <h5 class="fw-bold text-success mb-3 pb-2 border-bottom">
+                        <i class="bi bi-file-earmark-text me-2"></i>2. Thông tin Hợp đồng Thuê
+                    </h5>
+                </div>
+                <div class="card-body px-4 pb-4 pt-0">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark">Ngày bắt đầu thuê <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-calendar-event"></i></span>
+                                {{ contract_form.start_date }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark">Ngày kết thúc / Trả Phòng <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-calendar-check"></i></span>
+                                {{ contract_form.end_date }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-end mb-4 bg-light rounded-3 p-3 border mx-0">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="fw-bold mb-2 text-dark">Tổng giá trị Hợp đồng (Ghi chú thêm)</label>
+                            <div class="input-group">
+                                {{ contract_form.total_value }}
+                                <span class="input-group-text fw-bold text-success">VNĐ</span>
+                            </div>
+                            <small class="text-muted d-block mt-1">Ghi chú lại tổng số tiền dự kiến nếu cần.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold mb-2 text-dark">Upload bản cứng Hợp đồng (Nếu có)</label>
+                            <input type="file" class="form-control" name="contract_document"
+                                accept=".pdf,.doc,.docx,.zip,.jpg,.png">
+                            <small class="text-muted d-block mt-1">Đính kèm bản scan hợp đồng chữ ký tay
+                                (PDF/ZIP).</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top">
+                        <a href="{% url 'manage_post' %}" class="btn btn-light px-4 py-2 border fw-bold text-dark">Hủy
+                            bỏ</a>
+                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold text-white shadow-sm">
+                            <i class="bi bi-check-circle me-2"></i>Tạo hợp đồng & Đóng tin đăng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

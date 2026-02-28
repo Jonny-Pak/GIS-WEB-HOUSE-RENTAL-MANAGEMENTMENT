@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+</head>
+
+<body class="admin-page">
+    <header class="admin-topbar">
+        <div class="admin-topbar-title">
+            <h1>{{ page_title }}</h1>
+            <p>Biểu mẫu quản trị</p>
+        </div>
+        <div class="admin-topbar-actions">
+            <a href="{% url back_url %}" class="outline-btn">Quay lại</a>
+            <a href="{% url 'custom_admin_logout' %}" class="primary-btn">Đăng xuất</a>
+        </div>
+    </header>
+
+    <nav class="admin-nav">
+        <div class="admin-main-inner admin-nav-inner">
+            <a href="{% url 'custom_admin_dashboard' %}"
+                class="admin-nav-link {% if request.path == '/admin/' %}active{% endif %}">Tổng quan</a>
+            <a href="{% url 'custom_admin_users' %}"
+                class="admin-nav-link {% if '/admin/users/' in request.path %}active{% endif %}">User</a>
+            <a href="{% url 'custom_admin_groups' %}"
+                class="admin-nav-link {% if '/admin/groups/' in request.path %}active{% endif %}">Group</a>
+            <a href="{% url 'custom_admin_houses' %}"
+                class="admin-nav-link {% if '/admin/houses/' in request.path %}active{% endif %}">Nhà</a>
+
+            <a href="{% url 'custom_admin_contracts' %}"
+                class="admin-nav-link {% if '/admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
+            <a href="{% url 'custom_admin_furnitures' %}"
+                class="admin-nav-link {% if '/admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
+            <a href="{% url 'custom_admin_house_images' %}"
+                class="admin-nav-link {% if '/admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
+        </div>
+    </nav>
+
+    <main class="admin-main">
+        <div class="admin-main-inner">
+            {% if messages %}
+            <section class="admin-messages">
+                {% for message in messages %}
+                <div class="admin-message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <section class="panel-card admin-form-card">
+                <form method="post" {% if is_multipart %}enctype="multipart/form-data" {% endif %}>
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="admin-field-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="field-help">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                        <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                    {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                    <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+
+                    <div class="admin-form-actions">
+                        <button type="submit" class="primary-btn">Lưu</button>
+                        <a href="{% url back_url %}" class="outline-btn">Hủy</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>

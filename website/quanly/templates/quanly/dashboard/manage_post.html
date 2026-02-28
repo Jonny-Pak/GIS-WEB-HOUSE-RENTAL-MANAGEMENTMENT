@@ -7,7 +7,7 @@
 {% block content %}
 <div class="card-custom">
     <div class="card-body">
-        
+
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="input-group">
@@ -23,7 +23,8 @@
                 </select>
             </div>
             <div class="col-md-3 text-end">
-                <a href="{% url 'post_house' %}" class="btn btn-danger text-white fw-bold"><i class="bi bi-plus-lg"></i> Đăng tin mới</a>
+                <a href="{% url 'post_house' %}" class="btn btn-danger text-white fw-bold"><i class="bi bi-plus-lg"></i>
+                    Đăng tin mới</a>
             </div>
         </div>
 
@@ -39,43 +40,66 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for house in user_houses %}
                     <tr>
-                        <td><img src="{% static 'images/img_1.jpg' %}" class="rounded" width="80" height="60" style="object-fit: cover;"></td>
                         <td>
-                            <div class="fw-bold text-dark">Nhà phố mặt tiền Quận 5</div>
-                            <small class="text-muted">Mã tin: #10234</small><br>
-                            <small class="text-muted"><i class="bi bi-calendar"></i> 04/02/2026</small>
+                            {% if house.main_image %}
+                            <img src="{{ house.main_image.url }}" class="rounded" width="80" height="60"
+                                style="object-fit: cover;">
+                            {% else %}
+                            <div class="bg-secondary rounded" style="width: 80px; height: 60px;"></div>
+                            {% endif %}
                         </td>
                         <td>
-                            <div class="text-danger fw-bold">12 Tỷ</div>
-                            <small>80 m²</small>
+                            <div class="fw-bold text-dark">{{ house.name }}</div>
+                            <small class="text-muted">Mã tin: #{{ house.id }}</small><br>
+                            <small class="text-muted"><i class="bi bi-calendar"></i> {{ house.created_at|date:"d/m/Y"
+                                }}</small>
                         </td>
-                        <td><span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Đã duyệt</span></td>
+                        <td>
+                            <div class="text-danger fw-bold">{% if house.price %}{{ house.price|floatformat:0 }} VNĐ{%
+                                else %}Thỏa thuận{% endif %}</div>
+                            <small>{{ house.area }} m²</small>
+                        </td>
+                        <td>
+                            {% if house.status == 'available' %}
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Đang
+                                cho thuê</span>
+                            {% elif house.status == 'pending' %}
+                            <span
+                                class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill">Chờ
+                                duyệt</span>
+                            {% elif house.status == 'rented' %}
+                            <span
+                                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill">Đã
+                                cho thuê</span>
+                            {% else %}
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill">{{
+                                house.get_status_display }}</span>
+                            {% endif %}
+                        </td>
                         <td class="text-end">
-                            <button class="btn btn-light btn-sm text-primary" title="Sửa tin" onclick="alert('Lưu ý: Sau khi sửa, tin sẽ chuyển sang trạng thái CHỜ DUYỆT để Admin kiểm tra lại.')">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-light btn-sm text-danger" title="Xóa tin"><i class="bi bi-trash"></i></button>
+                            <div class="d-flex justify-content-end gap-2">
+                                {% if house.status == 'available' %}
+                                <a href="{% url 'create_contract' house.id %}"
+                                    class="btn btn-sm btn-outline-success fw-bold" title="Tạo hợp đồng cho căn nhà này">
+                                    <i class="bi bi-file-earmark-plus me-1"></i>Tạo Hợp Đồng
+                                </a>
+                                {% endif %}
+                                <a href="#" class="btn btn-light btn-sm text-primary" title="Sửa tin"><i
+                                        class="bi bi-pencil-square"></i></a>
+                                <a href="#" class="btn btn-light btn-sm text-danger" title="Xóa tin"><i
+                                        class="bi bi-trash"></i></a>
+                            </div>
                         </td>
                     </tr>
-
+                    {% empty %}
                     <tr>
-                        <td><img src="{% static 'images/img_4.jpg' %}" class="rounded" width="80" height="60" style="object-fit: cover;"></td>
-                        <td>
-                            <div class="fw-bold text-dark">Chung cư Mini Bình Thạnh</div>
-                            <small class="text-muted">Mã tin: #10235</small><br>
-                            <small class="text-muted"><i class="bi bi-calendar"></i> 04/02/2026</small>
-                        </td>
-                        <td>
-                            <div class="text-danger fw-bold">5 Triệu/tháng</div>
-                            <small>30 m²</small>
-                        </td>
-                        <td><span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill">Chờ duyệt</span></td>
-                        <td class="text-end">
-                            <button class="btn btn-light btn-sm text-primary" title="Sửa tin"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-light btn-sm text-danger" title="Xóa tin"><i class="bi bi-trash"></i></button>
-                        </td>
+                        <td colspan="5" class="text-center py-4 text-muted">Bạn chưa đăng tin nào.</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
