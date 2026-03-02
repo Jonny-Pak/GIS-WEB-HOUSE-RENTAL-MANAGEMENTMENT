@@ -53,12 +53,12 @@
                         <td>
                             <div class="fw-bold text-dark">{{ house.name }}</div>
                             <small class="text-muted">Mã tin: #{{ house.id }}</small><br>
-                            <small class="text-muted"><i class="bi bi-calendar"></i> {{ house.created_at|date:"d/m/Y"
-                                }}</small>
+                            <small class="text-muted"><i class="bi bi-calendar"></i>
+                                {{house.created_at|date:"d/m/Y"}}</small>
                         </td>
                         <td>
-                            <div class="text-danger fw-bold">{% if house.price %}{{ house.price|floatformat:0 }} VNĐ{%
-                                else %}Thỏa thuận{% endif %}</div>
+                            <div class="text-danger fw-bold">{% if house.price %}{{ house.price|floatformat:0 }} VNĐ
+                                {% else %}Thỏa thuận{% endif %}</div>
                             <small>{{ house.area }} m²</small>
                         </td>
                         <td>

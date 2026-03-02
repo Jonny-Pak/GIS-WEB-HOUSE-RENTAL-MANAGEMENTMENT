@@ -17,6 +17,8 @@ Including another URLconf
 from quanly.views import api_houses, api_polygon_search
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,3 +27,6 @@ urlpatterns = [
     path('api/polygon-search/', api_polygon_search, name='api_polygon_search'),
     path('', include('quanly.urls'))
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

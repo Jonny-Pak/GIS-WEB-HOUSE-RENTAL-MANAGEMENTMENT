@@ -40,7 +40,12 @@
 
             <a class="nav-link {% if request.resolver_match.url_name == 'manage_contracts' %}active{% endif %}"
                 href="{% url 'manage_contracts' %}">
-                <i class="bi bi-file-earmark-text"></i> Hợp đồng <span class="badge bg-success ms-2">Mới</span>
+                <i class="bi bi-file-earmark-text"></i> Hợp đồng
+            </a>
+
+            <a class="nav-link {% if request.resolver_match.url_name == 'manage_tenants' %}active{% endif %}"
+                href="{% url 'manage_tenants' %}">
+                <i class="bi bi-person-lines-fill"></i> Khách thuê <span class="badge bg-success ms-2">Mới</span>
             </a>
 
             <a class="nav-link" href="{% url 'home' %}">

@@ -83,3 +83,8 @@ def create_contract(request, house_id):
 def manage_contracts(request):
     user_contracts = Contract.objects.filter(house__owner=request.user).select_related('house', 'renter').order_by('-created_at')
     return render(request, 'quanly/dashboard/manage_contracts.html', {'user_contracts': user_contracts})
+
+@login_required(login_url='login')
+def manage_tenants(request):
+    user_tenants = Tenant.objects.filter(created_by=request.user).prefetch_related('signed_contracts__house').order_by('-created_at')
+    return render(request, 'quanly/dashboard/manage_tenants.html', {'user_tenants': user_tenants})

@@ -12,6 +12,7 @@ urlpatterns = [
     path('post-house/', views.post_house, name='post_house'),
     path('manage_post/', views.manage_post, name='manage_post'),
     path('manage-contracts/', views.manage_contracts, name='manage_contracts'),
+    path('manage-tenants/', views.manage_tenants, name='manage_tenants'),
     path('dashboard/house/<int:house_id>/contract/new/', views.create_contract, name='create_contract'),
     path('custom-admin/login/', views.custom_admin_login, name='custom_admin_login'),
     path('custom-admin/logout/', views.custom_admin_logout, name='custom_admin_logout'),
