@@ -23,7 +23,7 @@ class House(models.Model):
 
     STATUS_CHOICES = [
         ('pending', 'Chờ duyệt'),
-        ('available', 'Đang cho thuê'),
+        ('available', 'Còn trống'),
         ('rented', 'Đã cho thuê'),
         ('hidden', 'Đã ẩn'),
         ('rejected', 'Bị từ chối'),
