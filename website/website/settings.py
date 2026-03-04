@@ -127,5 +127,8 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
 
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+
 # GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"
 # GEOS_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgeos_c.dll"

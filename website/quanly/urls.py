@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import public
 from django.contrib.auth import views as auth_views 
 
 urlpatterns = [
@@ -7,7 +8,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='quanly/accounts/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('register/', views.register, name='register'),
-    path('detail/<int:house_id>/', views.house_detail, name='house_detail'),
+    path('house-detail/', public.home_details_view, name='home_details'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('post-house/', views.post_house, name='post_house'),
     path('manage_post/', views.manage_post, name='manage_post'),
@@ -17,6 +18,7 @@ urlpatterns = [
     path('custom-admin/login/', views.custom_admin_login, name='custom_admin_login'),
     path('custom-admin/logout/', views.custom_admin_logout, name='custom_admin_logout'),
     path('custom-admin/', views.custom_admin_dashboard, name='custom_admin_dashboard'),
+    path('profile/', views.profile_view, name='profile'),
     
     path('custom-admin/users/', views.custom_admin_users, name='custom_admin_users'),
     path('custom-admin/users/create/', views.custom_admin_user_create, name='custom_admin_user_create'),

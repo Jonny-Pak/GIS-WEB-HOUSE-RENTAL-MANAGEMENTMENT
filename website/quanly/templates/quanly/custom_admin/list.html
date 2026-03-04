@@ -81,8 +81,8 @@
                                     <form method="post" action="{% url action.url_name row.id %}"
                                         onsubmit="return confirm('Xác nhận thao tác này?');">
                                         {% csrf_token %}
-                                        <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">{{
-                                            action.label }}</button>
+                                        <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">
+                                            {{action.label }}</button>
                                     </form>
                                     {% endfor %}
                                     <a href="{% url edit_url_name row.id %}" class="mini-btn">Sửa</a>

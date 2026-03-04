@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.conf import settings
+from django.contrib.auth.models import User 
 
 # Create your models here.
 
@@ -154,3 +155,12 @@ class Contract(models.Model):
         house_name = self.house.name if self.house else "Nhà đã bị xoá"
         tenant_name = self.renter.full_name if self.renter else "Chưa có tên"
         return f"Hợp đồng thuê {house_name} - Đại diện: {tenant_name}"
+    
+# Hồ sơ cá nhân
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=10, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', default='default.png')
+
+    def __str__(self):
+        return f"Hồ sơ của {self.user.username}"
