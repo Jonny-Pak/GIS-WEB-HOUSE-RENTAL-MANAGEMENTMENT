@@ -16,13 +16,14 @@ def post_house(request):
             house = form.save(commit=False)
             house.owner = request.user
             house.status = 'pending'
+
             house.save()
             
             # Save detail gallery images
             detail_images = request.FILES.getlist('detail_images')
             for image in detail_images:
                 HouseImage.objects.create(house=house, image=image)
-                
+
             messages.success(request, 'Đăng thông tin nhà thành công! Vui lòng chờ quản trị viên duyệt bài.')
             return redirect('manage_post')
     else:

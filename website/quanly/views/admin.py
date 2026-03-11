@@ -340,6 +340,7 @@ def custom_admin_house_approve(request, object_id):
     - Redirect về danh sách House sau khi cập nhật.
     """
     house = get_object_or_404(House, id=object_id)
+
     house.status = 'available'
     house.save()
     messages.success(request, f'Đã duyệt bài đăng: {house.name}')

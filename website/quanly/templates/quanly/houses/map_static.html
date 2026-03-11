@@ -1,0 +1,57 @@
+{% extends 'quanly/layouts/base.html' %}
+{% load static %}
+
+{% block title %}Ban do GIS tinh | He thong Thue Nha{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="{% static 'css/map.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="map-page">
+    <div class="container">
+        <div id="static-map" aria-label="Ban do nha cho thue"></div>
+    </div>
+</section>
+
+{{ map_houses|json_script:"houses-data" }}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    const map = L.map("static-map", {
+        zoomControl: true,
+        scrollWheelZoom: true,
+    }).setView([10.7769, 106.7009], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    const houses = JSON.parse(document.getElementById("houses-data").textContent || "[]");
+    const markerGroup = L.featureGroup().addTo(map);
+
+    houses.forEach((house) => {
+        if (house.lat == null || house.lng == null) return;
+
+        const marker = L.marker([house.lat, house.lng]);
+        marker.bindPopup(`
+            <div class="map-popup-content">
+        <strong>${house.name || "Nha cho thue"}</strong><br>
+        Gia: ${house.price || "Lien he"}<br>
+        Khu vuc: ${house.district || "Khong ro khu vuc"}<br>
+        <a href="${house.detail_url || "#"}">Xem chi tiet</a>
+      </div>
+    `);
+        marker.addTo(markerGroup);
+    });
+
+    const bounds = markerGroup.getBounds();
+    if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [24, 24] });
+    }
+</script>
+{% endblock %}

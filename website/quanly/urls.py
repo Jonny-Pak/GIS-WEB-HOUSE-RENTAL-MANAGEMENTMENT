@@ -8,6 +8,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='quanly/accounts/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('register/', views.register, name='register'),
+    path('map/', views.map_view, name='map_view'),
     path('house-detail/', public.home_details_view, name='home_details'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('post-house/', views.post_house, name='post_house'),
