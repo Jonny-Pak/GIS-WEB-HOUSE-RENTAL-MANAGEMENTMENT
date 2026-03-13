@@ -24,20 +24,19 @@
     <nav class="admin-nav">
         <div class="admin-main-inner admin-nav-inner">
             <a href="{% url 'custom_admin_dashboard' %}"
-                class="admin-nav-link {% if request.path == '/admin/' %}active{% endif %}">Tổng quan</a>
+                class="admin-nav-link {% if request.path == '/custom-admin/' %}active{% endif %}">Tổng quan</a>
             <a href="{% url 'custom_admin_users' %}"
-                class="admin-nav-link {% if '/admin/users/' in request.path %}active{% endif %}">User</a>
-            <a href="{% url 'custom_admin_groups' %}"
-                class="admin-nav-link {% if '/admin/groups/' in request.path %}active{% endif %}">Group</a>
+                class="admin-nav-link {% if '/custom-admin/users/' in request.path %}active{% endif %}">User</a>
             <a href="{% url 'custom_admin_houses' %}"
-                class="admin-nav-link {% if '/admin/houses/' in request.path %}active{% endif %}">Nhà</a>
-
+                class="admin-nav-link {% if '/custom-admin/houses/' in request.path %}active{% endif %}">Nhà</a>
+            <a href="{% url 'custom_admin_tenants' %}"
+                class="admin-nav-link {% if '/custom-admin/tenants/' in request.path %}active{% endif %}">Khách thuê</a>
             <a href="{% url 'custom_admin_contracts' %}"
-                class="admin-nav-link {% if '/admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
+                class="admin-nav-link {% if '/custom-admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}"
-                class="admin-nav-link {% if '/admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
+                class="admin-nav-link {% if '/custom-admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
             <a href="{% url 'custom_admin_house_images' %}"
-                class="admin-nav-link {% if '/admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
+                class="admin-nav-link {% if '/custom-admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
         </div>
     </nav>
 
@@ -56,7 +55,9 @@
                     <input type="text" name="q" value="{{ query }}" placeholder="Tìm kiếm...">
                     <button type="submit" class="secondary-btn">Tìm</button>
                 </form>
+                {% if create_url %}
                 <a href="{% url create_url %}" class="primary-btn">+ Tạo mới</a>
+                {% endif %}
             </section>
 
             <section class="panel-card">
@@ -67,7 +68,9 @@
                                 {% for head in headers %}
                                 <th>{{ head }}</th>
                                 {% endfor %}
+                                {% if edit_url_name or delete_url_name %}
                                 <th>Hành động</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -76,22 +79,28 @@
                                 {% for col in row.columns %}
                                 <td>{{ col }}</td>
                                 {% endfor %}
+                                {% if edit_url_name or delete_url_name %}
                                 <td class="actions-cell">
                                     {% for action in row.extra_actions %}
                                     <form method="post" action="{% url action.url_name row.id %}"
-                                        onsubmit="return confirm('Xác nhận thao tác này?');">
+                                        onsubmit="return confirm('{{ action.confirm|default:"Xác nhận thao tác này?" }}');">
                                         {% csrf_token %}
                                         <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">
-                                            {{action.label }}</button>
+                                            {{ action.label }}</button>
                                     </form>
                                     {% endfor %}
+                                    {% if edit_url_name %}
                                     <a href="{% url edit_url_name row.id %}" class="mini-btn">Sửa</a>
+                                    {% endif %}
+                                    {% if delete_url_name %}
                                     <form method="post" action="{% url delete_url_name row.id %}"
                                         onsubmit="return confirm('Xác nhận xóa dữ liệu này?');">
                                         {% csrf_token %}
                                         <button type="submit" class="mini-btn danger-btn">Xóa</button>
                                     </form>
+                                    {% endif %}
                                 </td>
+                                {% endif %}
                             </tr>
                             {% empty %}
                             <tr>

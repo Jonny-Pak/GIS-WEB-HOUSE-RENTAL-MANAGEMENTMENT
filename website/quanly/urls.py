@@ -21,34 +21,32 @@ urlpatterns = [
     path('custom-admin/', views.custom_admin_dashboard, name='custom_admin_dashboard'),
     path('profile/', views.profile_view, name='profile'),
     
+    # --- Custom Admin: Users (CRUD đầy đủ) ---
     path('custom-admin/users/', views.custom_admin_users, name='custom_admin_users'),
     path('custom-admin/users/create/', views.custom_admin_user_create, name='custom_admin_user_create'),
     path('custom-admin/users/<int:user_id>/edit/', views.custom_admin_user_edit, name='custom_admin_user_edit'),
     path('custom-admin/users/<int:user_id>/delete/', views.custom_admin_user_delete, name='custom_admin_user_delete'),
 
-    path('custom-admin/groups/', views.custom_admin_groups, name='custom_admin_groups'),
-    path('custom-admin/groups/create/', views.custom_admin_group_create, name='custom_admin_group_create'),
-    path('custom-admin/groups/<int:object_id>/edit/', views.custom_admin_group_edit, name='custom_admin_group_edit'),
-    path('custom-admin/groups/<int:object_id>/delete/', views.custom_admin_group_delete, name='custom_admin_group_delete'),
-
+    # --- Custom Admin: Houses (Read + Update + Delete + Approve/Reject, KHÔNG Create) ---
     path('custom-admin/houses/', views.custom_admin_houses, name='custom_admin_houses'),
-    path('custom-admin/houses/create/', views.custom_admin_house_create, name='custom_admin_house_create'),
     path('custom-admin/houses/<int:object_id>/edit/', views.custom_admin_house_edit, name='custom_admin_house_edit'),
     path('custom-admin/houses/<int:object_id>/delete/', views.custom_admin_house_delete, name='custom_admin_house_delete'),
     path('custom-admin/houses/<int:object_id>/approve/', views.custom_admin_house_approve, name='custom_admin_house_approve'),
+    path('custom-admin/houses/<int:object_id>/reject/', views.custom_admin_house_reject, name='custom_admin_house_reject'),
 
+    # --- Custom Admin: Tenants (Read-Only) ---
+    path('custom-admin/tenants/', views.custom_admin_tenants, name='custom_admin_tenants'),
+
+    # --- Custom Admin: Contracts (Read-Only) ---
     path('custom-admin/contracts/', views.custom_admin_contracts, name='custom_admin_contracts'),
-    path('custom-admin/contracts/create/', views.custom_admin_contract_create, name='custom_admin_contract_create'),
-    path('custom-admin/contracts/<int:object_id>/edit/', views.custom_admin_contract_edit, name='custom_admin_contract_edit'),
-    path('custom-admin/contracts/<int:object_id>/delete/', views.custom_admin_contract_delete, name='custom_admin_contract_delete'),
 
+    # --- Custom Admin: Furnitures (CRUD đầy đủ — danh mục hệ thống) ---
     path('custom-admin/furnitures/', views.custom_admin_furnitures, name='custom_admin_furnitures'),
     path('custom-admin/furnitures/create/', views.custom_admin_furniture_create, name='custom_admin_furniture_create'),
     path('custom-admin/furnitures/<int:object_id>/edit/', views.custom_admin_furniture_edit, name='custom_admin_furniture_edit'),
     path('custom-admin/furnitures/<int:object_id>/delete/', views.custom_admin_furniture_delete, name='custom_admin_furniture_delete'),
 
+    # --- Custom Admin: House Images (Read + Delete vi phạm) ---
     path('custom-admin/house-images/', views.custom_admin_house_images, name='custom_admin_house_images'),
-    path('custom-admin/house-images/create/', views.custom_admin_house_image_create, name='custom_admin_house_image_create'),
-    path('custom-admin/house-images/<int:object_id>/edit/', views.custom_admin_house_image_edit, name='custom_admin_house_image_edit'),
     path('custom-admin/house-images/<int:object_id>/delete/', views.custom_admin_house_image_delete, name='custom_admin_house_image_delete'),
 ]

@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 
-from .models import House, Furniture, Contract, HouseImage
+from .models import House, Furniture
 
 
 User = get_user_model()
@@ -13,7 +12,7 @@ class AdminUserCreateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "is_staff", "is_superuser", "is_active"]
+        fields = ["username", "email", "password", "is_superuser", "is_active"]
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -33,7 +32,7 @@ class AdminUserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "is_staff", "is_superuser", "is_active"]
+        fields = ["username", "email", "is_superuser", "is_active"]
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -66,27 +65,14 @@ class AdminHouseForm(forms.ModelForm):
             'room_count': forms.NumberInput(attrs={'class': 'form-control'}),
             'max_people': forms.NumberInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
-            'is_negotiable': forms.CheckboxInput(attrs={'class': 'form-check-input'})
+            'is_negotiable': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'lat': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
+            'lng': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
+            'furniture': forms.CheckboxSelectMultiple(),
         }
+
 
 class AdminFurnitureForm(forms.ModelForm):
     class Meta:
         model = Furniture
         fields = "__all__"
-
-class AdminContractForm(forms.ModelForm):
-    class Meta:
-        model = Contract
-        fields = "__all__"
-
-
-class AdminHouseImageForm(forms.ModelForm):
-    class Meta:
-        model = HouseImage
-        fields = "__all__"
-
-
-class AdminGroupForm(forms.ModelForm):
-    class Meta:
-        model = Group
-        fields = ["name", "permissions"]
