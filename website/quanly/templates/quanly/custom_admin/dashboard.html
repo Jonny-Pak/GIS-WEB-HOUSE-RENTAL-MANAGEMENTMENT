@@ -25,9 +25,8 @@
         <div class="admin-main-inner admin-nav-inner">
             <a href="{% url 'custom_admin_dashboard' %}" class="admin-nav-link active">Tổng quan</a>
             <a href="{% url 'custom_admin_users' %}" class="admin-nav-link">User</a>
-            <a href="{% url 'custom_admin_groups' %}" class="admin-nav-link">Group</a>
             <a href="{% url 'custom_admin_houses' %}" class="admin-nav-link">Nhà</a>
-
+            <a href="{% url 'custom_admin_tenants' %}" class="admin-nav-link">Khách thuê</a>
             <a href="{% url 'custom_admin_contracts' %}" class="admin-nav-link">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}" class="admin-nav-link">Nội thất</a>
             <a href="{% url 'custom_admin_house_images' %}" class="admin-nav-link">Ảnh nhà</a>
@@ -86,7 +85,7 @@
                     <h2>Nhà mới đăng</h2>
                     <ul>
                         {% for house in latest_houses %}
-                        <li><strong>{{ house.name }}</strong> <span>{{ house.create_at|date:"d/m/Y" }}</span></li>
+                        <li><strong>{{ house.name }}</strong> <span>{{ house.created_at|date:"d/m/Y" }}</span></li>
                         {% empty %}
                         <li>Chưa có dữ liệu</li>
                         {% endfor %}

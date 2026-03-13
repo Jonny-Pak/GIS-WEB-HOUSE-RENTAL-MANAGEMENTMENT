@@ -24,20 +24,19 @@
     <nav class="admin-nav">
         <div class="admin-main-inner admin-nav-inner">
             <a href="{% url 'custom_admin_dashboard' %}"
-                class="admin-nav-link {% if request.path == '/admin/' %}active{% endif %}">Tổng quan</a>
+                class="admin-nav-link {% if request.path == '/custom-admin/' %}active{% endif %}">Tổng quan</a>
             <a href="{% url 'custom_admin_users' %}"
-                class="admin-nav-link {% if '/admin/users/' in request.path %}active{% endif %}">User</a>
-            <a href="{% url 'custom_admin_groups' %}"
-                class="admin-nav-link {% if '/admin/groups/' in request.path %}active{% endif %}">Group</a>
+                class="admin-nav-link {% if '/custom-admin/users/' in request.path %}active{% endif %}">User</a>
             <a href="{% url 'custom_admin_houses' %}"
-                class="admin-nav-link {% if '/admin/houses/' in request.path %}active{% endif %}">Nhà</a>
-
+                class="admin-nav-link {% if '/custom-admin/houses/' in request.path %}active{% endif %}">Nhà</a>
+            <a href="{% url 'custom_admin_tenants' %}"
+                class="admin-nav-link {% if '/custom-admin/tenants/' in request.path %}active{% endif %}">Khách thuê</a>
             <a href="{% url 'custom_admin_contracts' %}"
-                class="admin-nav-link {% if '/admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
+                class="admin-nav-link {% if '/custom-admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}"
-                class="admin-nav-link {% if '/admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
+                class="admin-nav-link {% if '/custom-admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
             <a href="{% url 'custom_admin_house_images' %}"
-                class="admin-nav-link {% if '/admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
+                class="admin-nav-link {% if '/custom-admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
         </div>
     </nav>
 

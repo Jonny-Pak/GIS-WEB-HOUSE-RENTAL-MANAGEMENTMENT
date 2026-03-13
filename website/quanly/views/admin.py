@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_POST
 from quanly.models import House, Contract, Furniture, HouseImage, Tenant
 from quanly.forms_admin import (
     AdminUserCreateForm, AdminUserUpdateForm, AdminHouseForm,
-    AdminFurnitureForm, AdminContractForm, AdminHouseImageForm, AdminGroupForm
+    AdminFurnitureForm
 )
 
 User = get_user_model()
@@ -15,10 +14,10 @@ User = get_user_model()
 def _is_admin_user(user):
     """
     Helper kiểm tra quyền admin.
-    - Đây là hàm tự viết (không phải Django built-in).
+    - Chỉ dùng is_superuser (không dùng is_staff).
     - Được tái sử dụng bởi decorator user_passes_test ở hầu hết view admin.
     """
-    return user.is_authenticated and (user.is_superuser or user.is_staff)
+    return user.is_authenticated and user.is_superuser
 
 def custom_admin_login(request):
     """
@@ -66,10 +65,6 @@ def custom_admin_dashboard(request):
     context gồm:
     - total_users/total_houses/total_contracts/pending_houses: số liệu đếm nhanh.
     - latest_users/latest_houses: 5 bản ghi mới nhất để hiển thị.
-
-    Ghi chú:
-    - order_by('-field') nghĩa là sắp xếp giảm dần theo field (mới nhất trước).
-    - [:5] nghĩa là lấy 5 bản ghi đầu tiên sau khi sắp xếp.
     """
     context = {
         'total_users': User.objects.count(),
@@ -84,19 +79,15 @@ def custom_admin_dashboard(request):
 # --- GENERIC HELPERS ---
 def _custom_admin_model_list(request, queryset, page_title, create_url, headers, row_builder, edit_url_name, delete_url_name):
     """
-    Hàm helper dựng trang LIST dùng chung cho nhiều model (User/Group/House/...).
+    Hàm helper dựng trang LIST dùng chung cho nhiều model (User/House/...).
 
     Ý nghĩa tham số:
     - queryset: tập dữ liệu gốc (Django QuerySet) cho module hiện tại.
     - page_title: tiêu đề trang.
-    - create_url: tên route dùng cho nút "Tạo mới".
+    - create_url: tên route dùng cho nút "Tạo mới" (None nếu không cho tạo).
     - headers: danh sách tiêu đề cột của bảng.
     - row_builder: dict cấu hình cách search/sort/render từng dòng.
-      + search(qs, q): trả về queryset đã lọc.
-      + order_by: field sắp xếp mặc định.
-      + columns(obj): trả về list giá trị cột cho 1 object.
-      + extra_actions(obj): trả về các action phụ (nếu có).
-    - edit_url_name/delete_url_name: tên route cho Sửa/Xóa.
+    - edit_url_name/delete_url_name: tên route cho Sửa/Xóa (None nếu không cho).
     """
     # 1) Lấy từ khóa tìm kiếm từ query string (?q=...)
     query = request.GET.get('q', '').strip()
@@ -135,12 +126,6 @@ def _custom_admin_model_list(request, queryset, page_title, create_url, headers,
 def _custom_admin_model_form(request, form_class, instance, page_title, back_url, success_message):
     """
     Helper dựng trang FORM dùng chung cho Create/Edit.
-
-    Ý nghĩa tham số:
-    - form_class: lớp ModelForm tương ứng model đang thao tác.
-    - instance: None (create) hoặc object có sẵn (edit).
-    - back_url: route quay lại trang list khi lưu thành công.
-    - success_message: flash message khi save OK.
     """
     # Xác định form có upload file/image không để bật enctype multipart/form-data
     is_multipart = getattr(form_class.Meta, 'is_multipart', False)
@@ -153,15 +138,12 @@ def _custom_admin_model_form(request, form_class, instance, page_title, back_url
                 is_multipart = True
 
     if request.method == 'POST':
-        # POST: bind dữ liệu người dùng gửi lên để validate/save
         form = form_class(request.POST, request.FILES if is_multipart else None, instance=instance)
         if form.is_valid():
             form.save()
-            # messages.success là Django messages framework (built-in)
             messages.success(request, success_message)
             return redirect(back_url)
     else:
-        # GET: render form rỗng (create) hoặc có dữ liệu sẵn (edit)
         form = form_class(instance=instance)
 
     return render(request, 'quanly/custom_admin/form.html', {
@@ -175,7 +157,7 @@ def _custom_admin_model_form(request, form_class, instance, page_title, back_url
 def _custom_admin_model_delete(request, model, object_id, back_url, guard_self_user=False):
     """
     Helper xóa bản ghi dùng chung.
-    - @require_POST (Django built-in decorator): chỉ cho phép HTTP POST để tăng an toàn.
+    - @require_POST: chỉ cho phép HTTP POST để tăng an toàn.
     - guard_self_user=True dùng cho User để chặn tự xóa chính mình.
     """
     obj = get_object_or_404(model, id=object_id)
@@ -191,13 +173,8 @@ def _custom_admin_model_delete(request, model, object_id, back_url, guard_self_u
 def custom_admin_users(request):
     """
     Trang danh sách User.
-
-    Cách hoạt động:
-    - Không tự viết logic list thủ công.
-    - Chỉ truyền cấu hình cho helper _custom_admin_model_list:
-      + search theo username
-      + sort theo ngày tham gia mới nhất
-      + định nghĩa các cột hiển thị trong bảng
+    - Search theo username.
+    - Sort theo ngày tham gia mới nhất.
     """
     return _custom_admin_model_list(
         request, User.objects.all(), 'Quản lý người dùng', 'custom_admin_user_create',
@@ -207,7 +184,7 @@ def custom_admin_users(request):
             'order_by': '-date_joined',
             'columns': lambda obj: [
                 obj.username, obj.email,
-                "Quản trị" if obj.is_superuser else ("Nhân viên" if obj.is_staff else "Khách hàng"),
+                "Quản trị" if obj.is_superuser else "Người dùng",
                 "Hoạt động" if obj.is_active else "Khóa",
                 obj.date_joined.strftime('%d/%m/%Y %H:%M')
             ]
@@ -217,82 +194,31 @@ def custom_admin_users(request):
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_user_create(request):
-    """
-    Trang tạo mới User.
-    - Dùng helper form chung.
-    - Form class: AdminUserCreateForm (định nghĩa field + logic set_password trong forms_admin.py).
-    - instance=None vì đây là create.
-    """
+    """Trang tạo mới User."""
     return _custom_admin_model_form(request, AdminUserCreateForm, None, 'Thêm người dùng mới', 'custom_admin_users', 'Tạo tài khoản thành công!')
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_user_edit(request, user_id):
-    """
-    Trang chỉnh sửa User.
-    - user_id lấy từ URL.
-    - get_object_or_404(User, id=user_id) để lấy bản ghi cần sửa.
-    - instance=user nghĩa là form edit trên object có sẵn.
-    """
+    """Trang chỉnh sửa User."""
     user = get_object_or_404(User, id=user_id)
     return _custom_admin_model_form(request, AdminUserUpdateForm, user, f'Chỉnh sửa người dùng: {user.username}', 'custom_admin_users', 'Cập nhật tài khoản thành công!')
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_user_delete(request, user_id):
-    """
-    Xóa User theo user_id.
-    - Dùng helper delete chung.
-    - guard_self_user=True để chặn tự xóa tài khoản hiện tại.
-    """
+    """Xóa User theo user_id. Chặn tự xóa chính mình."""
     return _custom_admin_model_delete(request, User, user_id, 'custom_admin_users', guard_self_user=True)
 
-# --- GROUPS ---
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_groups(request):
-    """
-    Trang danh sách Group (nhóm quyền Django auth).
-    - Search theo tên nhóm.
-    - Sort tăng dần theo name.
-    - Hiển thị thêm số lượng user trong từng group.
-    """
-    return _custom_admin_model_list(
-        request, Group.objects.all(), 'Quản lý nhóm quyền', 'custom_admin_group_create',
-        ['Tên nhóm', 'Số lượng User'],
-        {
-            'search': lambda qs, q: qs.filter(name__icontains=q),
-            'order_by': 'name',
-            'columns': lambda obj: [obj.name, obj.user_set.count()]
-        },
-        'custom_admin_group_edit', 'custom_admin_group_delete'
-    )
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_group_create(request):
-    """Trang tạo mới Group bằng AdminGroupForm."""
-    return _custom_admin_model_form(request, AdminGroupForm, None, 'Thêm nhóm', 'custom_admin_groups', 'Tạo nhóm thành công!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_group_edit(request, object_id):
-    """Trang chỉnh sửa Group theo object_id."""
-    obj = get_object_or_404(Group, id=object_id)
-    return _custom_admin_model_form(request, AdminGroupForm, obj, 'Chỉnh sửa nhóm', 'custom_admin_groups', 'Cập nhật thành công!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_group_delete(request, object_id):
-    """Xóa Group theo object_id bằng helper delete chung."""
-    return _custom_admin_model_delete(request, Group, object_id, 'custom_admin_groups')
-
-# --- HOUSES ---
+# --- HOUSES (Admin chỉ Read + Update status + Delete vi phạm, KHÔNG Create) ---
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_houses(request):
     """
     Trang danh sách House.
-    - select_related('owner') để tối ưu truy vấn khi đọc owner.username.
-    - Search theo name.
-    - Sort theo created_at giảm dần (mới nhất trước).
+    - select_related('owner') để tối ưu.
     - Có extra action "Duyệt" khi status=pending.
+    - Có extra action "Từ chối" khi status=pending.
     """
     return _custom_admin_model_list(
-        request, House.objects.select_related('owner'), 'Quản lý nhà', 'custom_admin_house_create',
+        request, House.objects.select_related('owner'), 'Quản lý nhà', None,
         ['Tên nhà', 'Chủ nhà', 'Quận', 'Trạng thái', 'Giá'],
         {
             'search': lambda qs, q: qs.filter(name__icontains=q),
@@ -307,57 +233,82 @@ def custom_admin_houses(request):
                     'label': 'Duyệt',
                     'class_name': 'success-btn',
                     'confirm': f'Xác nhận duyệt bài đăng: {obj.name}?',
-                }
+                },
+                {
+                    'url_name': 'custom_admin_house_reject',
+                    'label': 'Từ chối',
+                    'class_name': 'danger-btn',
+                    'confirm': f'Xác nhận từ chối bài đăng: {obj.name}?',
+                },
             ] if obj.status == 'pending' else [],
-            # extra_actions chỉ xuất hiện khi nhà đang "pending".
         },
         'custom_admin_house_edit', 'custom_admin_house_delete'
     )
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_house_create(request):
-    """Trang tạo mới House bằng AdminHouseForm."""
-    return _custom_admin_model_form(request, AdminHouseForm, None, 'Thêm nhà', 'custom_admin_houses', 'Tạo nhà thành công!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_edit(request, object_id):
-    """Trang chỉnh sửa House theo object_id."""
+    """Trang chỉnh sửa House (admin có thể đổi status, thông tin)."""
     obj = get_object_or_404(House, id=object_id)
     return _custom_admin_model_form(request, AdminHouseForm, obj, 'Chỉnh sửa nhà', 'custom_admin_houses', 'Cập nhật thành công!')
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_delete(request, object_id):
-    """Xóa House theo object_id bằng helper delete chung."""
+    """Xóa House vi phạm."""
     return _custom_admin_model_delete(request, House, object_id, 'custom_admin_houses')
 
 @require_POST
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_approve(request, object_id):
-    """
-    Duyệt bài đăng House.
-    - Chỉ nhận POST (an toàn thao tác).
-    - Chuyển status từ pending sang available.
-    - Redirect về danh sách House sau khi cập nhật.
-    """
+    """Duyệt bài đăng House: chuyển status từ pending sang available."""
     house = get_object_or_404(House, id=object_id)
-
     house.status = 'available'
     house.save()
     messages.success(request, f'Đã duyệt bài đăng: {house.name}')
     return redirect('custom_admin_houses')
 
-# --- CONTRACTS ---
+@require_POST
+@user_passes_test(_is_admin_user, login_url='custom_admin_login')
+def custom_admin_house_reject(request, object_id):
+    """Từ chối bài đăng House: chuyển status từ pending sang rejected."""
+    house = get_object_or_404(House, id=object_id)
+    house.status = 'rejected'
+    house.save()
+    messages.success(request, f'Đã từ chối bài đăng: {house.name}')
+    return redirect('custom_admin_houses')
+
+# --- TENANTS (Admin chỉ Read-Only, KHÔNG Create/Update/Delete) ---
+@user_passes_test(_is_admin_user, login_url='custom_admin_login')
+def custom_admin_tenants(request):
+    """
+    Trang danh sách Tenant (read-only).
+    - Admin chỉ xem để giám sát, không sửa/xóa.
+    - select_related('created_by') để tối ưu.
+    """
+    return _custom_admin_model_list(
+        request, Tenant.objects.select_related('created_by'), 'Quản lý khách thuê (Chỉ xem)', None,
+        ['Họ tên', 'SĐT', 'CCCD', 'Giới tính', 'Quản lý bởi'],
+        {
+            'search': lambda qs, q: qs.filter(full_name__icontains=q),
+            'order_by': '-created_at',
+            'columns': lambda obj: [
+                obj.full_name, obj.phone, obj.cccd,
+                obj.get_gender_display(),
+                obj.created_by.username if obj.created_by else '-'
+            ],
+        },
+        None, None  # Không cho edit/delete
+    )
+
+# --- CONTRACTS (Admin chỉ Read-Only, KHÔNG Create/Update/Delete) ---
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_contracts(request):
     """
-    Trang danh sách Contract.
-    - select_related('house', 'renter') để tránh N+1 query khi render.
-    - Search theo tên người thuê đại diện.
-    - Sort theo created_at giảm dần.
+    Trang danh sách Contract (read-only).
+    - Admin chỉ xem để giám sát, không sửa/xóa.
     """
     return _custom_admin_model_list(
-        request, Contract.objects.select_related('house', 'renter'), 'Quản lý hợp đồng', 'custom_admin_contract_create',
-        ['Khách thuê', 'Nhà', 'Bắt đầu', 'Kết thúc', 'Giá trị'],
+        request, Contract.objects.select_related('house', 'renter'), 'Quản lý hợp đồng (Chỉ xem)', None,
+        ['Khách thuê', 'Nhà', 'Bắt đầu', 'Kết thúc', 'Giá trị', 'Trạng thái'],
         {
             'search': lambda qs, q: qs.filter(renter__full_name__icontains=q),
             'order_by': '-created_at',
@@ -365,36 +316,17 @@ def custom_admin_contracts(request):
                 obj.renter.full_name if obj.renter else '-', obj.house.name if obj.house else '-', 
                 obj.start_date.strftime('%d/%m/%Y') if obj.start_date else '-', 
                 obj.end_date.strftime('%d/%m/%Y') if obj.end_date else '-', 
-                f"{obj.total_value:,} VNĐ" if obj.total_value else '-'
+                f"{obj.total_value:,} VNĐ" if obj.total_value else '-',
+                obj.get_status_display()
             ],
         },
-        'custom_admin_contract_edit', 'custom_admin_contract_delete'
+        None, None  # Không cho edit/delete
     )
 
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_contract_create(request):
-    """Trang tạo mới Contract bằng AdminContractForm."""
-    return _custom_admin_model_form(request, AdminContractForm, None, 'Thêm hợp đồng', 'custom_admin_contracts', 'Tạo hợp đồng thành công!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_contract_edit(request, object_id):
-    """Trang chỉnh sửa Contract theo object_id."""
-    obj = get_object_or_404(Contract, id=object_id)
-    return _custom_admin_model_form(request, AdminContractForm, obj, 'Chỉnh sửa hợp đồng', 'custom_admin_contracts', 'Cập nhật thành công!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_contract_delete(request, object_id):
-    """Xóa Contract theo object_id bằng helper delete chung."""
-    return _custom_admin_model_delete(request, Contract, object_id, 'custom_admin_contracts')
-
-# --- FURNITURES ---
+# --- FURNITURES (Admin CRUD đầy đủ — quản lý danh mục hệ thống) ---
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_furnitures(request):
-    """
-    Trang danh sách Furniture.
-    - Search theo tên nội thất.
-    - Sort tăng dần theo name.
-    """
+    """Trang danh sách Furniture."""
     return _custom_admin_model_list(
         request, Furniture.objects.all(), 'Quản lý nội thất', 'custom_admin_furniture_create',
         ['Tên nội thất'],
@@ -408,52 +340,38 @@ def custom_admin_furnitures(request):
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_furniture_create(request):
-    """Trang tạo mới Furniture bằng AdminFurnitureForm."""
+    """Trang tạo mới Furniture."""
     return _custom_admin_model_form(request, AdminFurnitureForm, None, 'Thêm nội thất', 'custom_admin_furnitures', 'Tạo nội thất thành công!')
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_furniture_edit(request, object_id):
-    """Trang chỉnh sửa Furniture theo object_id."""
+    """Trang chỉnh sửa Furniture."""
     obj = get_object_or_404(Furniture, id=object_id)
     return _custom_admin_model_form(request, AdminFurnitureForm, obj, 'Chỉnh sửa nội thất', 'custom_admin_furnitures', 'Cập nhật thành công!')
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_furniture_delete(request, object_id):
-    """Xóa Furniture theo object_id bằng helper delete chung."""
+    """Xóa Furniture."""
     return _custom_admin_model_delete(request, Furniture, object_id, 'custom_admin_furnitures')
 
-# --- HOUSE IMAGES ---
+# --- HOUSE IMAGES (Admin chỉ Read + Delete vi phạm, KHÔNG Create/Edit) ---
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_images(request):
     """
-    Trang danh sách HouseImage.
-    - select_related('house') để đọc tên nhà hiệu quả.
-    - Search theo house__name.
-    - Sort theo id giảm dần.
+    Trang danh sách HouseImage (chỉ xem + xóa vi phạm).
     """
     return _custom_admin_model_list(
-        request, HouseImage.objects.select_related('house'), 'Quản lý ảnh phụ nhà', 'custom_admin_house_image_create',
+        request, HouseImage.objects.select_related('house'), 'Quản lý ảnh phụ nhà', None,
         ['Thuộc nhà', 'Đường dẫn ảnh'],
         {
             'search': lambda qs, q: qs.filter(house__name__icontains=q),
             'order_by': '-id',
             'columns': lambda obj: [obj.house.name if obj.house else '-', obj.image.url if obj.image else '-'],
         },
-        'custom_admin_house_image_edit', 'custom_admin_house_image_delete'
+        None, 'custom_admin_house_image_delete'  # Chỉ cho delete, không cho edit
     )
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_house_image_create(request):
-    """Trang tạo mới HouseImage (có upload file ảnh)."""
-    return _custom_admin_model_form(request, AdminHouseImageForm, None, 'Thêm ảnh phụ', 'custom_admin_house_images', 'Đã thêm ảnh!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
-def custom_admin_house_image_edit(request, object_id):
-    """Trang chỉnh sửa HouseImage theo object_id."""
-    obj = get_object_or_404(HouseImage, id=object_id)
-    return _custom_admin_model_form(request, AdminHouseImageForm, obj, 'Chỉnh sửa ảnh phụ', 'custom_admin_house_images', 'Cập nhật thành công!')
-
-@user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_image_delete(request, object_id):
-    """Xóa HouseImage theo object_id bằng helper delete chung."""
+    """Xóa HouseImage vi phạm."""
     return _custom_admin_model_delete(request, HouseImage, object_id, 'custom_admin_house_images')
