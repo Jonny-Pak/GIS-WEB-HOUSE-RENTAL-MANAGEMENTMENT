@@ -15,7 +15,7 @@ def home_details_view(request):
 
 def map_view(request):
     approved_houses = House.objects.filter(
-        status='available',
+        status__in=['available', 'rented'],
         lat__isnull=False,
         lng__isnull=False,
     ).order_by('-created_at')
@@ -24,8 +24,9 @@ def map_view(request):
     for house in approved_houses:
         map_houses.append({
             'name': house.name,
-            'price': f"{house.price:,} VNĐ/thang" if house.price else 'Thoa thuan',
+            'price': f"{house.price:,} VNĐ/tháng" if house.price else 'Thỏa thuận',
             'district': house.get_district_display(),
+            'status': house.get_status_display(),
             'lat': house.lat,
             'lng': house.lng,
             'detail_url': reverse('home_details'),

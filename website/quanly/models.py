@@ -22,6 +22,7 @@ class House(models.Model):
     ]
 
     STATUS_CHOICES = [
+        ('no_coordinates', 'Chưa có tọa độ'),
         ('pending', 'Chờ duyệt'),
         ('available', 'Còn trống'),
         ('rented', 'Đã cho thuê'),
@@ -83,6 +84,8 @@ class House(models.Model):
     description = models.TextField(blank=True, verbose_name="Mô tả chi tiết")
     main_image = models.ImageField(upload_to='house/', null=True, blank=True, verbose_name="Ảnh đại diện")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Trạng thái cho thuê")
+    
+    requires_coordinates = models.BooleanField(default=False, verbose_name="Cần nhập tọa độ")
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày đăng")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")

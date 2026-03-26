@@ -3,13 +3,14 @@ from .models import House
 
 class HouseSerializer(serializers.ModelSerializer):
     district = serializers.CharField(source='get_district_display', read_only=True)
+    status = serializers.CharField(source='get_status_display', read_only=True)
     image = serializers.SerializerMethodField()
     coords = serializers.SerializerMethodField()
     distance = serializers.SerializerMethodField()
     
     class Meta:
         model = House
-        fields = ['id', 'name', 'price', 'address', 'district', 'image', 'coords', 'distance']
+        fields = ['id', 'name', 'price', 'address', 'district', 'status', 'image', 'coords', 'distance']
 
     def get_image(self, obj):
         if obj.main_image:

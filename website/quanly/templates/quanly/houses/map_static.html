@@ -40,10 +40,11 @@
         const marker = L.marker([house.lat, house.lng]);
         marker.bindPopup(`
             <div class="map-popup-content">
-        <strong>${house.name || "Nha cho thue"}</strong><br>
-        Gia: ${house.price || "Lien he"}<br>
-        Khu vuc: ${house.district || "Khong ro khu vuc"}<br>
-        <a href="${house.detail_url || "#"}">Xem chi tiet</a>
+                <strong>${house.name || "Nhà cho thuê"}</strong><br>
+                Giá: ${house.price || "Liên hệ"}<br>
+                Khu vực: ${house.district || "Không rõ khu vực"}<br>
+                Trạng thái: ${house.status || "Chưa cập nhật"}<br>
+                <a href="${house.detail_url || "#"}">Xem chi tiết</a>
       </div>
     `);
         marker.addTo(markerGroup);

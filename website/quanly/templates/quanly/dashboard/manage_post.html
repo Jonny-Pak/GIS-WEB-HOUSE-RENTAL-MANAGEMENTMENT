@@ -8,25 +8,28 @@
 <div class="card-custom">
     <div class="card-body">
 
-        <div class="row mb-4">
+        <form method="get" class="row mb-4">
             <div class="col-md-6">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control border-start-0" placeholder="Tìm theo mã tin, tiêu đề...">
+                    <input type="text" name="q" value="{{ query }}" class="form-control border-start-0"
+                        placeholder="Tìm theo tiêu đề...">
                 </div>
             </div>
             <div class="col-md-3">
-                <select class="form-select">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="active">Đã duyệt</option>
-                    <option value="pending">Chờ duyệt</option>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="" {% if not selected_status %}selected{% endif %}>Tất cả trạng thái</option>
+                    {% for value, label, is_selected in status_choices %}
+                    <option value="{{ value }}" {% if is_selected %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="col-md-3 text-end">
+                <button type="submit" class="btn btn-outline-secondary fw-bold me-2">Lọc</button>
                 <a href="{% url 'post_house' %}" class="btn btn-danger text-white fw-bold"><i class="bi bi-plus-lg"></i>
                     Đăng tin mới</a>
             </div>
-        </div>
+        </form>
 
         <div class="table-responsive">
             <table class="table align-middle table-hover">
@@ -62,10 +65,14 @@
                             <small>{{ house.area }} m²</small>
                         </td>
                         <td>
-                            {% if house.status == 'available' %}
+                            {% if house.status == 'no_coordinates' %}
                             <span
-                                class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Đang
-                                cho thuê</span>
+                                class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 rounded-pill">Chưa
+                                có tọa độ</span>
+                            {% elif house.status == 'available' %}
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Còn
+                                trống</span>
                             {% elif house.status == 'pending' %}
                             <span
                                 class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill">Chờ
@@ -74,10 +81,14 @@
                             <span
                                 class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill">Đã
                                 cho thuê</span>
+                            {% elif house.status == 'hidden' %}
+                            <span
+                                class="badge bg-dark-subtle text-dark border border-dark-subtle px-3 py-2 rounded-pill">Đã
+                                ẩn</span>
                             {% else %}
                             <span
-                                class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill">
-                                {{house.get_status_display}}</span>
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill">Bị
+                                từ chối</span>
                             {% endif %}
                         </td>
                         <td class="text-end">
@@ -88,10 +99,15 @@
                                     <i class="bi bi-file-earmark-plus me-1"></i>Tạo Hợp Đồng
                                 </a>
                                 {% endif %}
-                                <a href="#" class="btn btn-light btn-sm text-primary" title="Sửa tin"><i
-                                        class="bi bi-pencil-square"></i></a>
-                                <a href="#" class="btn btn-light btn-sm text-danger" title="Xóa tin"><i
-                                        class="bi bi-trash"></i></a>
+                                <a href="{% url 'edit_house' house.id %}" class="btn btn-light btn-sm text-primary"
+                                    title="Sửa tin"><i class="bi bi-pencil-square"></i></a>
+                                <form method="post" action="{% url 'delete_house' house.id %}" class="d-inline"
+                                    onsubmit="return confirm('Bạn có chắc muốn xóa tin này?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-light btn-sm text-danger" title="Xóa tin">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

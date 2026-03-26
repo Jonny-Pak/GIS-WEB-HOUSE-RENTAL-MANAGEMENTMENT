@@ -240,7 +240,7 @@ def custom_admin_houses(request):
                     'class_name': 'danger-btn',
                     'confirm': f'Xác nhận từ chối bài đăng: {obj.name}?',
                 },
-            ] if obj.status == 'pending' else [],
+            ] if obj.status in ['pending', 'no_coordinates'] else [],
         },
         'custom_admin_house_edit', 'custom_admin_house_delete'
     )
@@ -261,8 +261,17 @@ def custom_admin_house_delete(request, object_id):
 def custom_admin_house_approve(request, object_id):
     """Duyệt bài đăng House: chuyển status từ pending sang available."""
     house = get_object_or_404(House, id=object_id)
+
+    if house.lat is None or house.lng is None:
+        house.status = 'no_coordinates'
+        house.requires_coordinates = True
+        house.save(update_fields=['status', 'requires_coordinates'])
+        messages.error(request, f'Không thể duyệt "{house.name}" vì chưa có tọa độ. Vui lòng nhập kinh độ/vĩ độ trước.')
+        return redirect('custom_admin_houses')
+
     house.status = 'available'
-    house.save()
+    house.requires_coordinates = False
+    house.save(update_fields=['status', 'requires_coordinates'])
     messages.success(request, f'Đã duyệt bài đăng: {house.name}')
     return redirect('custom_admin_houses')
 

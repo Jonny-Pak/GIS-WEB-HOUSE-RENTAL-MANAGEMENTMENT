@@ -76,9 +76,26 @@
                             {{ form.district }}
                         </div>
                         <div class="col-md-8 mb-4">
-                            <label class="fw-bold mb-2 text-dark">Địa chỉ chi tiết <span
-                                    class="text-danger">*</span></label>
-                            {{ form.address }}
+                            <label class="fw-bold mb-2 text-dark">Địa chỉ cũ (tuỳ chọn)</label>
+                            {{ form.old_address }}
+                            {% if form.old_address.errors %}
+                            <div class="text-danger small mt-1">{{ form.old_address.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <label class="fw-bold mb-2 text-dark">Địa chỉ mới (tuỳ chọn)</label>
+                            {{ form.new_address }}
+                            {% if form.new_address.errors %}
+                            <div class="text-danger small mt-1">{{ form.new_address.errors|striptags }}</div>
+                            {% endif %}
+                            <div class="form-text">
+                                Chỉ cần nhập một trong hai ô địa chỉ. Hệ thống chấp nhận viết tắt như P., Q., TP., có
+                                dấu hoặc không dấu.
+                            </div>
+                            <div class="form-text text-muted">Hệ thống sẽ tự tìm tọa độ theo địa chỉ cũ/mới sau khi bạn
+                                lưu tin.</div>
                         </div>
                     </div>
                 </div>

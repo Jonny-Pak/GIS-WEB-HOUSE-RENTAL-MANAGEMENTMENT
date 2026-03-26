@@ -130,5 +130,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 
+GEOCODING_USER_AGENT = os.getenv('GEOCODING_USER_AGENT', 'ltgis-house-rental/1.0')
+GEOCODING_TIMEOUT = int(os.getenv('GEOCODING_TIMEOUT', '6'))
+
 # GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"
 # GEOS_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgeos_c.dll"
