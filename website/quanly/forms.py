@@ -4,7 +4,7 @@ from .models import House, HouseImage, Tenant, Contract
 class HouseForm(forms.ModelForm):
     class Meta:
         model = House
-        exclude = ['owner', 'status', 'created_at', 'updated_at', 'lat', 'lng', 'furniture']
+        exclude = ['owner', 'status', 'created_at', 'updated_at', 'lat', 'lng']
         
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ví dụ: Nhà nguyên căn 3 phòng ngủ...'}),
@@ -28,7 +28,8 @@ class HouseForm(forms.ModelForm):
             'unit_count': forms.NumberInput(attrs={'class': 'form-control'}),
             'room_count': forms.NumberInput(attrs={'class': 'form-control'}),
             'max_people': forms.NumberInput(attrs={'class': 'form-control'}),
-            'is_negotiable': forms.CheckboxInput(attrs={'class': 'form-check-input'})
+            'is_negotiable': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'furniture': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'})
         }
 
 class TenantForm(forms.ModelForm):

@@ -34,7 +34,10 @@
 
             <div class="col-lg-8">
                 <div class="img-property-main mb-4">
-                    {% if house.images.all %}
+                    {% if house.main_image %}
+                    <img src="{{ house.main_image.url }}" alt="{{ house.name }}"
+                        class="img-fluid rounded w-100 house-main-image">
+                    {% elif house.images.all %}
                     <img src="{{ house.images.first.image.url }}" alt="{{ house.name }}"
                         class="img-fluid rounded w-100 house-main-image">
                     {% else %}
@@ -143,7 +146,7 @@
                         <img src="{% static 'images/person_1-min.jpg' %}" alt="Owner"
                             class="img-fluid rounded-circle me-3 owner-avatar">
                         <div>
-                            <h5 class="mb-0 text-black fw-bold">{{ house.owner.username }}</h5>
+                            <h5 class="mb-0 text-black fw-bold">{{ house.owner.username|default:"Chủ nhà" }}</h5>
                             <span class="text-muted small">Chủ sở hữu</span>
                         </div>
                     </div>
@@ -167,7 +170,7 @@
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="property-item shadow-sm border rounded">
                     <a href="{% url 'house_detail' other_house.id %}" class="img">
-                        <img src="{% if other_house.images.all %}{{ other_house.images.first.image.url }}{% else %}{% static 'images/img_1.jpg' %}{% endif %}"
+                        <img src="{% if other_house.main_image %}{{ other_house.main_image.url }}{% elif other_house.images.all %}{{ other_house.images.first.image.url }}{% else %}{% static 'images/img_1.jpg' %}{% endif %}"
                             alt="Image" class="img-fluid rounded-top">
                     </a>
                     <div class="p-3">
@@ -204,14 +207,13 @@
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="property-item bg-white shadow-sm border rounded">
                     <a href="{% url 'house_detail' related.id %}" class="img">
-                        <img src="{% if related.images.all %}{{ related.images.first.image.url }}{% else %}{% static 'images/img_4.jpg' %}{% endif %}"
+                        <img src="{% if related.main_image %}{{ related.main_image.url }}{% elif related.images.all %}{{ related.images.first.image.url }}{% else %}{% static 'images/img_4.jpg' %}{% endif %}"
                             alt="Image" class="img-fluid rounded-top">
                     </a>
                     <div class="p-3">
                         <div class="price mb-2 text-primary fw-bold"><span>{{ related.price|floatformat:0 }} VNĐ</span>
                         </div>
-                        <h5 class="mb-2"><a href="{% url 'house_detail' related.id %}" class="text-black">{{
-                                related.name }}</a></h5>
+                        <h5 class="mb-2"><a href="{% url 'house_detail' related.id %}" class="text-black">{{related.name }}</a></h5>
                         <span class="city d-block mb-3 text-muted small">{{ related.address }}</span>
                         <a href="{% url 'house_detail' related.id %}" class="btn btn-outline-primary btn-sm">Xem chi
                             tiết</a>

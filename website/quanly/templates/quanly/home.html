@@ -15,6 +15,9 @@
 
         <form action="{% url 'home' %}" method="GET" class="narrow-w form-search d-flex align-items-stretch mb-3" data-aos="fade-up" data-aos-delay="200">
           <input type="text" name="search" class="form-control px-4" placeholder="Nhập tên quận, đường hoặc thành phố..." value="{{ search_query }}">
+          {% if selected_district %}<input type="hidden" name="quan" value="{{ selected_district }}">{% endif %}
+          {% if selected_price %}<input type="hidden" name="gia" value="{{ selected_price }}">{% endif %}
+          {% if selected_house_type %}<input type="hidden" name="loai" value="{{ selected_house_type }}">{% endif %}
           <button type="submit" class="btn btn-primary">Tìm kiếm</button>
         </form>
 
@@ -30,6 +33,7 @@
       <div class="col-lg-12">
         <div class="filter-box p-4 bg-white shadow-sm rounded border">
           <form action="{% url 'home' %}" method="GET">
+            {% if search_query %}<input type="hidden" name="search" value="{{ search_query }}">{% endif %}
             <div class="row g-3 align-items-center">
               <div class="col-md-12 mb-2">
                 <h5 class="text-primary fw-bold"><span class="flaticon-search me-2"></span>Bộ lọc tìm kiếm</h5>
@@ -38,28 +42,27 @@
                 <label class="form-label small fw-bold text-muted">Khu vực</label>
                 <select class="form-select" name="quan">
                   <option value="">-- Tất cả Quận --</option>
-                  <option value="Q1" {% if request.GET.quan == 'Q1' %}selected{% endif %}>Quận 1</option>
-                  <option value="Q5" {% if request.GET.quan == 'Q5' %}selected{% endif %}>Quận 5</option>
-                  <option value="QBT" {% if request.GET.quan == 'QBT' %}selected{% endif %}>Quận Bình Thạnh</option>
-                  <option value="TPTD" {% if request.GET.quan == 'TPTD' %}selected{% endif %}>TP. Thủ Đức</option>
+                  {% for district_value, district_label in district_choices %}
+                  <option value="{{ district_value }}" {% if selected_district == district_value %}selected{% endif %}>{{ district_label }}</option>
+                  {% endfor %}
                 </select>
               </div>
               <div class="col-md-3">
                 <label class="form-label small fw-bold text-muted">Mức giá</label>
                 <select class="form-select" name="gia">
                   <option value="">-- Tất cả mức giá --</option>
-                  <option value="0-5" {% if request.GET.gia == '0-5' %}selected{% endif %}>Dưới 5 triệu</option>
-                  <option value="5-10" {% if request.GET.gia == '5-10' %}selected{% endif %}>5 - 10 triệu</option>
-                  <option value="10-plus" {% if request.GET.gia == '10-plus' %}selected{% endif %}>Trên 10 triệu</option>
+                  <option value="0-5" {% if selected_price == '0-5' %}selected{% endif %}>Dưới 5 triệu</option>
+                  <option value="5-10" {% if selected_price == '5-10' %}selected{% endif %}>5 - 10 triệu</option>
+                  <option value="10-plus" {% if selected_price == '10-plus' %}selected{% endif %}>Trên 10 triệu</option>
                 </select>
               </div>
               <div class="col-md-3">
                 <label class="form-label small fw-bold text-muted">Loại nhà</label>
                 <select class="form-select" name="loai">
                   <option value="">-- Tất cả loại hình --</option>
-                  <option value="nguyen_can" {% if request.GET.loai == 'nguyen_can' %}selected{% endif %}>Nhà nguyên căn</option>
-                  <option value="chung_cu" {% if request.GET.loai == 'chung_cu' %}selected{% endif %}>Căn hộ chung cư</option>
-                  <option value="phong_tro" {% if request.GET.loai == 'phong_tro' %}selected{% endif %}>Phòng trọ</option>
+                  {% for type_value, type_label in house_type_choices %}
+                  <option value="{{ type_value }}" {% if selected_house_type == type_value %}selected{% endif %}>{{ type_label }}</option>
+                  {% endfor %}
                 </select>
               </div>
               <div class="col-md-3">
@@ -88,7 +91,9 @@
       <div class="col-md-6 col-lg-4 mb-4">
         <div class="property-item h-100 shadow-sm border rounded overflow-hidden">
           <a href="{% url 'house_detail' house.id %}" class="img">
-            {% if house.images.all %}
+            {% if house.main_image %}
+              <img src="{{ house.main_image.url }}" alt="Image" class="img-fluid" style="height: 250px; object-fit: cover; width: 100%;" />
+            {% elif house.images.all %}
               <img src="{{ house.images.first.image.url }}" alt="Image" class="img-fluid" style="height: 250px; object-fit: cover; width: 100%;" />
             {% else %}
               <img src="{% static 'images/img_1.jpg' %}" alt="Default Image" class="img-fluid" style="height: 250px; object-fit: cover; width: 100%;" />
@@ -97,8 +102,9 @@
           <div class="property-content p-4">
             <div class="price mb-2 text-primary fw-bold"><span>{{ house.price|floatformat:0 }} VNĐ</span></div>
             <div>
+              <h5 class="mb-2 fw-bold text-dark text-truncate" title="{{ house.name }}">{{ house.name }}</h5>
               <span class="d-block mb-2 text-black-50 text-truncate">{{ house.address }}</span>
-              <span class="city d-block mb-3 fw-bold">{{ house.get_district_display }}</span>
+              <span class="city d-block mb-3 text-muted">{{ house.get_district_display }}</span>
               <div class="specs d-flex mb-4">
                 <span class="d-block d-flex align-items-center me-3">
                   <span class="flaticon-house-1 me-2"></span><span class="caption">{{ house.area }} m²</span>
@@ -121,6 +127,42 @@
       </div>
       {% endfor %}
     </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="row mt-4">
+      <div class="col-12 d-flex justify-content-center">
+        <nav aria-label="Phân trang danh sách nhà">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">Trước</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Trước</span></li>
+            {% endif %}
+
+            {% for page_num in page_obj.paginator.page_range %}
+            {% if page_num == page_obj.number %}
+            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+            {% elif page_num >= page_obj.number|add:'-2' and page_num <= page_obj.number|add:'2' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_num }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">{{ page_num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">Sau</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Sau</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
 

@@ -126,6 +126,27 @@
                         <label class="fw-bold mb-2 text-dark">Mô tả chi tiết</label>
                         {{ form.description }}
                     </div>
+
+                    <div class="mt-4">
+                        <label class="fw-bold mb-2 text-dark">Nội thất đi kèm</label>
+                        <div class="row g-2">
+                            {% for checkbox in form.furniture %}
+                            <div class="col-md-4">
+                                <div class="form-check border rounded px-3 py-2 bg-light">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label ms-1" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <small class="text-muted">Chưa có danh mục nội thất.</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.furniture.errors %}
+                        <div class="text-danger small mt-1">{{ form.furniture.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 

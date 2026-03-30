@@ -49,6 +49,9 @@
                             {% if house.main_image %}
                             <img src="{{ house.main_image.url }}" class="rounded" width="80" height="60"
                                 style="object-fit: cover;">
+                            {% elif house.images.all %}
+                            <img src="{{ house.images.first.image.url }}" class="rounded" width="80" height="60"
+                                style="object-fit: cover;">
                             {% else %}
                             <div class="bg-secondary rounded" style="width: 80px; height: 60px;"></div>
                             {% endif %}

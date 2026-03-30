@@ -22,6 +22,7 @@ def post_house(request):
             house.requires_coordinates = True
 
             house.save()
+            form.save_m2m()
             
             # Save detail gallery images
             detail_images = request.FILES.getlist('detail_images')
@@ -95,6 +96,7 @@ def edit_house(request, house_id):
                 updated_house.requires_coordinates = False
                 
             updated_house.save()
+            form.save_m2m()
 
             messages.success(request, 'Cập nhật thông tin nhà thành công!')
             return redirect('manage_post')
