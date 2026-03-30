@@ -1,5 +1,62 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from .models import House, HouseImage, Tenant, Contract
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    phone = forms.CharField(required=True, max_length=10)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'phone', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control register-input',
+            'placeholder': 'Tên đăng nhập',
+        })
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-control register-input',
+            'placeholder': 'example@gmail.com',
+        })
+        self.fields['phone'].widget.attrs.update({
+            'class': 'form-control register-input',
+            'placeholder': 'Số điện thoại',
+            'inputmode': 'numeric',
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control register-input',
+            'placeholder': 'Mật khẩu',
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control register-input',
+            'placeholder': 'Nhập lại mật khẩu',
+        })
+
+        self.fields['password1'].help_text = ''
+        self.fields['password2'].help_text = ''
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Email này đã được sử dụng.')
+        return email
+
+    def clean_phone(self):
+        phone = ''.join(ch for ch in (self.cleaned_data.get('phone') or '') if ch.isdigit())
+        if len(phone) != 10:
+            raise forms.ValidationError('Số điện thoại phải gồm đúng 10 chữ số.')
+        return phone
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
 
 class HouseForm(forms.ModelForm):
     class Meta:

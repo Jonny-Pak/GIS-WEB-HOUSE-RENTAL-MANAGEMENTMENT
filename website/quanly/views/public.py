@@ -1,10 +1,14 @@
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+from django.contrib import messages
 from django.urls import reverse
+from django.shortcuts import redirect
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.core.files.storage import default_storage
-from quanly.models import House
+from quanly.models import House, Profile
+from quanly.forms import RegisterForm
 
 def home(request):
     search_query = request.GET.get('search', '').strip()
@@ -61,7 +65,24 @@ def home(request):
     return render(request, 'quanly/home.html', context)
 
 def register(request):
-    return render(request, 'quanly/accounts/register.html')
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            Profile.objects.get_or_create(
+                user=user,
+                defaults={'phone': form.cleaned_data['phone']}
+            )
+            login(request, user)
+            messages.success(request, 'Đăng ký tài khoản thành công!')
+            return redirect('home')
+    else:
+        form = RegisterForm()
+
+    return render(request, 'quanly/accounts/register.html', {'form': form})
 
 def house_detail_view(request, house_id):
     house = get_object_or_404(House, id=house_id)

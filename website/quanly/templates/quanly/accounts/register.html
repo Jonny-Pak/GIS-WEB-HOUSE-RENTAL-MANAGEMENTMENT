@@ -22,36 +22,53 @@
 
                     <form method="POST" action="">
                         {% csrf_token %}
-                        
-                        {% if form.errors %}
-                            <div class="alert alert-danger">
-                                Vui lòng kiểm tra lại thông tin nhập.
-                            </div>
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
                         {% endif %}
 
                         <div class="mb-3">
                             <label class="form-label">Tên đăng nhập</label>
-                            <input type="text" name="username" class="form-control register-input" required>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                            <div class="text-danger small mt-1">{{ form.username.errors|striptags }}</div>
+                            {% endif %}
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control register-input" placeholder="example@gmail.com" required>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger small mt-1">{{ form.email.errors|striptags }}</div>
+                            {% endif %}
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Số điện thoại</label>
-                            <input type="text" name="phone" class="form-control register-input" required>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="text-danger small mt-1">{{ form.phone.errors|striptags }}</div>
+                            {% endif %}
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Mật khẩu</label>
-                            <input type="password" name="password" class="form-control register-input" placeholder="Mật khẩu" required>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                            <div class="text-danger small mt-1">{{ form.password1.errors|striptags }}</div>
+                            {% endif %}
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Nhập lại mật khẩu</label>
-                            <input type="password" name="confirm_password" class="form-control register-input" placeholder="Nhập lại mật khẩu" required>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                            <div class="text-danger small mt-1">{{ form.password2.errors|striptags }}</div>
+                            {% endif %}
                         </div>
 
                         <div class="mb-4">
