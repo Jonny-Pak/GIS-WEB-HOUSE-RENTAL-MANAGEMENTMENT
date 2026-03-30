@@ -140,3 +140,37 @@ def resolve_house_coordinates(address: str, district_code: str, district_display
 
     # Không dùng fallback - trả về None để admin nhập tay
     return None, None, 'failed'
+
+
+def resolve_search_address(query: str) -> tuple[float | None, float | None, str]:
+    """
+    Geocode địa chỉ tự do cho chức năng tìm kiếm bản đồ.
+    Trả về (lat, lng, status) với status thuộc {'geocoded', 'failed'}.
+    """
+    cleaned = re.sub(r'\s+', ' ', (query or '').strip())
+    if not cleaned:
+        return None, None, 'failed'
+
+    candidates = [cleaned]
+    if 'hồ chí minh' not in cleaned.lower() and 'ho chi minh' not in cleaned.lower() and 'hcm' not in cleaned.lower():
+        candidates.append(f'{cleaned}, Thành phố Hồ Chí Minh, Việt Nam')
+        candidates.append(f'{cleaned}, Ho Chi Minh City, Vietnam')
+
+    # Thử thêm biến thể không dấu để tăng tỉ lệ geocode thành công.
+    candidates.append(_ascii_fold(cleaned))
+
+    seen = set()
+    for candidate in candidates:
+        key = candidate.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+
+        try:
+            lat, lng = _geocode_nominatim(candidate)
+            if lat is not None and lng is not None:
+                return lat, lng, 'geocoded'
+        except (ValueError, KeyError, TimeoutError, HTTPError, URLError):
+            continue
+
+    return None, None, 'failed'

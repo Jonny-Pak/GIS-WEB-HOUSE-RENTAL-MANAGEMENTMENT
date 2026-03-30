@@ -6,12 +6,35 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{% static 'css/map.css' %}" />
 {% endblock %}
 
 {% block content %}
 <section class="map-page">
     <div class="container">
+        <div class="map-tools shadow-sm rounded-4 mb-3">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-5 col-md-12">
+                    <label for="search-address" class="form-label mb-1">Nhập địa chỉ để tìm</label>
+                    <input type="text" id="search-address" class="form-control"
+                        placeholder="Ví dụ: 120 Nguyễn Huệ, Quận 1">
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <label for="radius-km" class="form-label mb-1">Bán kính tìm kiếm (km)</label>
+                    <input type="number" id="radius-km" class="form-control" min="0.5" max="30" step="0.5" value="5">
+                </div>
+                <div class="col-lg-5 col-md-8 col-12">
+                    <div class="d-flex flex-wrap gap-2 map-tools-actions">
+                        <button type="button" id="btn-use-location" class="btn btn-success">Dùng vị trí hiện tại</button>
+                        <button type="button" id="btn-search-address" class="btn btn-dark">Tìm theo địa chỉ</button>
+                        <button type="button" id="btn-reset-map" class="btn btn-outline-secondary">Hiển thị tất cả</button>
+                    </div>
+                </div>
+            </div>
+            <p id="map-status" class="map-status mb-0 mt-2">Mẹo: Bấm vào biểu tượng vẽ đa giác trên bản đồ để khoanh vùng tìm kiếm.</p>
+        </div>
         <div id="static-map" aria-label="Ban do nha cho thue"></div>
     </div>
 </section>
@@ -21,39 +44,334 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    const map = L.map("static-map", {
-        zoomControl: true,
-        scrollWheelZoom: true,
-    }).setView([10.7769, 106.7009], 12);
+    (function () {
+        const defaultCenter = [10.7769, 106.7009];
+        const map = L.map("static-map", {
+            zoomControl: true,
+            scrollWheelZoom: true,
+        }).setView(defaultCenter, 12);
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    }).addTo(map);
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        }).addTo(map);
 
-    const houses = JSON.parse(document.getElementById("houses-data").textContent || "[]");
-    const markerGroup = L.featureGroup().addTo(map);
+        const houses = JSON.parse(document.getElementById("houses-data").textContent || "[]");
+        const markerGroup = L.featureGroup().addTo(map);
+        const drawnItems = new L.FeatureGroup().addTo(map);
 
-    houses.forEach((house) => {
-        if (house.lat == null || house.lng == null) return;
+        const mapStatus = document.getElementById("map-status");
+        const searchAddressInput = document.getElementById("search-address");
+        const radiusInput = document.getElementById("radius-km");
+        const btnSearchAddress = document.getElementById("btn-search-address");
+        const btnUseLocation = document.getElementById("btn-use-location");
+        const btnResetMap = document.getElementById("btn-reset-map");
 
-        const marker = L.marker([house.lat, house.lng]);
-        marker.bindPopup(`
-            <div class="map-popup-content">
-                <strong>${house.name || "Nhà cho thuê"}</strong><br>
-                Giá: ${house.price || "Liên hệ"}<br>
-                Khu vực: ${house.district || "Không rõ khu vực"}<br>
-                Trạng thái: ${house.status || "Chưa cập nhật"}<br>
-                <a href="${house.detail_url || "#"}">Xem chi tiết</a>
-      </div>
-    `);
-        marker.addTo(markerGroup);
-    });
+        let currentLocation = null;
+        let userMarker = null;
+        let radiusCircle = null;
+        let routeLine = null;
+        let selectedPolygonLayer = null;
 
-    const bounds = markerGroup.getBounds();
-    if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [24, 24] });
-    }
+        function setStatus(message, isError) {
+            mapStatus.textContent = message;
+            mapStatus.classList.toggle("text-danger", !!isError);
+            mapStatus.classList.toggle("text-success", !isError);
+        }
+
+        function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const toRad = (value) => value * Math.PI / 180;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function extractCoords(house) {
+            if (house.coords && house.coords.lat != null && house.coords.lng != null) {
+                return { lat: Number(house.coords.lat), lng: Number(house.coords.lng) };
+            }
+            if (house.lat != null && house.lng != null) {
+                return { lat: Number(house.lat), lng: Number(house.lng) };
+            }
+            return null;
+        }
+
+        function clearMarkers() {
+            markerGroup.clearLayers();
+            if (routeLine) {
+                map.removeLayer(routeLine);
+                routeLine = null;
+            }
+        }
+
+        function renderMarkers(houseList) {
+            clearMarkers();
+            let count = 0;
+
+            houseList.forEach((house) => {
+                const coords = extractCoords(house);
+                if (!coords || !Number.isFinite(coords.lat) || !Number.isFinite(coords.lng)) return;
+
+                const distanceFromUser = currentLocation
+                    ? haversineDistanceKm(currentLocation.lat, currentLocation.lng, coords.lat, coords.lng)
+                    : null;
+                const distanceText = distanceFromUser == null
+                    ? "Chưa tính khoảng cách"
+                    : `${distanceFromUser.toFixed(2)} km`;
+
+                const marker = L.marker([coords.lat, coords.lng]);
+                marker.bindPopup(`
+                    <div class="map-popup-content">
+                        <strong>${house.name || "Nhà cho thuê"}</strong><br>
+                        Giá: ${house.price || "Liên hệ"}<br>
+                        Khu vực: ${house.district || "Không rõ khu vực"}<br>
+                        Trạng thái: ${house.status || "Chưa cập nhật"}<br>
+                        Khoảng cách: ${distanceText}<br>
+                        <a href="${house.detail_url || (house.id ? `/house-detail/${house.id}/` : "#")}">Xem chi tiết</a>
+                    </div>
+                `);
+
+                marker.on("click", function () {
+                    if (!currentLocation) return;
+                    if (routeLine) {
+                        map.removeLayer(routeLine);
+                    }
+                    routeLine = L.polyline([
+                        [currentLocation.lat, currentLocation.lng],
+                        [coords.lat, coords.lng],
+                    ], {
+                        color: "#1f6f52",
+                        weight: 4,
+                        dashArray: "8 6",
+                    }).addTo(map);
+
+                    setStatus(`Khoảng cách đến ${house.name || "nhà đã chọn"}: ${distanceText}`);
+                });
+
+                marker.addTo(markerGroup);
+                count += 1;
+            });
+
+            if (count > 0) {
+                const bounds = markerGroup.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [24, 24] });
+                }
+            }
+            return count;
+        }
+
+        function drawOrUpdateCurrentLocation(lat, lng) {
+            currentLocation = { lat, lng };
+            if (!userMarker) {
+                userMarker = L.marker([lat, lng], {
+                    title: "Vị trí hiện tại",
+                }).addTo(map);
+            } else {
+                userMarker.setLatLng([lat, lng]);
+            }
+        }
+
+        function clearRadiusCircle() {
+            if (radiusCircle) {
+                map.removeLayer(radiusCircle);
+                radiusCircle = null;
+            }
+        }
+
+        async function fetchNearbyHouses() {
+            if (!currentLocation) {
+                setStatus("Vui lòng lấy vị trí hiện tại trước khi tìm theo bán kính.", true);
+                return;
+            }
+
+            const radius = Number(radiusInput.value);
+            if (!Number.isFinite(radius) || radius <= 0) {
+                setStatus("Bán kính không hợp lệ. Vui lòng nhập số > 0.", true);
+                return;
+            }
+
+            clearRadiusCircle();
+            radiusCircle = L.circle([currentLocation.lat, currentLocation.lng], {
+                radius: radius * 1000,
+                color: "#2b7a57",
+                fillColor: "#4aa477",
+                fillOpacity: 0.16,
+                weight: 2,
+            }).addTo(map);
+
+            try {
+                setStatus("Đang tìm nhà trong bán kính...");
+                const params = new URLSearchParams({
+                    lat: String(currentLocation.lat),
+                    lng: String(currentLocation.lng),
+                    radius: String(radius),
+                });
+
+                const response = await fetch(`/api/houses/?${params.toString()}`);
+                if (!response.ok) throw new Error("Không thể tải dữ liệu theo bán kính.");
+                const data = await response.json();
+                const total = renderMarkers(Array.isArray(data) ? data : []);
+                setStatus(`Tìm thấy ${total} căn nhà trong bán kính ${radius} km.`);
+            } catch (error) {
+                setStatus(error.message || "Đã xảy ra lỗi khi tìm theo bán kính.", true);
+            }
+        }
+
+        async function geocodeAddressAndSearch() {
+            const query = (searchAddressInput.value || "").trim();
+            if (!query) {
+                setStatus("Vui lòng nhập địa chỉ trước khi tìm.", true);
+                return;
+            }
+
+            try {
+                setStatus("Đang định vị địa chỉ...");
+                const params = new URLSearchParams({ q: query });
+                const response = await fetch(`/api/geocode-address/?${params.toString()}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Không thể định vị địa chỉ đã nhập.");
+                }
+
+                drawOrUpdateCurrentLocation(Number(data.lat), Number(data.lng));
+                map.setView([Number(data.lat), Number(data.lng)], 14);
+                await fetchNearbyHouses();
+            } catch (error) {
+                setStatus(error.message || "Đã xảy ra lỗi khi tìm địa chỉ.", true);
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
+            return "";
+        }
+
+        async function fetchHousesInPolygon(coords) {
+            try {
+                setStatus("Đang tìm nhà trong vùng đa giác...");
+                const response = await fetch("/api/polygon-search/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                    body: JSON.stringify({ coords }),
+                });
+                if (!response.ok) throw new Error("Không thể tải dữ liệu trong vùng vẽ.");
+
+                const data = await response.json();
+                const total = renderMarkers(Array.isArray(data) ? data : []);
+                setStatus(`Tìm thấy ${total} căn nhà trong vùng đa giác.`);
+            } catch (error) {
+                setStatus(error.message || "Đã xảy ra lỗi khi tìm theo vùng đa giác.", true);
+            }
+        }
+
+        function resetMapView() {
+            clearRadiusCircle();
+            if (selectedPolygonLayer) {
+                drawnItems.removeLayer(selectedPolygonLayer);
+                selectedPolygonLayer = null;
+            }
+            const total = renderMarkers(houses);
+            setStatus(`Đang hiển thị toàn bộ ${total} căn nhà.`);
+        }
+
+        const drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems,
+                edit: false,
+                remove: true,
+            },
+            draw: {
+                polygon: {
+                    allowIntersection: false,
+                    showArea: true,
+                    shapeOptions: {
+                        color: "#1f6f52",
+                        weight: 3,
+                        fillOpacity: 0.12,
+                    },
+                },
+                polyline: false,
+                rectangle: false,
+                circle: false,
+                marker: false,
+                circlemarker: false,
+            },
+        });
+        map.addControl(drawControl);
+
+        map.on(L.Draw.Event.CREATED, function (event) {
+            if (selectedPolygonLayer) {
+                drawnItems.removeLayer(selectedPolygonLayer);
+            }
+            selectedPolygonLayer = event.layer;
+            drawnItems.addLayer(selectedPolygonLayer);
+
+            const latLngs = selectedPolygonLayer.getLatLngs();
+            if (!latLngs || !latLngs[0] || latLngs[0].length < 3) {
+                setStatus("Đa giác chưa hợp lệ, vui lòng vẽ lại.", true);
+                return;
+            }
+
+            const coords = latLngs[0].map((point) => ({
+                lat: point.lat,
+                lng: point.lng,
+            }));
+            fetchHousesInPolygon(coords);
+        });
+
+        map.on(L.Draw.Event.DELETED, function () {
+            selectedPolygonLayer = null;
+            resetMapView();
+        });
+
+        btnUseLocation.addEventListener("click", function () {
+            if (!navigator.geolocation) {
+                setStatus("Trình duyệt không hỗ trợ lấy vị trí hiện tại.", true);
+                return;
+            }
+
+            setStatus("Đang lấy vị trí hiện tại...");
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    drawOrUpdateCurrentLocation(lat, lng);
+                    map.setView([lat, lng], 14);
+                    fetchNearbyHouses();
+                },
+                function () {
+                    setStatus("Không thể lấy vị trí hiện tại. Vui lòng kiểm tra quyền truy cập vị trí.", true);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+
+        btnSearchAddress.addEventListener("click", geocodeAddressAndSearch);
+        searchAddressInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                geocodeAddressAndSearch();
+            }
+        });
+        btnResetMap.addEventListener("click", resetMapView);
+
+        const total = renderMarkers(houses);
+        setStatus(`Đang hiển thị toàn bộ ${total} căn nhà.`);
+    })();
 </script>
 {% endblock %}

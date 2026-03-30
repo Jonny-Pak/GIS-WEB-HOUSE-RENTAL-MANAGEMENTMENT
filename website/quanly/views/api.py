@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from quanly.service import get_nearby_houses_qs, get_houses_in_polygon_qs
 from quanly.serializers import HouseSerializer
+from quanly.geocoding import resolve_search_address
 
 @api_view(['GET'])
 def api_houses(request):
@@ -41,3 +42,17 @@ def api_polygon_search(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Lỗi máy chủ: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def api_geocode_address(request):
+    """API đổi địa chỉ text sang tọa độ để tìm theo bán kính."""
+    query = (request.GET.get('q') or '').strip()
+    if not query:
+        return Response({"error": "Vui lòng nhập địa chỉ cần tìm"}, status=status.HTTP_400_BAD_REQUEST)
+
+    lat, lng, result = resolve_search_address(query)
+    if result != 'geocoded' or lat is None or lng is None:
+        return Response({"error": "Không tìm thấy tọa độ cho địa chỉ đã nhập"}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({"lat": lat, "lng": lng, "query": query}, status=status.HTTP_200_OK)

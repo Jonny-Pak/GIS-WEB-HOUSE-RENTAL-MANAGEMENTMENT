@@ -26,6 +26,37 @@
     overflow: hidden;
 }
 
+.map-tools {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(30, 61, 50, 0.14);
+    padding: 16px;
+    backdrop-filter: blur(4px);
+}
+
+.map-tools .form-label {
+    color: #244b3d;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.map-tools .form-control {
+    border-color: rgba(30, 61, 50, 0.24);
+}
+
+.map-tools .form-control:focus {
+    border-color: #4d8f72;
+    box-shadow: 0 0 0 0.18rem rgba(77, 143, 114, 0.18);
+}
+
+.map-tools-actions .btn {
+    min-width: 150px;
+}
+
+.map-status {
+    font-size: 14px;
+    color: #3d5f50;
+}
+
 .leaflet-popup-content {
     font-family: "Work Sans", sans-serif;
 }
@@ -49,5 +80,17 @@
         min-height: 360px;
         height: 62vh;
         border-radius: 12px;
+    }
+
+    .map-tools {
+        padding: 12px;
+    }
+
+    .map-tools-actions .btn {
+        min-width: calc(50% - 0.25rem);
+    }
+
+    .map-tools-actions .btn:last-child {
+        min-width: 100%;
     }
 }

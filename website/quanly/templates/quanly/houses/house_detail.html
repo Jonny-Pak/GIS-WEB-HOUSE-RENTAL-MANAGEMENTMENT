@@ -87,8 +87,7 @@
                             <span class="icon-users me-2 text-primary display-6"></span>
                             <div>
                                 <span class="d-block fw-bold">Số người tối đa</span>
-                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else
-                                    %}Không giới hạn{% endif %}</span>
+                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else %}Không giới hạn{% endif %}</span>
                             </div>
                         </div>
                     </div>
@@ -119,8 +118,7 @@
                     <span class="icon-map-marker text-danger me-2"></span>
                     Chưa có tọa độ chính xác cho căn nhà này.
                 </div>
-                <small class="d-block mt-2 text-muted">Lat: {{ house.lat|default:"N/A" }} | Long: {{
-                    house.lng|default:"N/A" }}</small>
+                <small class="d-block mt-2 text-muted">Lat: {{ house.lat|default:"N/A" }} | Long: {{ house.lng|default:"N/A" }}</small>
             </div>
 
             <div class="col-lg-4">
