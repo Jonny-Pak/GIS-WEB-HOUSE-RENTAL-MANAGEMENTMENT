@@ -24,7 +24,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 h-100 text-success">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 bg-success-subtle p-3 rounded-3 me-3">
-                        <i class="bi bi-check-circle-fill fs-4"></i>
+                        <i class="bi bi-check-circle-fill fs-4 text-success"></i>
                     </div>
                     <div>
                         <h6 class="text-muted mb-1 small">Đang hiệu lực</h6>
@@ -37,7 +37,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 h-100 text-danger">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 bg-danger-subtle p-3 rounded-3 me-3">
-                        <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                        <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
                     </div>
                     <div>
                         <h6 class="text-muted mb-1 small">Sắp hết hạn</h6>
@@ -50,7 +50,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 h-100 text-info">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 bg-info-subtle p-3 rounded-3 me-3">
-                        <i class="bi bi-cash-stack fs-4"></i>
+                        <i class="bi bi-cash-stack fs-4 text-info"></i>
                     </div>
                     <div>
                         <h6 class="text-muted mb-1 small">Dự kiến thu</h6>
@@ -106,7 +106,8 @@
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="avatar-sm bg-teal-subtle text-teal rounded-circle d-flex align-items-center justify-content-center me-2 fw-bold" style="width: 32px; height: 32px; background-color: #e0f2f1; color: #008080;">
+                                            <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center me-2 fw-bold" 
+                                                 style="width: 32px; height: 32px; background-color: #e0f2f1; color: #008080;">
                                                 {{ contract.renter.full_name|first|upper }}
                                             </div>
                                             <div>
@@ -116,7 +117,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{% url 'home_details' %}" target="_blank" 
+                                        <a href="{% url 'house_detail' contract.house.id %}" target="_blank" 
                                            class="fw-bold text-teal text-decoration-none d-block mb-0" style="color: #008080;">
                                             {{ contract.house.name }}
                                         </a>
@@ -149,7 +150,7 @@
                                     <td class="text-end pe-4">
                                         <div class="btn-group shadow-sm rounded bg-white border">
                                             {% if contract.contract_document %}
-                                            <a href="{{ contract.contract_document.url }}" target="_blank" class="btn btn-sm text-info border-0" title="Tải file">
+                                            <a href="{{ contract.contract_document.url }}" target="_blank" class="btn btn-sm text-info border-0" title="Xem hợp đồng">
                                                 <i class="bi bi-paperclip"></i>
                                             </a>
                                             {% endif %}

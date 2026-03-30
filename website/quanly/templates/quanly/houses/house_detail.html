@@ -1,7 +1,7 @@
 {% extends 'quanly/layouts/base.html' %}
 {% load static %}
 
-{% block title %}Chi tiết - Biệt thự Thảo Điền cao cấp{% endblock %}
+{% block title %}Chi tiết - {{ house.name }}{% endblock %}
 
 {% block content %}
 
@@ -9,11 +9,11 @@
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height: 40vh; min-height: 300px;">
             <div class="col-lg-9 text-center mt-5">
-                <h1 class="heading" data-aos="fade-up">Biệt thự Thảo Điền cao cấp</h1>
+                <h1 class="heading" data-aos="fade-up">{{ house.name }}</h1>
                 <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="200">
                     <ol class="breadcrumb text-center justify-content-center">
                         <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
-                        <li class="breadcrumb-item"><a href="#">TP. Thủ Đức</a></li>
+                        <li class="breadcrumb-item"><a href="#">{{ house.get_district_display }}</a></li>
                         <li class="breadcrumb-item active text-white-50" aria-current="page">Chi tiết</li>
                     </ol>
                 </nav>
@@ -25,59 +25,73 @@
 <div class="section">
     <div class="container">
         <div class="row justify-content-between">
+
             <div class="col-lg-8">
                 <div class="img-property-main mb-4">
-                    <img src="{% static 'images/img_3.jpg' %}" alt="Image" class="img-fluid rounded w-100" style="height: 500px; object-fit: cover;">
+                    {% if house.images.all %}
+                        <img src="{{ house.images.first.image.url }}" alt="{{ house.name }}" class="img-fluid rounded w-100" style="height: 500px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/img_3.jpg' %}" alt="Default Image" class="img-fluid rounded w-100" style="height: 500px; object-fit: cover;">
+                    {% endif %}
                 </div>
 
                 <div class="row mb-5">
+                    {% for img in house.images.all %}
                     <div class="col-4 mb-3">
-                        <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid rounded" style="height: 120px; width: 100%; object-fit: cover;">
+                        <img src="{{ img.image.url }}" alt="Gallery Image" class="img-fluid rounded" style="height: 120px; width: 100%; object-fit: cover; cursor: pointer;">
                     </div>
-                    <div class="col-4 mb-3">
-                        <img src="{% static 'images/img_2.jpg' %}" alt="Image" class="img-fluid rounded" style="height: 120px; width: 100%; object-fit: cover;">
-                    </div>
-                    <div class="col-4 mb-3">
-                        <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid rounded" style="height: 120px; width: 100%; object-fit: cover;">
-                    </div>
+                    {% empty %}
+                        <div class="col-12"><p class="text-muted fst-italic small">Chưa có ảnh thư viện cho căn nhà này.</p></div>
+                    {% endfor %}
                 </div>
 
                 <h2 class="heading text-primary">Thông tin chi tiết</h2>
-                <p class="text-black-50"><span class="icon-map-marker me-1"></span> 123 Đường Thảo Điền, Quận Thủ Đức, TP.HCM</p>
+                <p class="text-black-50"><span class="icon-map-marker me-1"></span> {{ house.address }}, {{ house.get_district_display }}</p>
 
                 <div class="row mt-4 mb-4">
                     <div class="col-md-6 col-lg-4 mb-3">
                         <div class="d-flex align-items-center">
                             <span class="flaticon-house-1 me-2 text-primary display-6"></span>
-                            <div><span class="d-block fw-bold">Diện tích</span><span class="text-black-50">120 m²</span></div>
+                            <div>
+                                <span class="d-block fw-bold">Diện tích</span>
+                                <span class="text-black-50">{{ house.area }} m²</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-4 mb-3">
                         <div class="d-flex align-items-center">
                             <span class="flaticon-building me-2 text-primary display-6"></span>
-                            <div><span class="d-block fw-bold">Loại hình</span><span class="text-black-50">Biệt thự</span></div>
+                            <div>
+                                <span class="d-block fw-bold">Loại hình</span>
+                                <span class="text-black-50">{{ house.get_house_type_display }}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-4 mb-3">
                         <div class="d-flex align-items-center">
                             <span class="icon-users me-2 text-primary display-6"></span>
-                            <div><span class="d-block fw-bold">Số người tối đa</span><span class="text-black-50">5 người</span></div>
+                            <div>
+                                <span class="d-block fw-bold">Số người tối đa</span>
+                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else %}Không giới hạn{% endif %}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <hr>
                 <h3 class="heading text-primary mt-4">Mô tả</h3>
-                <p>Căn biệt thự Thảo Điền tuyệt đẹp với thiết kế hiện đại, không gian mở thoáng mát. Nằm trong khu vực an ninh, yên tĩnh, đầy đủ tiện ích xung quanh.</p>
+                <p>{{ house.description|linebreaks }}</p>
 
                 <h3 class="heading text-primary mt-4">Nội thất (Đã trang bị)</h3>
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <div class="p-3 border rounded bg-light">
+                        <div class="p-3 border rounded bg-light h-100">
                             <ul class="list-unstyled mb-0">
-                                <li class="mb-2"><span class="icon-check text-success me-2"></span> Máy lạnh Inverter</li>
-                                <li class="mb-2"><span class="icon-check text-success me-2"></span> Tủ lạnh side-by-side</li>
-                                <li class="mb-2"><span class="icon-check text-success me-2"></span> Hệ thống đèn thông minh</li>
+                                {% for item in house.furniture.all %}
+                                    <li class="mb-2"><span class="icon-check text-success me-2"></span> {{ item.name }}</li>
+                                {% empty %}
+                                    <li class="text-muted">Chưa cập nhật thông tin nội thất.</li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
@@ -89,7 +103,7 @@
                     <div class="text-center p-4 bg-white rounded shadow-sm opacity-75">
                         <span class="icon-map-marker display-4 text-danger"></span>
                         <p class="mt-2 text-black fw-bold mb-0">Bản đồ GIS</p>
-                        <small>Lat: 10.8012 | Long: 106.7364</small>
+                        <small>Lat: {{ house.lat|default:"N/A" }} | Long: {{ house.lng|default:"N/A" }}</small>
                     </div>
                 </div>
             </div>
@@ -98,26 +112,26 @@
                 <div class="bg-white widget border rounded p-4 mb-4 shadow-sm sticky-top" style="top: 20px; z-index: 10;">
                     <h3 class="h4 text-black widget-title mb-3">Giá thuê</h3>
                     <div class="price mb-3">
-                        <span class="text-primary h2 fw-bold">25,000,000 VNĐ</span><span class="text-muted">/tháng</span>
+                        <span class="text-primary h2 fw-bold">{{ house.price|floatformat:0 }} VNĐ</span><span class="text-muted">/tháng</span>
                     </div>
                     <div class="mb-3">
-                        <span class="badge bg-warning text-dark px-3 py-2">Cọc: 50,000,000 VNĐ</span>
+                        <span class="badge bg-warning text-dark px-3 py-2">Cọc: {{ house.deposit|floatformat:0 }} VNĐ</span>
                     </div>
-                    <button type="button" class="btn btn-primary w-100 py-3 fw-bold shadow-sm">
-                        <span class="icon-phone me-2"></span> 0901 234 567
-                    </button>
+                    <a href="tel:{{ house.owner_phone }}" class="btn btn-primary w-100 py-3 fw-bold shadow-sm text-white">
+                        <span class="icon-phone me-2"></span> {{ house.owner_phone }}
+                    </a>
                 </div>
 
                 <div class="bg-white widget border rounded p-4 shadow-sm mt-4">
                     <h3 class="h4 text-black widget-title mb-3">Người đăng tin</h3>
                     <div class="d-flex align-items-center mb-4">
-                        <img src="{% static 'images/person_1-min.jpg' %}" alt="Image" class="img-fluid rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                        <img src="{% static 'images/person_1-min.jpg' %}" alt="Owner" class="img-fluid rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
                         <div>
-                            <h5 class="mb-0 text-black fw-bold">Lê Ngọc Thuận</h5>
-                            <span class="text-muted small">Chủ nhà</span>
+                            <h5 class="mb-0 text-black fw-bold">{{ house.owner.username }}</h5>
+                            <span class="text-muted small">Chủ sở hữu</span>
                         </div>
                     </div>
-                    <p class="text-muted small fst-italic">"Tôi luôn hỗ trợ khách hàng xem nhà 24/7. Vui lòng liên hệ trước khi đến."</p>
+                    <p class="text-muted small fst-italic">"Liên hệ trực tiếp với chủ nhà để trao đổi và xem phòng nhanh nhất."</p>
                 </div>
             </div>
         </div>
@@ -128,52 +142,27 @@
     <div class="container">
         <div class="row mb-4">
             <div class="col-md-12">
-                <h2 class="font-weight-bold text-primary heading">Tin đăng khác của Lê Ngọc Thuận</h2>
+                <h2 class="font-weight-bold text-primary heading">Tin đăng khác của {{ house.owner.username }}</h2>
             </div>
         </div>
         <div class="row">
+            {% for other_house in other_houses %}
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="property-item shadow-sm border rounded">
-                    <a href="#" class="img"><img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid rounded-top"></a>
+                    <a href="{% url 'house_detail' other_house.id %}" class="img">
+                        <img src="{% if other_house.images.all %}{{ other_house.images.first.image.url }}{% else %}{% static 'images/img_1.jpg' %}{% endif %}" alt="Image" class="img-fluid rounded-top">
+                    </a>
                     <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>12,000,000 VNĐ</span></div>
-                        <h5 class="mb-2"><a href="#" class="text-black">Căn hộ Studio Quận 1</a></h5>
-                        <span class="city d-block mb-3 text-muted"><span class="icon-map-marker me-1"></span>Quận 1, TP.HCM</span>
-                        <div class="specs d-flex">
-                            <span class="me-3 small"><span class="icon-bed me-1"></span>1 Ngủ</span>
-                            <span class="small"><span class="icon-bath me-1"></span>1 Tắm</span>
-                        </div>
+                        <div class="price mb-2 text-primary fw-bold"><span>{{ other_house.price|floatformat:0 }} VNĐ</span></div>
+                        <h5 class="mb-2"><a href="{% url 'house_detail' other_house.id %}" class="text-black">{{ other_house.name }}</a></h5>
+                        <span class="city d-block mb-3 text-muted small"><span class="icon-map-marker me-1"></span>{{ other_house.get_district_display }}</span>
+                        <a href="{% url 'house_detail' other_house.id %}" class="btn btn-primary btn-sm px-3 text-white">Chi tiết</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="property-item shadow-sm border rounded">
-                    <a href="#" class="img"><img src="{% static 'images/img_2.jpg' %}" alt="Image" class="img-fluid rounded-top"></a>
-                    <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>8,500,000 VNĐ</span></div>
-                        <h5 class="mb-2"><a href="#" class="text-black">Nhà nguyên căn mini</a></h5>
-                        <span class="city d-block mb-3 text-muted"><span class="icon-map-marker me-1"></span>Bình Thạnh, TP.HCM</span>
-                        <div class="specs d-flex">
-                            <span class="me-3 small"><span class="icon-bed me-1"></span>2 Ngủ</span>
-                            <span class="small"><span class="icon-bath me-1"></span>1 Tắm</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="property-item shadow-sm border rounded">
-                    <a href="#" class="img"><img src="{% static 'images/img_5.jpg' %}" alt="Image" class="img-fluid rounded-top"></a>
-                    <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>15,000,000 VNĐ</span></div>
-                        <h5 class="mb-2"><a href="#" class="text-black">Căn hộ dịch vụ cao cấp</a></h5>
-                        <span class="city d-block mb-3 text-muted"><span class="icon-map-marker me-1"></span>Quận 3, TP.HCM</span>
-                        <div class="specs d-flex">
-                            <span class="me-3 small"><span class="icon-bed me-1"></span>1 Ngủ</span>
-                            <span class="small"><span class="icon-bath me-1"></span>1 Tắm</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% empty %}
+                <div class="col-12"><p class="text-muted">Chủ nhà hiện chưa có tin đăng nào khác.</p></div>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -183,43 +172,27 @@
         <div class="row mb-4">
             <div class="col-md-12 text-center">
                 <h2 class="font-weight-bold text-primary heading">Có thể bạn quan tâm</h2>
-                <p class="text-muted">Những căn biệt thự tương tự trong khu vực</p>
+                <p class="text-muted">Những căn nhà tương tự tại khu vực {{ house.get_district_display }}</p>
             </div>
         </div>
         <div class="row">
+            {% for related in related_houses %}
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="property-item bg-white shadow-sm border rounded">
-                    <a href="#" class="img"><img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid rounded-top"></a>
+                    <a href="{% url 'house_detail' related.id %}" class="img">
+                        <img src="{% if related.images.all %}{{ related.images.first.image.url }}{% else %}{% static 'images/img_4.jpg' %}{% endif %}" alt="Image" class="img-fluid rounded-top">
+                    </a>
                     <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>30,000,000 VNĐ</span></div>
-                        <h5 class="mb-2"><a href="#" class="text-black">Biệt thự sân vườn Thảo Điền</a></h5>
-                        <span class="city d-block mb-3 text-muted">Thủ Đức, TP.HCM</span>
-                        <a href="#" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                        <div class="price mb-2 text-primary fw-bold"><span>{{ related.price|floatformat:0 }} VNĐ</span></div>
+                        <h5 class="mb-2"><a href="{% url 'house_detail' related.id %}" class="text-black">{{ related.name }}</a></h5>
+                        <span class="city d-block mb-3 text-muted small">{{ related.address }}</span>
+                        <a href="{% url 'house_detail' related.id %}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="property-item bg-white shadow-sm border rounded">
-                    <a href="#" class="img"><img src="{% static 'images/img_6.jpg' %}" alt="Image" class="img-fluid rounded-top"></a>
-                    <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>22,000,000 VNĐ</span></div>
-                        <h5 class="mb-2"><a href="#" class="text-black">Biệt thự mini khu biệt lập</a></h5>
-                        <span class="city d-block mb-3 text-muted">Quận 7, TP.HCM</span>
-                        <a href="#" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="property-item bg-white shadow-sm border rounded">
-                    <a href="#" class="img"><img src="{% static 'images/img_3.jpg' %}" alt="Image" class="img-fluid rounded-top"></a>
-                    <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>28,000,000 VNĐ</span></div>
-                        <h5 class="mb-2"><a href="#" class="text-black">Villa phong cách Châu Âu</a></h5>
-                        <span class="city d-block mb-3 text-muted">Thủ Đức, TP.HCM</span>
-                        <a href="#" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                    </div>
-                </div>
-            </div>
+            {% empty %}
+                <div class="col-12 text-center"><p class="text-muted">Hiện chưa tìm thấy nhà tương tự trong khu vực này.</p></div>
+            {% endfor %}
         </div>
     </div>
 </div>

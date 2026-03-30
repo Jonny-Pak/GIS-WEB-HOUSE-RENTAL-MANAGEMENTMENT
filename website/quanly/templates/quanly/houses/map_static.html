@@ -19,16 +19,17 @@
 {{ map_houses|json_script:"houses-data" }}
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
+</script>
 <script>
     const map = L.map("static-map", {
         zoomControl: true,
         scrollWheelZoom: true,
     }).setView([10.7769, 106.7009], 12);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
         maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     }).addTo(map);
 
     const houses = JSON.parse(document.getElementById("houses-data").textContent || "[]");
