@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.core.files.storage import default_storage
 from quanly.models import House, HouseImage, Tenant, Contract
 from quanly.forms import HouseForm, TenantForm, ContractForm
 
@@ -37,7 +38,11 @@ def post_house(request):
             return redirect('manage_post')
     else:
         form = HouseForm()
-    return render(request, 'quanly/dashboard/post_house.html', {'form': form})
+    return render(request, 'quanly/dashboard/post_house.html', {
+        'form': form,
+        'is_edit': False,
+        'existing_gallery_images': [],
+    })
 
 @login_required(login_url='login')
 def manage_post(request):
@@ -73,6 +78,10 @@ def manage_post(request):
 def edit_house(request, house_id):
     house = get_object_or_404(House, id=house_id, owner=request.user)
     original_address = house.address
+    existing_gallery_images = [
+        img for img in house.images.all()
+        if img.image and default_storage.exists(img.image.name)
+    ]
 
     if request.method == 'POST':
         form = HouseForm(request.POST, request.FILES, instance=house)
@@ -94,16 +103,39 @@ def edit_house(request, house_id):
                 updated_house.status = 'no_coordinates'
             else:
                 updated_house.requires_coordinates = False
+
+            remove_main_image = request.POST.get('remove_main_image') == '1'
+            if remove_main_image and not request.FILES.get('main_image'):
+                if updated_house.main_image:
+                    updated_house.main_image.delete(save=False)
+                updated_house.main_image = None
                 
             updated_house.save()
             form.save_m2m()
+
+            delete_gallery_image_ids = request.POST.getlist('delete_gallery_image_ids')
+            if delete_gallery_image_ids:
+                for gallery_image in HouseImage.objects.filter(house=updated_house, id__in=delete_gallery_image_ids):
+                    if gallery_image.image:
+                        gallery_image.image.delete(save=False)
+                    gallery_image.delete()
+
+            # Save additional gallery images uploaded in edit mode.
+            detail_images = request.FILES.getlist('detail_images')
+            for image in detail_images:
+                HouseImage.objects.create(house=updated_house, image=image)
 
             messages.success(request, 'Cập nhật thông tin nhà thành công!')
             return redirect('manage_post')
     else:
         form = HouseForm(instance=house)
 
-    return render(request, 'quanly/dashboard/post_house.html', {'form': form})
+    return render(request, 'quanly/dashboard/post_house.html', {
+        'form': form,
+        'is_edit': True,
+        'house': house,
+        'existing_gallery_images': existing_gallery_images,
+    })
 
 @require_POST
 @login_required(login_url='login')
