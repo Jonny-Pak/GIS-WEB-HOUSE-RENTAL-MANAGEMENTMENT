@@ -155,7 +155,51 @@ def create_contract(request, house_id):
     return render(request, 'quanly/dashboard/create_contract.html', {
         'house': house,
         'tenant_form': tenant_form,
-        'contract_form': contract_form
+        'contract_form': contract_form,
+        'is_edit': False,
+    })
+
+
+@login_required(login_url='login')
+def edit_contract(request, contract_id):
+    contract = get_object_or_404(
+        Contract.objects.select_related('house', 'renter'),
+        id=contract_id,
+        house__owner=request.user,
+    )
+
+    if contract.renter is None:
+        messages.error(request, 'Hợp đồng không có thông tin khách thuê để chỉnh sửa.')
+        return redirect('manage_contracts')
+
+    if request.method == 'POST':
+        tenant_form = TenantForm(request.POST, request.FILES, instance=contract.renter)
+        contract_form = ContractForm(request.POST, request.FILES, instance=contract)
+
+        if tenant_form.is_valid() and contract_form.is_valid():
+            tenant = tenant_form.save(commit=False)
+            tenant.created_by = request.user
+            tenant.save()
+
+            updated_contract = contract_form.save(commit=False)
+            updated_contract.house = contract.house
+            updated_contract.renter = tenant
+            updated_contract.save()
+
+            messages.success(request, f'Cập nhật hợp đồng #{contract.id} thành công!')
+            return redirect('manage_contracts')
+        else:
+            messages.error(request, 'Vui lòng kiểm tra lại thông tin biểu mẫu.')
+    else:
+        tenant_form = TenantForm(instance=contract.renter)
+        contract_form = ContractForm(instance=contract)
+
+    return render(request, 'quanly/dashboard/create_contract.html', {
+        'house': contract.house,
+        'tenant_form': tenant_form,
+        'contract_form': contract_form,
+        'is_edit': True,
+        'contract': contract,
     })
 
 @login_required(login_url='login')

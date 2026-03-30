@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.core.files.storage import default_storage
 from quanly.models import House
 
 def home(request):
@@ -65,9 +66,17 @@ def register(request):
 def house_detail_view(request, house_id):
     house = get_object_or_404(House, id=house_id)
     related_houses = House.objects.filter(district=house.district).exclude(id=house_id)[:3]
+
+    # Hide broken gallery entries when image files are missing on disk.
+    gallery_images = [
+        img for img in house.images.all()
+        if img.image and default_storage.exists(img.image.name)
+    ]
+
     context = {
         'house': house,
         'related_houses': related_houses,
+        'gallery_images': gallery_images,
     }
     return render(request, 'quanly/houses/house_detail.html', context)
 

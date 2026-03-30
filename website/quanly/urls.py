@@ -16,6 +16,7 @@ urlpatterns = [
     path('dashboard/house/<int:house_id>/edit/', views.edit_house, name='edit_house'),
     path('dashboard/house/<int:house_id>/delete/', views.delete_house, name='delete_house'),
     path('manage-contracts/', views.manage_contracts, name='manage_contracts'),
+    path('dashboard/contracts/<int:contract_id>/edit/', views.edit_contract, name='edit_contract'),
     path('manage-tenants/', views.manage_tenants, name='manage_tenants'),
     path('dashboard/house/<int:house_id>/contract/new/', views.create_contract, name='create_contract'),
     path('custom-admin/login/', views.custom_admin_login, name='custom_admin_login'),

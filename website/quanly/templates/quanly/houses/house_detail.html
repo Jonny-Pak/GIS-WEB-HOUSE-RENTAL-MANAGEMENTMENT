@@ -37,8 +37,8 @@
                     {% if house.main_image %}
                     <img src="{{ house.main_image.url }}" alt="{{ house.name }}"
                         class="img-fluid rounded w-100 house-main-image">
-                    {% elif house.images.all %}
-                    <img src="{{ house.images.first.image.url }}" alt="{{ house.name }}"
+                    {% elif gallery_images %}
+                    <img src="{{ gallery_images.0.image.url }}" alt="{{ house.name }}"
                         class="img-fluid rounded w-100 house-main-image">
                     {% else %}
                     <img src="{% static 'images/img_3.jpg' %}" alt="Default Image"
@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="row mb-5">
-                    {% for img in house.images.all %}
+                    {% for img in gallery_images %}
                     <div class="col-4 mb-3">
                         <img src="{{ img.image.url }}" alt="Gallery Image"
                             class="img-fluid rounded house-gallery-image">

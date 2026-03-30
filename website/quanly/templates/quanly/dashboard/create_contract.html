@@ -1,18 +1,22 @@
 {% extends 'quanly/layouts/dashboard_base.html' %}
 {% load static %}
 
-{% block title %}Tạo mới hợp đồng đính kèm{% endblock %}
-{% block header_title %}Tạo mới Hợp Đồng{% endblock %}
+{% block title %}{% if is_edit %}Chỉnh sửa hợp đồng{% else %}Tạo mới hợp đồng đính kèm{% endif %}{% endblock %}
+{% block header_title %}{% if is_edit %}Chỉnh sửa Hợp Đồng{% else %}Tạo mới Hợp Đồng{% endif %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
 
         <div class="alert alert-info border-info mb-4">
-            <h5 class="alert-heading fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>Đang tạo hợp đồng cho nhà:
+            <h5 class="alert-heading fw-bold mb-2"><i class="bi bi-info-circle-fill me-2"></i>{% if is_edit %}Đang chỉnh sửa hợp đồng cho nhà:{% else %}Đang tạo hợp đồng cho nhà:{% endif %}
                 {{ house.name }}</h5>
+            {% if is_edit %}
+            <p class="mb-0 small">Bạn đang cập nhật thông tin khách thuê và điều khoản hợp đồng đã tạo.</p>
+            {% else %}
             <p class="mb-0 small">Bằng việc lưu biểu mẫu này, hệ thống sẽ ghi nhận Thông tin Khách hàng, lưu trữ Hợp
                 đồng và tự động thay đổi Trạng thái của căn nhà này thành <strong>"Đã cho thuê"</strong>.</p>
+            {% endif %}
         </div>
 
         <form method="POST" enctype="multipart/form-data">
@@ -122,10 +126,10 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a href="{% url 'manage_post' %}" class="btn btn-light px-4 py-2 border fw-bold text-dark">Hủy
+                        <a href="{% if is_edit %}{% url 'manage_contracts' %}{% else %}{% url 'manage_post' %}{% endif %}" class="btn btn-light px-4 py-2 border fw-bold text-dark">Hủy
                             bỏ</a>
                         <button type="submit" class="btn btn-primary px-5 py-2 fw-bold text-white shadow-sm">
-                            <i class="bi bi-check-circle me-2"></i>Tạo hợp đồng
+                            <i class="bi bi-check-circle me-2"></i>{% if is_edit %}Lưu cập nhật{% else %}Tạo hợp đồng{% endif %}
                         </button>
                     </div>
                 </div>
