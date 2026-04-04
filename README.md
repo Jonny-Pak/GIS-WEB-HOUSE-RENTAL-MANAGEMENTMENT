@@ -12,8 +12,11 @@ GIS-WEB-HOUSE-RENTAL-MANAGEMENTMENT/
 |- media/
 |- website/
 |  |- manage.py
-|  |- quanly/
-|  |- website/
+|  |- accounts/       # Quản lý tài khoản (Auth)
+|  |- api/            # API DRF (Bản đồ, Tìm kiếm)
+|  |- contracts/      # Quản lý hợp đồng & khách thuê
+|  |- houses/         # Quản lý thông tin nhà, geocoding
+|  |- website/        # Root Config
 |- README.md
 ```
 
