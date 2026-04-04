@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_POST
 from houses.models import House, Furniture, HouseImage
 from contracts.models import Contract, Tenant
-from .forms_admin import (
+from .forms import (
     AdminUserCreateForm, AdminUserUpdateForm, AdminHouseForm,
     AdminFurnitureForm
 )
@@ -46,7 +46,7 @@ def custom_admin_login(request):
         else:
             error_message = 'Tài khoản hoặc mật khẩu không đúng, hoặc bạn không có quyền.'
 
-    return render(request, 'quanly/custom_admin/login.html', {'error': error_message})
+    return render(request, 'custom_admin/login.html', {'error': error_message})
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_logout(request):
@@ -75,7 +75,7 @@ def custom_admin_dashboard(request):
         'latest_users': User.objects.order_by('-date_joined')[:5],
         'latest_houses': House.objects.order_by('-created_at')[:5],
     }
-    return render(request, 'quanly/custom_admin/dashboard.html', context)
+    return render(request, 'custom_admin/dashboard.html', context)
 
 # --- GENERIC HELPERS ---
 def _custom_admin_model_list(request, queryset, page_title, create_url, headers, row_builder, edit_url_name, delete_url_name):
@@ -113,7 +113,7 @@ def _custom_admin_model_list(request, queryset, page_title, create_url, headers,
         for item in items
     ]
 
-    return render(request, 'quanly/custom_admin/list.html', {
+    return render(request, 'custom_admin/list.html', {
         'page_title': page_title,
         'create_url': create_url,
         'items': items,
@@ -147,7 +147,7 @@ def _custom_admin_model_form(request, form_class, instance, page_title, back_url
     else:
         form = form_class(instance=instance)
 
-    return render(request, 'quanly/custom_admin/form.html', {
+    return render(request, 'custom_admin/form.html', {
         'page_title': page_title,
         'form': form,
         'back_url': back_url,

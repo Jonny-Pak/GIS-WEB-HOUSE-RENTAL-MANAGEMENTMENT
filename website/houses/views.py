@@ -8,12 +8,12 @@ from .forms import HouseForm
 
 def home(request):
     houses = House.objects.filter(status='available').order_by('-created_at')[:6]
-    return render(request, 'quanly/home.html', {'houses': houses})
+    return render(request, 'home.html', {'houses': houses})
 
 def house_detail_view(request, house_id):
     house = get_object_or_404(House, id=house_id)
     related_houses = House.objects.filter(district=house.district).exclude(id=house_id)[:3]
-    return render(request, 'quanly/houses/house_detail.html', {'house': house, 'related_houses': related_houses})
+    return render(request, 'houses/house_detail.html', {'house': house, 'related_houses': related_houses})
 
 def map_view(request):
     approved_houses = House.objects.filter(
@@ -30,11 +30,11 @@ def map_view(request):
         'lng': house.lng,
         'detail_url': reverse('house_detail', args=[house.id]),
     } for house in approved_houses]
-    return render(request, 'quanly/houses/map_static.html', {'map_houses': map_houses})
+    return render(request, 'houses/map_static.html', {'map_houses': map_houses})
 
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'quanly/dashboard/overview.html')
+    return render(request, 'dashboard/overview.html')
 
 @login_required(login_url='login')
 def post_house(request):
@@ -54,7 +54,7 @@ def post_house(request):
             return redirect('manage_post')
     else:
         form = HouseForm()
-    return render(request, 'quanly/dashboard/post_house.html', {'form': form})
+    return render(request, 'dashboard/post_house.html', {'form': form})
 
 @login_required(login_url='login')
 def manage_post(request):
@@ -67,7 +67,7 @@ def manage_post(request):
     if status in valid_status_values:
         user_houses = user_houses.filter(status=status)
     status_choices = [(v, l, v == status) for v, l in House.STATUS_CHOICES]
-    return render(request, 'quanly/dashboard/manage_post.html', {
+    return render(request, 'dashboard/manage_post.html', {
         'user_houses': user_houses.order_by('-created_at'),
         'query': query,
         'selected_status': status,
@@ -98,7 +98,7 @@ def edit_house(request, house_id):
             return redirect('manage_post')
     else:
         form = HouseForm(instance=house)
-    return render(request, 'quanly/dashboard/post_house.html', {'form': form})
+    return render(request, 'dashboard/post_house.html', {'form': form})
 
 @require_POST
 @login_required(login_url='login')

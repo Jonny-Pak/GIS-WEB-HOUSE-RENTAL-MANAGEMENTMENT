@@ -32,7 +32,7 @@ def create_contract(request, house_id):
     else:
         tenant_form = TenantForm()
         contract_form = ContractForm()
-    return render(request, 'quanly/dashboard/create_contract.html', {
+    return render(request, 'dashboard/create_contract.html', {
         'house': house,
         'tenant_form': tenant_form,
         'contract_form': contract_form
@@ -41,9 +41,9 @@ def create_contract(request, house_id):
 @login_required(login_url='login')
 def manage_contracts(request):
     user_contracts = Contract.objects.filter(house__owner=request.user).select_related('house', 'renter').order_by('-created_at')
-    return render(request, 'quanly/dashboard/manage_contracts.html', {'user_contracts': user_contracts})
+    return render(request, 'dashboard/manage_contracts.html', {'user_contracts': user_contracts})
 
 @login_required(login_url='login')
 def manage_tenants(request):
     user_tenants = Tenant.objects.filter(created_by=request.user).prefetch_related('signed_contracts__house').order_by('-created_at')
-    return render(request, 'quanly/dashboard/manage_tenants.html', {'user_tenants': user_tenants})
+    return render(request, 'dashboard/manage_tenants.html', {'user_tenants': user_tenants})
