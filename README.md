@@ -27,14 +27,12 @@ GIS-WEB-HOUSE-RENTAL-MANAGEMENTMENT/
     │   ├── models.py           #   Profile (1-1 với User)
     │   ├── views/              #   [Thư mục] Đăng ký, xem hồ sơ (auth.py, profile.py)
     │   ├── urls/               #   [Thư mục] /auth/login, /auth/register, /auth/profile
-    │   ├── urls.py             #   Facade tổng hợp các file urls con
     │   └── admin.py            #   Đăng ký ProfileAdmin
     │
     ├── houses/                 # App: Quản lý Nhà cho thuê (Core Domain)
     │   ├── models.py           #   House, Furniture, HouseImage
     │   ├── views/              #   [Thư mục] Gồm public.py (khách vãng lai) và landlord.py (chủ nhà)
     │   ├── urls/               #   [Thư mục] Bảng định tuyến được chia theo user type
-    │   ├── urls.py             #   Facade tổng hợp các file urls con
     │   ├── forms.py            #   HouseForm (form đăng tin)
     │   ├── admin.py            #   HouseAdmin + custom filter/actions (duyệt, từ chối)
     │   ├── services/           #   Tầng Business Logic (tách khỏi views)
@@ -49,14 +47,12 @@ GIS-WEB-HOUSE-RENTAL-MANAGEMENTMENT/
     │   ├── models.py           #   Tenant (khách thuê), Contract (hợp đồng)
     │   ├── views/              #   [Thư mục] Chứa landlord.py xử lý hợp đồng, khách thuê
     │   ├── urls/               #   [Thư mục] Định tuyến tạo/xem hợp đồng
-    │   ├── urls.py             #   Facade tổng hợp các file urls con
     │   ├── forms.py            #   TenantForm, ContractForm
     │   └── admin.py            #   TenantAdmin, ContractAdmin
     │
     ├── custom_admin/           # App: Trang Quản trị Tùy chỉnh (thay thế Django Admin)
     │   ├── views/              #   [Thư mục] Tách nhỏ 400 dòng thành: auth, users, houses, contracts, furnitures
     │   ├── urls/               #   [Thư mục] Tách nhỏ các route theo từng phân hệ
-    │   ├── urls.py             #   Facade tổng hợp các file urls con
     │   └── forms.py            #   AdminUserCreateForm, AdminHouseForm, AdminFurnitureForm
     │
     ├── templates/              # Templates tập trung (HTML — xử lý phía server)
@@ -186,7 +182,7 @@ Quyết định kiến trúc này nhằm giải quyết 3 bài toán:
 
 - **Tính nhất quán tuyệt đối (Absolute Uniformity)**: Bất kể dev nhảy vào app nào, họ cũng thấy cùng một format. Không có chuyện "app nhỏ thì 1 file, app to thì 1 thư mục". Sự đồng bộ này giảm thiểu triệt để chi phí "chuyển đổi luồng suy nghĩ" (context-switching cost) khi làm việc.
 - **Code tự giải thích (Self-Documenting Code)**: Dev mới nhìn vào thư mục `houses/views/` là biết ngay app này phục vụ 2 đối tượng `public` và `landlord` mà không cần đọc bất kỳ dòng code logic nào. Tên file đã nói lên tất cả.
-- **Tuân thủ xuất sắc MVC & SOLID**: MVC quy định "View (Controller trong Django)" có nhiệm vụ điều phối. Nhưng nếu bạn nhét 50 chức năng chọc Database khác nhau vào cùng 1 file, bạn đang vi phạm nguyên tắc S (Single Responsibility) trong SOLID. Việc chia thư mục giúp các "Nhạc trưởng" chỉ huy đúng sân khấu của mình (Auth quản lý đăng nhập, Landlord quản lý đăng bài), vừa chuẩn MVC, vừa sạch sẽ theo SOLID. File `urls.py` ở vòng ngoài được giữ lại đóng vai trò như một **Facade (Cổng mặt tiền)** giúp ẩn đi cấu trúc phức tạp bên trong khỏi rễ điều hướng chính của dự án.
+- **Tuân thủ xuất sắc MVC & SOLID**: MVC quy định "View (Controller trong Django)" có nhiệm vụ điều phối. Nhưng nếu bạn nhét 50 chức năng chọc Database khác nhau vào cùng 1 file, bạn đang vi phạm nguyên tắc S (Single Responsibility) trong SOLID. Việc chia thư mục giúp các "Nhạc trưởng" chỉ huy đúng sân khấu của mình (Auth quản lý đăng nhập, Landlord quản lý đăng bài), vừa chuẩn MVC, vừa sạch sẽ theo SOLID. Cuối cùng, ở file root `config/urls.py`, chúng ta điều hướng tập trung trực tiếp vào các file route con này, giúp bức tranh luồng đi của dự án hiện ra vô cùng minh bạch.
 
 ---
 
