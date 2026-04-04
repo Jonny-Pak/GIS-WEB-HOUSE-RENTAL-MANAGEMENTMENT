@@ -166,6 +166,44 @@ Hai loại tài nguyên này phục vụ mục đích hoàn toàn khác:
 - **Khi deploy**, media thường lưu trên storage riêng (S3, CDN)
 - Docker volume mount riêng, không ảnh hưởng khi rebuild container
 
+### 8. Tại sao tách `custom_admin` thay vì gộp logic quản trị vào từng App con?
+
+Một lựa chọn kiến trúc khác là phân bổ logic quản trị vào từng app riêng lẻ (ví dụ: `houses/admin_views.py`). Dù cách này đảm bảo tính đóng gói tốt (Domain-Driven Design), dự án vẫn quyết định gom tất cả giao diện quản trị vào một App trung tâm `custom_admin` vì 3 lý do cốt lõi:
+
+- **Tính liên thông dữ liệu (Cross-Domain)**: Trang Dashboard thường cần vẽ biểu đồ và thống kê chéo nhiều bảng dữ liệu. Ví dụ: *Biểu đồ tỉ lệ Hợp đồng (`contracts`) thực tế theo từng khu vực Nhà trọ (`houses`)*. Đặt logic đa chiều này ở `custom_admin` đảm bảo tính trung lập, tránh việc một app phải gánh trách nhiệm của app khác.
+- **Thống nhất Giao diện (Layout & Assets)**: Hệ thống quản trị nội bộ sử dụng một bộ khung Layout riêng rất phức tạp (Sidebar điều hướng chung, Chart.js, DataTables). Một app trung tâm giúp gom gọn toàn bộ cấu hình Template và CSS/JS thay vì bắt các app con chia nhau xử lý.
+- **Màng lọc bảo mật (Security Choke Point)**: Mọi đường dẫn quản trị đều quy về một mạch máu duy nhất (ví dụ `/custom-admin/...`). Cấu trúc này giúp lập trình viên có thể đặt bức tường lửa chặn người dùng ngay từ URL tổng thông qua Route Grouping hoặc Middleware cực kỳ an toàn; triệt tiêu hoàn toàn rủi ro bị "lọt lưới" bảo mật do quên cấu hình phân quyền như khi code rải rác từng app.
+
+---
+
+## Luồng Xử lý Dữ liệu (Data Flow)
+
+Dự án tuân thủ chặt chẽ mô hình **MVT (Model - View - Template)** của Django. Dưới đây là luồng Data đi từ lúc Client gửi yêu cầu đến lúc nhận được giao diện:
+
+```text
+[BƯỚC 1] 🌐 TRÌNH DUYỆT (Client) 
+   └── Gửi Request: Gõ địa chỉ `http://.../house-detail/5/`
+
+[BƯỚC 2] 🚦 config/urls.py (Bộ định tuyến gốc)
+   └── Nhận Request, thấy khớp chữ "house-detail", bèn chuyển bưu phẩm gửi vào phòng ban (App) `houses/`
+
+[BƯỚC 3] 🔀 houses/urls.py (Bộ định tuyến của App)
+   └── Lọc ra được mã ID nhà là 5. Gọi ông "View" xử lý căn nhà số 5.
+
+[BƯỚC 4] 🧠 houses/views.py (View - Nhạc trưởng điều phối)
+   ├── 4.1. Có thể nhờ `services/house_service.py` xử lý các phép toán khó (như tính khoảng cách)
+   └── 4.2. Ra lệnh cho `models.py` xuống kho (Database) bê món hàng số 5 lên.
+
+[BƯỚC 5] 🗄️ houses/models.py (Model - Tương tác Database)
+   └── Truy vấn CSDL, bê nguyên bộ dữ liệu tivi, tủ lạnh, giá thuê của Căn số 5 trả về cho View.
+
+[BƯỚC 6] 🎨 templates/ (Template - Bộ mặt Layout)
+   └── View cầm tệp dữ liệu đó, "đổ" (render) vào file `detail.html`. Trộn chung với `base.html` để có header, footer đẹp đẽ.
+
+[BƯỚC 7] 🚀 TRẢ HÀNG (Response)
+   └── View ném nguyên cục HTML siêu đẹp vừa trộn xong về lại cho Trình duyệt. Kết thúc nụ hôn!
+```
+
 ---
 
 ## Yêu cầu
