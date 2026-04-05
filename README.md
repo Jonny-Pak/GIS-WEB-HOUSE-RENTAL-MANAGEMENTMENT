@@ -149,10 +149,13 @@ Django hỗ trợ cả hai cách:
 - **Cách 1**: `templates/` tập trung ← đang dùng
 - **Cách 2**: `accounts/templates/accounts/`, `houses/templates/houses/`...
 
-Chọn Cách 1 vì:
-- Project quy mô nhỏ-vừa, ~20 templates → mở một folder là thấy hết
-- Nhiều template dùng chung layout (`base.html`, `dashboard_base.html`) → quản lý tập trung tiện hơn
-- Các app trong project này không cần tái sử dụng cho project khác
+**Khác với Backend (mạnh ai nấy lo), bộ mặt Frontend là một khối dính liền.** Nếu chia nhỏ template vào từng app, Kỹ sư Frontend sẽ phải đào bới 10 thư mục Python chỉ để sửa giao diện. Gom chung lại giúp:
+- Quản lý tập trung các layout dùng chung (`base.html`, `dashboard_base.html`).
+- Frontend Dev chỉ cần làm việc trong đúng 2 gốc là `templates/` và `static/`.
+- Dễ dàng Ghi đè (Override) giao diện của các thư viện bên thứ 3 (như `allauth`).
+
+**Hỏi thêm: Tại sao file Bản đồ (`map_static.html`) lại nằm trong `templates/houses/` mà không tách ra thư mục `maps/` riêng?**
+Bởi vì ở giai đoạn hiện tại, bản đồ sinh ra với mục đích duy nhất là **Hiển thị Vị trí Nhà trọ**. Nó đóng vai trò là một "Giao diện trực quan" của bảng dữ liệu `House`. Do đó, đặt nó ở `houses/` là chuẩn xác theo Domain-Driven Design. (Trừ khi sau này Bản đồ thăng cấp thành "Siêu bản đồ" hiển thị cả Trạm xe buýt, Quy hoạch thành phố... thì lúc đó mới xứng đáng tách ra thư mục `maps/` độc lập).
 
 ### 6. Tại sao `static/` và `templates/` ngang hàng, không lồng nhau?
 
