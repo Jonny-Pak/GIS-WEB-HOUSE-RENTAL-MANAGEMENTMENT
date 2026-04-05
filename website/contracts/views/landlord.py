@@ -4,6 +4,7 @@ from django.contrib import messages
 from contracts.models import Tenant, Contract
 from houses.models import House
 from contracts.forms import TenantForm, ContractForm
+from contracts.services.contract_service import create_contract_workflow
 
 @login_required(login_url='login')
 def create_contract(request, house_id):
@@ -15,18 +16,12 @@ def create_contract(request, house_id):
         tenant_form = TenantForm(request.POST, request.FILES)
         contract_form = ContractForm(request.POST, request.FILES)
         if tenant_form.is_valid() and contract_form.is_valid():
-            tenant = tenant_form.save(commit=False)
-            tenant.created_by = request.user
-            tenant.save()
-            contract = contract_form.save(commit=False)
-            contract.house = house
-            contract.renter = tenant
-            contract.status = 'active'
-            contract.save()
-            house.status = 'rented'
-            house.save()
-            messages.success(request, f'Đã tạo hợp đồng thành công cho căn nhà: {house.name}!')
-            return redirect('manage_post')
+            try:
+                create_contract_workflow(house, request.user, tenant_form, contract_form)
+                messages.success(request, f'Đã tạo hợp đồng thành công cho căn nhà: {house.name}!')
+                return redirect('manage_post')
+            except Exception as e:
+                messages.error(request, f'Có lỗi xảy ra: {str(e)}')
         else:
             messages.error(request, 'Vui lòng kiểm tra lại thông tin biểu mẫu.')
     else:

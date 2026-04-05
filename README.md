@@ -99,26 +99,17 @@ Khi chạy `django-admin startproject`, Django tạo folder cùng tên project (
 - Convention phổ biến trong cộng đồng Django
 - Thể hiện rõ mục đích: đây là folder **cấu hình**, không chứa logic nghiệp vụ
 
-### 3. Tại sao `houses/services/` — Service Layer?
+### 3. Kiến trúc Enterprise MVC (Có thêm tầng Service)
 
-Thông thường Django để business logic trong views. Nhưng khi logic trở nên phức tạp (tính toán Haversine, geocoding, Shapely polygon...), để trong views sẽ:
+Tại sao không đẩy thẳng toàn bộ nghiệp vụ (lưu Form, kiểm tra tọa độ, gán trạng thái, v.v) vào file `views.py` như truyền thống mà lại sinh ra thư mục `services/`?
 
-- View dài, khó đọc, khó test
-- Không tái sử dụng được (nếu cần dùng ở view khác hoặc management command)
+Câu trả lời nằm ở khái niệm thiết kế phần mềm cốt lõi: **Actor-Driven (Hướng Tác nhân) vs Domain-Driven (Hướng Thực thể)**.
 
-**Service Layer** giải quyết vấn đề đó:
+- **Thư mục Views là "Người Gác Cửa" (Actor-Driven):** Nó bắt buộc phải chia theo vai trò người dùng (`public.py`, `landlord.py`, `custom_admin`). Nhiệm vụ của View chỉ là Nhận Yêu Cầu (Request) -> Nhờ vả ai đó làm -> Báo kết quả (Response). View tuyệt đối KHÔNG chứa các câu lệnh `if/else` để lưu dữ liệu phức tạp. Điều này giúp ngăn chặn tình trạng "Fat Controller" (Bộ điều khiển béo phì).
+- **Thư mục Services là "Bếp Trưởng" (Domain-Driven):** Nó chia theo các thực thể CSDL cốt lõi (`house_service.py`, `contract_service.py`). Nó không quan tâm ai là người gọi nó (Chủ nhà gọi, hay Admin gọi, hay Thằng lập trình viên test code gọi). Nhiệm vụ của nó là thực thi chính xác thuật toán cốt lõi.
 
-```text
-View (nhận request, trả response)
-  └── gọi Service (xử lý logic nghiệp vụ)
-        └── gọi Model (truy vấn database)
-```
-
-Ví dụ cụ thể:
-- `house_service.py` → Tính khoảng cách Haversine, tìm nhà trong polygon
-- `geocoding.py` → Chuyển địa chỉ thành tọa độ (gọi Nominatim API)
-
-Cả API views lẫn web views đều gọi chung services → **không viết lại logic**.
+**Lợi ích khổng lồ:**
+Nếu sau này hệ thống viết thêm API cho Mobile App, thì cái `api/views.py` chỉ việc gọi lại nguyên xi hàm `HouseService.process_coordinate_status()`. Điểm 10 cho khả năng tái sử dụng (DRY - Don't Repeat Yourself)! Cả hệ thống Web HTML và Mobile App sẽ xài chung logic mà không lo bị lệch pha.
 
 ### 4. Tại sao API nằm trong `houses/api/` thay vì app riêng hay nhét vào thư mục `views/`?
 
@@ -197,33 +188,40 @@ Quyết định kiến trúc này nhằm giải quyết 3 bài toán:
 
 ---
 
-## Luồng Xử lý Dữ liệu (Data Flow)
+## Luồng Xử lý Dữ liệu Chuyên sâu (Data Flow với Service Layer)
 
-Dự án tuân thủ chặt chẽ mô hình **MVT (Model - View - Template)** của Django. Dưới đây là luồng Data đi từ lúc Client gửi yêu cầu đến lúc nhận được giao diện:
+Để hình dung hệ thống chạy như thế nào với kiến trúc MVC + Service, hãy xem xét luồng giao dịch **"Tạo Hợp đồng thuê nhà"** (Create Contract):
 
-```text
-[BƯỚC 1] 🌐 TRÌNH DUYỆT (Client) 
-   └── Gửi Request: Gõ địa chỉ `http://.../house-detail/5/`
+```mermaid
+sequenceDiagram
+    participant User as Khách (Browser)
+    participant Route as URL Router (config/urls)
+    participant View as View (Lễ tân)
+    participant Service as ContractService (Bếp trưởng)
+    participant House as HouseService
+    participant DB as Database (Model)
 
-[BƯỚC 2] 🚦 config/urls.py (Bộ định tuyến gốc, Trạm trung chuyển)
-   └── Nhận Request, thấy khớp chữ "house-detail", bèn chuyển bưu phẩm thẳng vào phân hệ `houses.urls.public`
-
-[BƯỚC 3] 🔀 houses/urls/public.py (Định tuyến phân hệ)
-   └── Lọc ra được mã ID nhà là 5. Gọi ông "View" là `house_detail_view` xử lý căn nhà số 5.
-
-[BƯỚC 4] 🧠 houses/views/public.py (View - Nhạc trưởng điều phối)
-   ├── 4.1. Có thể nhờ `services/house_service.py` xử lý các phép toán khó (như tính khoảng cách)
-   └── 4.2. Ra lệnh cho `models.py` xuống kho (Database) bê món hàng số 5 lên.
-
-[BƯỚC 5] 🗄️ houses/models.py (Model - Tương tác Database)
-   └── Truy vấn CSDL, bê nguyên bộ dữ liệu tivi, tủ lạnh, giá thuê của Căn số 5 trả về cho View.
-
-[BƯỚC 6] 🎨 templates/ (Template - Bộ mặt Layout)
-   └── View cầm tệp dữ liệu đó, "đổ" (render) vào file `detail.html`. Trộn chung với `base.html` để có header, footer đẹp đẽ.
-
-[BƯỚC 7] 🚀 TRẢ HÀNG (Response)
-   └── View ném nguyên cục HTML siêu đẹp vừa trộn xong về lại cho Trình duyệt. Kết thúc nụ hôn!
+    User->>Route: Nộp Form Tạo Hợp đồng (/create-contract/)
+    Route->>View: Phân luồng tới contracts/views/landlord.py
+    Note over View: Kiểm tra Form (is_valid)<br/>-> Ngăn chặn dữ liệu rác
+    View->>Service: Bàn giao Dữ liệu sạc cho Service (create_contract_workflow)
+    Note over Service: Mở Cổng Giao Dịch (Database Transaction)
+    Service->>DB: 1. Lưu thông tin Khách (Tenant)
+    Service->>DB: 2. Lưu thông tin Hợp Đồng (Contract)
+    Service->>House: 3. Nhờ HouseService cập nhật nhà
+    House->>DB: Đổi House status = 'rented'
+    Note over Service: Đóng Giao Dịch (Thành công trọn vẹn 3 bước)
+    Service-->>View: Trả về đối tượng Contract & Tenant
+    View-->>User: Ép tạo Flash Message "Thành công" và Redirect trang
 ```
+
+**Diễn giải theo ẩn dụ Nhà Hàng:**
+1. Khách hàng nộp Order List cho Gác cửa.
+2. Bộ định tuyến (URL) thấy khách mặc đồ Landlord bèn chỉ đường tới Lễ tân khu vực Chủ nhà (`contracts/views/landlord.py`).
+3. Lễ tân (View) dòm lướt qua cái Order thấy Form hợp lệ (is_valid), bèn chạy vào trong bếp tìm Bếp Trưởng Hợp Đồng (`contract_service.py`). Lễ tân KHÔNG BAO GIỜ tự tay xào nấu dữ liệu.
+4. Bếp Trưởng (Service) kích hoạt `atomic transaction` (Đảm bảo nấu xong món ăn trọn vẹn, nếu giữa tiến trình cúp điện thì đổ bỏ hết làm lại từ đầu chứ không bưng ra món ăn sống).
+5. Bếp Trưởng lưu Khách Thuê -> Lưu Hợp Đồng -> Rồi hô gào qua khu bếp kế bên nhờ lão Bếp Trưởng Nhà (`house_service.py`) đổi cái biển báo của Căn nhà đó thành "Đã thuê". (Đây là lý do tại sao các Service gọi nhau, tính đóng gói cực cao).
+6. Nấu xong xuôi, Bếp báo cho Lễ tân. Lễ tân bưng đồ ăn (Flash Message) ra tươi cười với Khách và lật menu sang trang mới (Redirect).
 
 ---
 

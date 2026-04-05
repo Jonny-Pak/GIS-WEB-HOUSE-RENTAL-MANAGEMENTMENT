@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_POST
 from houses.models import House, HouseImage
+from houses.services.house_service import approve_house, reject_house
 from custom_admin.forms import AdminHouseForm
 from custom_admin.views.helpers import _is_admin_user, _custom_admin_model_list, _custom_admin_model_form, _custom_admin_model_delete
 
@@ -50,27 +51,19 @@ def custom_admin_house_delete(request, object_id):
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_approve(request, object_id):
     house = get_object_or_404(House, id=object_id)
-
-    if house.lat is None or house.lng is None:
-        house.status = 'no_coordinates'
-        house.requires_coordinates = True
-        house.save(update_fields=['status', 'requires_coordinates'])
-        messages.error(request, f'Không thể duyệt "{house.name}" vì chưa có tọa độ. Vui lòng nhập kinh độ/vĩ độ trước.')
-        return redirect('custom_admin_houses')
-
-    house.status = 'available'
-    house.requires_coordinates = False
-    house.save(update_fields=['status', 'requires_coordinates'])
-    messages.success(request, f'Đã duyệt bài đăng: {house.name}')
+    success, msg = approve_house(house)
+    if success:
+        messages.success(request, msg)
+    else:
+        messages.error(request, msg)
     return redirect('custom_admin_houses')
 
 @require_POST
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_reject(request, object_id):
     house = get_object_or_404(House, id=object_id)
-    house.status = 'rejected'
-    house.save()
-    messages.success(request, f'Đã từ chối bài đăng: {house.name}')
+    success, msg = reject_house(house)
+    messages.success(request, msg)
     return redirect('custom_admin_houses')
 
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
