@@ -146,10 +146,11 @@ houses/
 ### 5. Tại sao Templates tập trung (`templates/`) thay vì mỗi app một folder?
 
 Django hỗ trợ cả hai cách:
-- **Cách 1**: `templates/` tập trung ← đang dùng
-- **Cách 2**: `accounts/templates/accounts/`, `houses/templates/houses/`...
+- **Cách 1**: `templates/` tập trung ở ngoài rễ dự án.
+- **Cách 2**: Để tản mác trong từng app (`accounts/templates/accounts/`, `houses/templates/houses/`...)
 
-**Khác với Backend (mạnh ai nấy lo), bộ mặt Frontend là một khối dính liền.** Nếu chia nhỏ template vào từng app, Kỹ sư Frontend sẽ phải đào bới 10 thư mục Python chỉ để sửa giao diện. Gom chung lại giúp:
+**Dự án quyết định chọn Cách 1 vì:**
+Khác với Backend (mạnh ai nấy lo), bộ mặt Frontend là một khối dính liền. Nếu chia nhỏ template vào từng app, Kỹ sư Frontend sẽ phải đào bới 10 thư mục Python chỉ để sửa giao diện. Gom chung lại giúp:
 - Quản lý tập trung các layout dùng chung (`base.html`, `dashboard_base.html`).
 - Frontend Dev chỉ cần làm việc trong đúng 2 gốc là `templates/` và `static/`.
 - Dễ dàng Ghi đè (Override) giao diện của các thư viện bên thứ 3 (như `allauth`).
