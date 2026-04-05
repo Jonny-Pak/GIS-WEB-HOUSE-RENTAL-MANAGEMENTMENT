@@ -120,21 +120,28 @@ Ví dụ cụ thể:
 
 Cả API views lẫn web views đều gọi chung services → **không viết lại logic**.
 
-### 4. Tại sao API nằm trong `houses/api/` thay vì app riêng?
+### 4. Tại sao API nằm trong `houses/api/` thay vì app riêng hay nhét vào thư mục `views/`?
 
-API bản chất là **một cách phục vụ dữ liệu** (trả JSON thay vì HTML). Nó không phải một domain nghiệp vụ riêng.
+API bản chất là **một cách phục vụ dữ liệu** (trả JSON thay vì HTML). Nó không phải một domain nghiệp vụ riêng, nhưng nó lại cần một hệ sinh thái riêng biệt.
 
 ```text
 houses/
-├── views/        → Phục vụ qua giao diện web (HTML)
-├── api/          → Phục vụ qua API (trả về JSON)
+├── views/        → Dành trọn vẹn cho giao diện Web (Render HTML, dùng Forms)
+├── api/          → Thế giới thu nhỏ của API (JSON, dùng Serializers)
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
 └── services/     → Chứa logic nghiệp vụ dùng chung cho cả 2 bên (Ví dụ: Geocoding)
 ```
 
-Nếu tách `api` thành app riêng:
-- API import model từ `houses`, import service từ `houses` → phụ thuộc hoàn toàn vào `houses`
-- Nếu sau này `contracts` cũng cần API → lại tạo thêm app? Không hợp lý
-- Giữ API trong app chủ → dễ tìm, dễ hiểu, đúng Single Responsibility
+**Tại sao KHÔNG tách `api` thành app riêng?**
+- Nếu tạo app `api`, nó sẽ phải import model `House` từ `houses` → phụ thuộc chéo nặng nề.
+- Nếu sau này `contracts` cũng cần API → lại phải nhét vào app `api` đó? Rất nhanh chóng app `api` sẽ biến thành một "Bãi rác" chứa API của toàn hệ thống mà không có ranh giới nghiệp vụ (Domain boundary) rõ ràng.
+
+**Tại sao KHÔNG nhét API vào thư mục `views/`? (Dù bản chất nó vẫn là View)**
+Đúng là API View vẫn kế thừa từ View của Django. Thế nhưng, nếu bạn tạo file `houses/views/api.py` thì sẽ cực kỳ lấn cấn khi giải quyết câu hỏi: **Vậy file `serializers.py` và đường dẫn tĩnh `/api/v1/` vứt ở đâu?**
+- Nếu ném `serializers.py` ra ngoài rễ thư mục `houses/`, nó sẽ lạc quẻ vì code Web không hề dùng tới nó.
+- Việc tạo hẳn một phân hệ `api/` giúp "gói ghém" trọng vẹn hệ sinh thái của DRF (gồm URLs, Views, Serializers) vào chung một chỗ. Không giẫm đạp lên code Web HTML, và cực kỳ dễ gỡ bỏ (Plug & Play) nếu sau này dự án không cần API nữa.
 
 ### 5. Tại sao Templates tập trung (`templates/`) thay vì mỗi app một folder?
 
