@@ -10,6 +10,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+handler403 = 'houses.views.public.error_403'
+handler404 = 'houses.views.public.error_404'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     

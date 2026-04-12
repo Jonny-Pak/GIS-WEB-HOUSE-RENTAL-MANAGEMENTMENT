@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}404 - Không tìm thấy trang{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/error_pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="error-page-wrap">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="error-card">
+          <h1 class="error-code">404</h1>
+          <h2 class="error-title">Trang bạn tìm kiếm không tồn tại</h2>
+          <p class="error-subtitle">Đường dẫn có thể đã thay đổi, nội dung đã bị xóa, hoặc bạn đã nhập sai địa chỉ.</p>
+          <div class="error-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary error-btn-primary">Quay về trang chủ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

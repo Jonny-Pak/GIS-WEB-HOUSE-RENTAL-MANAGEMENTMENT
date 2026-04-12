@@ -4,169 +4,127 @@
 {% block title %}Trang chủ - Thuê Nhà Nhanh{% endblock %}
 
 {% block content %}
-<div class="hero">
-  <div class="overlay"></div>
+<section class="home-discovery">
   <div class="container">
-    <div class="row justify-content-center align-items-center">
-      <div class="col-lg-9 text-center">
-        <h1 class="heading text-white" data-aos="fade-up">
-          Tìm ngôi nhà mơ ước của bạn
-        </h1>
-
-        <form action="{% url 'home' %}" method="GET" class="narrow-w form-search d-flex align-items-stretch mb-3" data-aos="fade-up" data-aos-delay="200">
-          <input type="text" name="search" class="form-control px-4" placeholder="Nhập tên quận, đường hoặc thành phố..." value="{{ search_query }}">
-          <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-        </form>
-
+    <div class="discovery-grid">
+      <div class="discovery-intro">
+        <h2>Tìm nhà nhanh chóng</h2>
+        <p>Thuê nhà dễ dàng</p>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="section">
-  <div class="container">
+      <div class="discovery-filter-controls">
+        <form class="discovery-filter-form" method="get">
+          <div class="discovery-filter-row">
+            <select name="district" class="form-select" title="Chọn quận">
+              <option value="">Tất cả quận</option>
+              {% for item in district_items %}
+              <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
+              {% endfor %}
+            </select>
 
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-12">
-        <div class="filter-box p-4 bg-white shadow-sm rounded border">
-          <form action="{% url 'home' %}" method="GET">
-            <div class="row g-3 align-items-center">
-              <div class="col-md-12 mb-2">
-                <h5 class="text-primary fw-bold"><span class="flaticon-search me-2"></span>Bộ lọc tìm kiếm</h5>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold text-muted">Khu vực</label>
-                <select class="form-select" name="quan">
-                  <option value="">-- Tất cả Quận --</option>
-                  <option value="Q1" {% if request.GET.quan == 'Q1' %}selected{% endif %}>Quận 1</option>
-                  <option value="Q5" {% if request.GET.quan == 'Q5' %}selected{% endif %}>Quận 5</option>
-                  <option value="QBT" {% if request.GET.quan == 'QBT' %}selected{% endif %}>Quận Bình Thạnh</option>
-                  <option value="TPTD" {% if request.GET.quan == 'TPTD' %}selected{% endif %}>TP. Thủ Đức</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold text-muted">Mức giá</label>
-                <select class="form-select" name="gia">
-                  <option value="">-- Tất cả mức giá --</option>
-                  <option value="0-5" {% if request.GET.gia == '0-5' %}selected{% endif %}>Dưới 5 triệu</option>
-                  <option value="5-10" {% if request.GET.gia == '5-10' %}selected{% endif %}>5 - 10 triệu</option>
-                  <option value="10-plus" {% if request.GET.gia == '10-plus' %}selected{% endif %}>Trên 10 triệu</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold text-muted">Loại nhà</label>
-                <select class="form-select" name="loai">
-                  <option value="">-- Tất cả loại hình --</option>
-                  <option value="nguyen_can" {% if request.GET.loai == 'nguyen_can' %}selected{% endif %}>Nhà nguyên căn</option>
-                  <option value="chung_cu" {% if request.GET.loai == 'chung_cu' %}selected{% endif %}>Căn hộ chung cư</option>
-                  <option value="phong_tro" {% if request.GET.loai == 'phong_tro' %}selected{% endif %}>Phòng trọ</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label d-none d-md-block">&nbsp;</label>
-                <button type="submit" class="btn btn-primary w-100">
-                  <span class="icon-filter me-1"></span> Lọc Tin
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+            <select name="house_type" class="form-select" title="Chọn loại nhà">
+              <option value="">Tất cả loại nhà</option>
+              {% for item in house_type_items %}
+              <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
+              {% endfor %}
+            </select>
 
-    <div class="row mb-5 align-items-center">
-      <div class="col-lg-6">
-        <h2 class="font-weight-bold text-primary heading">Nhà đang cho thuê</h2>
-      </div>
-      <div class="col-lg-6 text-lg-end">
-        <a href="{% url 'home' %}" class="btn btn-primary text-white py-3 px-4">Làm mới danh sách</a>
-      </div>
-    </div>
-
-    <div class="row">
-      {% for house in houses %}
-      <div class="col-md-6 col-lg-4 mb-4">
-        <div class="property-item h-100 shadow-sm border rounded overflow-hidden">
-          <a href="{% url 'house_detail' house.id %}" class="img">
-            {% if house.images.all %}
-              <img src="{{ house.images.first.image.url }}" alt="Image" class="img-fluid" style="height: 250px; object-fit: cover; width: 100%;" />
-            {% else %}
-              <img src="{% static 'images/img_1.jpg' %}" alt="Default Image" class="img-fluid" style="height: 250px; object-fit: cover; width: 100%;" />
-            {% endif %}
-          </a>
-          <div class="property-content p-4">
-            <div class="price mb-2 text-primary fw-bold"><span>{{ house.price|floatformat:0 }} VNĐ</span></div>
-            <div>
-              <span class="d-block mb-2 text-black-50 text-truncate">{{ house.address }}</span>
-              <span class="city d-block mb-3 fw-bold">{{ house.get_district_display }}</span>
-              <div class="specs d-flex mb-4">
-                <span class="d-block d-flex align-items-center me-3">
-                  <span class="flaticon-house-1 me-2"></span><span class="caption">{{ house.area }} m²</span>
-                </span>
-                <span class="d-block d-flex align-items-center">
-                  <span class="icon-users me-2"></span><span class="caption">{% if house.max_people %}{{ house.max_people }}{% else %}--{% endif %} người</span>
-                </span>
-              </div>
-              <a href="{% url 'house_detail' house.id %}" class="btn btn-primary py-2 px-3">Chi tiết</a>
-            </div>
+            <select name="price_range" class="form-select" title="Chọn mức giá">
+              <option value="">Tất cả giá</option>
+              {% for item in price_range_items %}
+              <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
+              {% endfor %}
+            </select>
           </div>
-        </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center py-5">
-        <div class="p-5 bg-light rounded">
-          <h4 class="text-muted">Không tìm thấy kết quả phù hợp</h4>
-          <p>Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</div>
 
-<section class="features-1 mt-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature shadow-sm">
-          <span class="flaticon-house"></span>
-          <h3 class="mb-3">Nhà chất lượng</h3>
-          <p>Thông tin minh bạch.</p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature shadow-sm">
-          <span class="flaticon-building"></span>
-          <h3 class="mb-3">Chính chủ</h3>
-          <p>Kết nối trực tiếp.</p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature shadow-sm">
-          <span class="flaticon-house-3"></span>
-          <h3 class="mb-3">Hỗ trợ 24/7</h3>
-          <p>Tư vấn nhiệt tình.</p>
-        </div>
-      </div>
-      <div class="col-6 col-lg-3 mb-4">
-        <div class="box-feature shadow-sm">
-          <span class="flaticon-house-1"></span>
-          <h3 class="mb-3">An toàn</h3>
-          <p>Bảo mật tuyệt đối.</p>
-        </div>
+          <div class="discovery-filter-actions">
+            <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Xóa</a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </section>
 
-<div class="section sec-testimonials bg-light">
+<section class="section rooms-section">
   <div class="container">
-    <div class="row mb-5 align-items-center">
+    <div class="rooms-section-head">
+      <h2 class="heading text-primary mb-0">Có <span>{{ total_available_rooms }}</span> phòng đang trống</h2>
+      <a href="{% url 'home' %}" class="rooms-see-all">Xem tất cả <span class="icon-chevron-right"></span></a>
+    </div>
+
+    <div class="district-scroll-controls rooms">
+      <button type="button" class="district-scroll-btn" id="roomScrollPrev" aria-label="Cuộn trái phòng">
+        <span class="icon-chevron-left"></span>
+      </button>
+      <button type="button" class="district-scroll-btn" id="roomScrollNext" aria-label="Cuộn phải phòng">
+        <span class="icon-chevron-right"></span>
+      </button>
+    </div>
+
+    <div class="room-cards-scroll" id="roomCardsScroll">
+      {% for house in houses %}
+      <article class="room-card-item">
+        <a href="{% url 'house_detail' house.id %}" class="room-card-image-link">
+          {% if house.main_image %}
+          <img src="{{ house.main_image.url }}" alt="{{ house.name }}" class="room-card-image">
+          {% else %}
+            {% with first_image=house.images.all|first %}
+              {% if first_image %}
+              <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="room-card-image">
+              {% else %}
+              <img src="{% static 'images/img_1.jpg' %}" alt="{{ house.name }}" class="room-card-image">
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        </a>
+
+        <div class="room-card-body">
+          <span class="room-vacancy-badge">Còn trống</span>
+          <h3 class="room-card-title">{{ house.name }}</h3>
+          <p class="room-card-address">• {{ house.address }}, {{ house.get_district_display }}</p>
+          <p class="room-card-meta">• Giá từ {{ house.price|floatformat:0 }} VNĐ, diện tích {{ house.area }}m², tối đa {{ house.max_people }} người</p>
+
+          <div class="room-card-actions">
+            <a href="{% url 'map_view' %}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+            <a href="{% url 'house_detail' house.id %}" class="btn btn-primary btn-sm px-3">Xem chi tiết</a>
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <div class="w-100 text-center py-5 bg-white rounded border">
+        <h4 class="text-muted">Không có phòng phù hợp</h4>
+        <p class="text-muted mb-0">Bạn hãy thử tìm với quận hoặc từ khóa khác.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if has_more_houses %}
+    <div class="text-center mt-4">
+      <a
+        href="{% url 'home' %}?page={{ next_page }}{% if filters.search %}&search={{ filters.search|urlencode }}{% endif %}{% if filters.district %}&district={{ filters.district|urlencode }}{% endif %}{% if filters.house_type %}&house_type={{ filters.house_type|urlencode }}{% endif %}{% if filters.price_range %}&price_range={{ filters.price_range|urlencode }}{% endif %}"
+        class="btn btn-outline-primary btn-lg px-5"
+      >
+        Xem thêm phòng
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section sec-testimonials bg-light">
+  <div class="container">
+    <div class="row mb-4 align-items-center">
       <div class="col-md-6">
-        <h2 class="font-weight-bold heading text-primary mb-4 mb-md-0">Đánh giá hệ thống</h2>
+        <h2 class="font-weight-bold heading text-primary mb-0">Đánh giá hệ thống</h2>
+      </div>
+      <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <button type="button" class="btn btn-outline-primary" id="toggleReviewsBtn">Xem thêm đánh giá</button>
       </div>
     </div>
-    <div class="row">
+
+    <div class="row" id="reviewsWrap">
       <div class="col-md-6 col-lg-4 mb-4">
         <div class="testimonial bg-white p-4 rounded shadow-sm">
           <img src="{% static 'images/tinh.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
@@ -197,7 +155,40 @@
           <blockquote><p>&ldquo;Hỗ trợ nhiệt tình, thông tin nhà chính xác.&rdquo;</p></blockquote>
         </div>
       </div>
+
+      <div class="col-md-6 col-lg-4 mb-4 review-extra d-none">
+        <div class="testimonial bg-white p-4 rounded shadow-sm">
+          <img src="{% static 'images/person_2-min.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
+          <div class="rate text-warning mb-2">
+            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
+          </div>
+          <h3 class="h5 text-primary">Ngọc Minh</h3>
+          <blockquote><p>&ldquo;Danh mục theo quận rất tiện, tìm phòng nhanh hơn trước rất nhiều.&rdquo;</p></blockquote>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-4 review-extra d-none">
+        <div class="testimonial bg-white p-4 rounded shadow-sm">
+          <img src="{% static 'images/person_3-min.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
+          <div class="rate text-warning mb-2">
+            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
+          </div>
+          <h3 class="h5 text-primary">Bảo Trâm</h3>
+          <blockquote><p>&ldquo;Thông tin rõ ràng, xem chi tiết phòng và liên hệ chủ trọ cực kỳ dễ.&rdquo;</p></blockquote>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 mb-4 review-extra d-none">
+        <div class="testimonial bg-white p-4 rounded shadow-sm">
+          <img src="{% static 'images/person_4-min.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
+          <div class="rate text-warning mb-2">
+            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
+          </div>
+          <h3 class="h5 text-primary">Hoàng Nam</h3>
+          <blockquote><p>&ldquo;Giao diện mượt, phân loại theo quận giúp mình chọn khu phù hợp rất nhanh.&rdquo;</p></blockquote>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>
+
+<script src="{% static 'Js/home.js' %}?v=20260405a"></script>
 {% endblock %}

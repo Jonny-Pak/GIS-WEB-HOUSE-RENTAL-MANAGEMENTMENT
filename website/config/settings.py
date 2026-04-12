@@ -12,9 +12,20 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from importlib.util import find_spec
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from project root .env when available.
+ENV_FILE = BASE_DIR.parent / '.env'
+if ENV_FILE.exists():
+    for raw_line in ENV_FILE.read_text(encoding='utf-8').splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        os.environ.setdefault(key.strip(), value.strip())
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,6 +47,7 @@ INSTALLED_APPS = [
     'houses',
     'contracts',
     'custom_admin',
+    'anymail',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,6 +64,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'config.middleware.FriendlyErrorPagesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -68,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'accounts.context_processors.current_user_profile',
             ],
         },
     },
@@ -79,16 +93,30 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = { 
-'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'quanlythuenha'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', '123456'),
-        'HOST': os.getenv('DB_HOST', 'localhost'), 
-        'PORT': os.getenv('DB_PORT', '5432'),
+db_backend = os.getenv('DB_BACKEND', 'postgresql').lower()
+
+if db_backend == 'postgresql':
+    if find_spec('psycopg2') is None and find_spec('psycopg') is None:
+        db_backend = 'sqlite3'
+
+if db_backend == 'postgresql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'quanlythuenha'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', '123456'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -137,7 +165,40 @@ MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 
+GEOCODING_USER_AGENT = os.getenv('GEOCODING_USER_AGENT', 'ltgis-house-rental/1.0')
+GEOCODING_TIMEOUT = int(os.getenv('GEOCODING_TIMEOUT', '6'))
+GEOCODING_CACHE_TIMEOUT = int(os.getenv('GEOCODING_CACHE_TIMEOUT', '86400'))
+GEOCODING_NOMINATIM_ENDPOINTS = os.getenv(
+    'GEOCODING_NOMINATIM_ENDPOINTS',
+    'https://nominatim.openstreetmap.org,https://nominatim.openstreetmap.fr',
+)
 
+MAILTRAP_API_TOKEN = os.getenv('MAILTRAP_API_TOKEN', '').strip()
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').strip()
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    # Prefer SMTP when explicit credentials are available.
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'live.smtp.mailtrap.io')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', '1') == '1'
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '0') == '1'
+elif MAILTRAP_API_TOKEN:
+    EMAIL_BACKEND = 'anymail.backends.mailtrap.EmailBackend'
+    ANYMAIL = {
+        'MAILTRAP_API_TOKEN': MAILTRAP_API_TOKEN,
+    }
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'live.smtp.mailtrap.io')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', '1') == '1'
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '0') == '1'
+
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'hello@demomailtrap.co')
+SUPPORT_INBOX_EMAIL = os.getenv('SUPPORT_INBOX_EMAIL', 'thuenhanhanh.gis@gmail.com')
+SUPPORT_CONTACT_PHONE = os.getenv('SUPPORT_CONTACT_PHONE', '0900 123 456')
 
 # GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"
 # GEOS_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgeos_c.dll"

@@ -4,7 +4,7 @@
 {% block title %}Đăng nhập - Thuê Nhà Nhanh{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}?v=20260411a">
 {% endblock %}
 
 {% block content %}
@@ -19,6 +19,16 @@
                 <div class="card login-card">
                     <form method="POST" action="">
                         {% csrf_token %}
+
+                        {% if messages %}
+                            <div class="mb-3">
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags|default:'info' }} small mb-2" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         
                         {% if form.errors %}
                             <div class="alert alert-danger small mb-3">
@@ -34,6 +44,9 @@
                         <div class="mb-4">
                             <label class="form-label" for="password">Mật khẩu</label>
                             <input type="password" class="form-control custom-input" id="password" name="password" placeholder="********" required>
+                            <div class="text-end mt-2">
+                                <a href="{% url 'forgot_password' %}" class="link-register">Quên mật khẩu?</a>
+                            </div>
                         </div>
 
                         <div class="form-group mb-4">

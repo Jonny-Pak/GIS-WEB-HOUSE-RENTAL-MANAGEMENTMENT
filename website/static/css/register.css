@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #005555;
+    --primary-color: #181460;
     --text-color: #000000;
 }
 
@@ -40,7 +40,7 @@
 .register-input:focus {
     border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0, 85, 85, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(24, 20, 96, 0.25);
 }
 
 .btn-register {
@@ -54,9 +54,9 @@
 }
 
 .btn-register:hover {
-    background-color: #004444;
+    background-color: #120f49;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 85, 85, 0.3);
+    box-shadow: 0 5px 15px rgba(24, 20, 96, 0.3);
 }
 
 .btn-google {
@@ -118,3 +118,4 @@
     color: var(--primary-color);
     text-decoration: none;
 }
+

@@ -1,0 +1,43 @@
+.card-custom {
+    background: #fff;
+    border-radius: 15px;
+}
+
+.btn-primary {
+    background-color: #181460;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #120f49;
+}
+
+.text-primary {
+    color: #181460 !important;
+}
+
+.border-bottom {
+    border-bottom: 2px solid #f0f0f0 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #181460;
+    box-shadow: 0 0 0 0.25rem rgba(24, 20, 96, 0.12);
+}
+
+.post-house-map-container {
+    height: 320px;
+    background: #f8f9fa;
+}
+
+.main-img-preview {
+    max-height: 200px;
+    width: auto;
+}
+
+.post-house-furniture-box {
+    min-height: 150px;
+    border-style: dashed !important;
+    border-color: #ccc !important;
+}

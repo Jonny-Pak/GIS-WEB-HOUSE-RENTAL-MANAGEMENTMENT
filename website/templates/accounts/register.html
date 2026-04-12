@@ -16,32 +16,36 @@
                 
                 <div class="card register-card shadow-lg">
                     <div class="text-center mb-4">
-                        <h2 class="register-title">Đăng ký</h2>
+                        <h2 class="register-title">Đăng ký tài khoản</h2>
                         <p class="text-muted mb-0">Tạo tài khoản mới</p>
                     </div>
 
                     <form method="POST" action="">
                         {% csrf_token %}
-                        
-                        {% if form.errors %}
+
+                        {% if reg_errors %}
                             <div class="alert alert-danger">
-                                Vui lòng kiểm tra lại thông tin nhập.
+                                <ul class="mb-0 ps-3">
+                                    {% for err in reg_errors %}
+                                        <li>{{ err }}</li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         {% endif %}
 
                         <div class="mb-3">
                             <label class="form-label">Tên đăng nhập</label>
-                            <input type="text" name="username" class="form-control register-input" required>
+                            <input type="text" name="username" class="form-control register-input"  placeholder="Tên đăng nhập" value="{{ form_data.username|default:'' }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control register-input" placeholder="example@gmail.com" required>
+                            <input type="email" name="email" class="form-control register-input" placeholder="Gmail" value="{{ form_data.email|default:'' }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Số điện thoại</label>
-                            <input type="text" name="phone" class="form-control register-input" required>
+                            <input type="text" name="phone" class="form-control register-input" placeholder="Số điện thoại" value="{{ form_data.phone|default:'' }}" required>
                         </div>
 
                         <div class="mb-3">
@@ -50,11 +54,11 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">Nhập lại mật khẩu</label>
+                            <label class="form-label">Xác nhận mật khẩu</label>
                             <input type="password" name="confirm_password" class="form-control register-input" placeholder="Nhập lại mật khẩu" required>
                         </div>
 
-                        <div class="mb-4">
+                        {% comment %} <div class="mb-4">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="terms" style="cursor: pointer;" required>
                                 <label class="form-check-label text-muted terms-label" for="terms">
@@ -62,11 +66,11 @@
                                     <a href="#" class="terms-link">Chính sách</a> của chúng tôi
                                 </label>
                             </div>
-                        </div>
+                        </div> {% endcomment %}
 
                         <div class="mb-4">
                             <button type="submit" class="btn w-100 py-3 btn-register">
-                                Tiếp tục
+                                Đăng ký
                             </button>
                         </div>
 

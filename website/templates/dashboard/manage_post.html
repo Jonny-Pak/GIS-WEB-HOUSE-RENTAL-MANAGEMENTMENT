@@ -4,6 +4,14 @@
 {% block title %}Danh sách tin đăng{% endblock %}
 {% block header_title %}Quản lý Tin đăng{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/manage_post.css' %}?v=20260406e" />
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'Js/form_helpers.js' %}?v=20260406e"></script>
+{% endblock %}
+
 {% block content %}
 <div class="card-custom">
     <div class="card-body">
@@ -17,7 +25,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <select class="form-select" name="status" onchange="this.form.submit()">
+                <select class="form-select" name="status" data-auto-submit>
                     <option value="" {% if not selected_status %}selected{% endif %}>Tất cả trạng thái</option>
                     {% for value, label, is_selected in status_choices %}
                     <option value="{{ value }}" {% if is_selected %}selected{% endif %}>{{ label }}</option>
@@ -35,7 +43,7 @@
             <table class="table align-middle table-hover">
                 <thead class="bg-light">
                     <tr class="text-muted small text-uppercase">
-                        <th style="width: 100px;">Hình ảnh</th>
+                        <th class="manage-post-image-head">Hình ảnh</th>
                         <th>Tiêu đề tin</th>
                         <th>Giá & Diện tích</th>
                         <th>Trạng thái</th>
@@ -47,10 +55,9 @@
                     <tr>
                         <td>
                             {% if house.main_image %}
-                            <img src="{{ house.main_image.url }}" class="rounded" width="80" height="60"
-                                style="object-fit: cover;">
+                            <img src="{{ house.main_image.url }}" class="rounded manage-post-thumbnail" width="80" height="60">
                             {% else %}
-                            <div class="bg-secondary rounded" style="width: 80px; height: 60px;"></div>
+                            <div class="bg-secondary rounded manage-post-thumbnail-placeholder"></div>
                             {% endif %}
                         </td>
                         <td>
@@ -58,6 +65,17 @@
                             <small class="text-muted">Mã tin: #{{ house.id }}</small><br>
                             <small class="text-muted"><i class="bi bi-calendar"></i>
                                 {{house.created_at|date:"d/m/Y"}}</small>
+                            <br>
+                            {% if house.lat and house.lng %}
+                            <small class="text-success">
+                                <i class="bi bi-geo-alt"></i>
+                                {{ house.lat|floatformat:6 }}, {{ house.lng|floatformat:6 }}
+                            </small>
+                            {% else %}
+                            <small class="text-muted">
+                                <i class="bi bi-geo-alt"></i> Chưa có tọa độ
+                            </small>
+                            {% endif %}
                         </td>
                         <td>
                             <div class="text-danger fw-bold">{% if house.price %}{{ house.price|floatformat:0 }} VNĐ
@@ -102,7 +120,7 @@
                                 <a href="{% url 'edit_house' house.id %}" class="btn btn-light btn-sm text-primary"
                                     title="Sửa tin"><i class="bi bi-pencil-square"></i></a>
                                 <form method="post" action="{% url 'delete_house' house.id %}" class="d-inline"
-                                    onsubmit="return confirm('Bạn có chắc muốn xóa tin này?');">
+                                    data-confirm-submit="Bạn có chắc muốn xóa tin này?">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-light btn-sm text-danger" title="Xóa tin">
                                         <i class="bi bi-trash"></i>

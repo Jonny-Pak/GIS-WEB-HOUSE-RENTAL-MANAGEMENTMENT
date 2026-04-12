@@ -6,59 +6,73 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<link rel="stylesheet" href="{% static 'css/house_detail.css' %}" />
+<link rel="stylesheet" href="{% static 'css/house_detail.css' %}?v=20260404n" />
 {% endblock %}
 
 {% block content %}
 
-<div class="hero page-inner overlay house-hero">
-    <div class="container">
-        <div class="row justify-content-center align-items-center house-hero-row">
-            <div class="col-lg-9 text-center mt-5">
-                <h1 class="heading" data-aos="fade-up">{{ house.name }}</h1>
-                <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="200">
-                    <ol class="breadcrumb text-center justify-content-center">
-                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
-                        <li class="breadcrumb-item"><a href="#">{{ house.get_district_display }}</a></li>
-                        <li class="breadcrumb-item active text-white-50" aria-current="page">Chi tiết</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="section">
     <div class="container">
-        <div class="row justify-content-between">
+        <div class="row justify-content-between house-detail-row">
 
             <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="house-breadcrumb mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ > </a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}?district={{ house.district|urlencode }}">{{ house.get_district_display }} ></a></li>
+                        <li class="breadcrumb-item active" aria-current="page"> {{ house.name }}</li>
+                    </ol>
+                </nav>
+
                 <div class="img-property-main mb-4">
-                    {% if house.images.all %}
-                    <img src="{{ house.images.first.image.url }}" alt="{{ house.name }}"
-                        class="img-fluid rounded w-100 house-main-image">
-                    {% else %}
-                    <img src="{% static 'images/img_3.jpg' %}" alt="Default Image"
-                        class="img-fluid rounded w-100 house-main-image">
-                    {% endif %}
+                    <div class="house-main-view">
+                        <button type="button" class="house-main-nav" id="houseMainPrev" aria-label="Ảnh trước">
+                            <span class="icon-chevron-left"></span>
+                        </button>
+                        {% if house.main_image %}
+                        <img src="{{ house.main_image.url }}" alt="{{ house.name }}" class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        {% else %}
+                            {% with first_image=house.images.all|first %}
+                                {% if first_image %}
+                                <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                                {% else %}
+                                <img src="{% static 'images/img_3.jpg' %}" alt="Default Image" class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <button type="button" class="house-main-nav" id="houseMainNext" aria-label="Ảnh kế tiếp">
+                            <span class="icon-chevron-right"></span>
+                        </button>
+                        <div class="house-main-overlay">
+                            <h1 class="house-main-title mb-0">{{ house.name }}</h1>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="row mb-5">
-                    {% for img in house.images.all %}
-                    <div class="col-4 mb-3">
-                        <img src="{{ img.image.url }}" alt="Gallery Image"
-                            class="img-fluid rounded house-gallery-image">
+                <div class="house-gallery-wrap mb-5">
+                    <button type="button" class="house-gallery-nav" id="houseGalleryPrev" aria-label="Xem ảnh trước">
+                        <span class="icon-chevron-left"></span>
+                    </button>
+
+                    <div class="house-gallery-strip" id="houseGalleryStrip" aria-label="Ảnh phụ của căn nhà">
+                        {% for img in house.images.all %}
+                        <button type="button" class="house-gallery-item" data-src="{{ img.image.url }}" data-alt="Gallery Image {{ forloop.counter }}">
+                            <img src="{{ img.image.url }}" alt="Gallery Image {{ forloop.counter }}" class="house-gallery-image">
+                        </button>
+                        {% empty %}
+                        <div class="w-100">
+                            <p class="text-muted fst-italic small mb-0">Chưa có ảnh thư viện cho căn nhà này.</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% empty %}
-                    <div class="col-12">
-                        <p class="text-muted fst-italic small">Chưa có ảnh thư viện cho căn nhà này.</p>
-                    </div>
-                    {% endfor %}
+
+                    <button type="button" class="house-gallery-nav" id="houseGalleryNext" aria-label="Xem ảnh kế tiếp">
+                        <span class="icon-chevron-right"></span>
+                    </button>
                 </div>
 
                 <h2 class="heading text-primary">Thông tin chi tiết</h2>
-                <p class="text-black-50"><span class="icon-map-marker me-1"></span> {{ house.address }}, {{
-                    house.get_district_display }}</p>
+                <p class="text-black-50"><span class="icon-map-marker me-1"></span> {{ house.address }}, {{ house.get_district_display }}</p>
 
                 <div class="row mt-4 mb-4">
                     <div class="col-md-6 col-lg-4 mb-3">
@@ -84,8 +98,7 @@
                             <span class="icon-users me-2 text-primary display-6"></span>
                             <div>
                                 <span class="d-block fw-bold">Số người tối đa</span>
-                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else
-                                    %}Không giới hạn{% endif %}</span>
+                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else %}Không giới hạn{% endif %}</span>
                             </div>
                         </div>
                     </div>
@@ -100,8 +113,8 @@
                     <div class="col-md-12 mb-3">
                         <div class="p-3 border rounded bg-light h-100">
                             <ul class="list-unstyled mb-0">
-                                {% for item in house.furniture.all %}
-                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{ item.name }}</li>
+                                {% for item in house.furniture_items.all %}
+                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{ item.furniture.name }} (x{{ item.quantity }})</li>
                                 {% empty %}
                                 <li class="text-muted">Chưa cập nhật thông tin nội thất.</li>
                                 {% endfor %}
@@ -111,7 +124,12 @@
                 </div>
 
                 <h3 class="heading text-primary mt-5">Vị trí trên bản đồ</h3>
-                <div id="house-location-map" class="house-map-wrapper shadow-sm"></div>
+                <div id="house-location-map" class="house-map-wrapper shadow-sm"
+                    data-lat="{{ house.lat|default_if_none:'' }}"
+                    data-lng="{{ house.lng|default_if_none:'' }}"
+                    data-name="{{ house.name|escape }}"
+                    data-address="{{ house.address|escape }}"
+                    data-district="{{ house.get_district_display|escape }}"></div>
                 <div id="house-location-fallback" class="house-map-fallback mt-3 p-3 rounded border bg-light d-none">
                     <span class="icon-map-marker text-danger me-2"></span>
                     Chưa có tọa độ chính xác cho căn nhà này.
@@ -121,7 +139,7 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="bg-white widget border rounded p-4 mb-4 shadow-sm sticky-top house-price-widget">
+                <div class="bg-white widget border rounded p-4 mb-5 shadow-sm sticky-top house-price-widget">
                     <h3 class="h4 text-black widget-title mb-3">Giá thuê</h3>
                     <div class="price mb-3">
                         <span class="text-primary h2 fw-bold">{{ house.price|floatformat:0 }} VNĐ</span><span
@@ -131,13 +149,13 @@
                         <span class="badge bg-warning text-dark px-3 py-2">Cọc: {{ house.deposit|floatformat:0 }}
                             VNĐ</span>
                     </div>
-                    <a href="tel:{{ house.owner_phone }}"
+                    <button type="button" id="copyOwnerPhoneBtn" data-phone="{{ house.owner_phone }}"
                         class="btn btn-primary w-100 py-3 fw-bold shadow-sm text-white">
                         <span class="icon-phone me-2"></span> {{ house.owner_phone }}
-                    </a>
+                    </button>
                 </div>
 
-                <div class="bg-white widget border rounded p-4 shadow-sm mt-4">
+                <div class="bg-white widget border rounded p-4 shadow-sm mt-5">
                     <h3 class="h4 text-black widget-title mb-3">Người đăng tin</h3>
                     <div class="d-flex align-items-center mb-4">
                         <img src="{% static 'images/person_1-min.jpg' %}" alt="Owner"
@@ -167,8 +185,17 @@
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="property-item shadow-sm border rounded">
                     <a href="{% url 'house_detail' other_house.id %}" class="img">
-                        <img src="{% if other_house.images.all %}{{ other_house.images.first.image.url }}{% else %}{% static 'images/img_1.jpg' %}{% endif %}"
-                            alt="Image" class="img-fluid rounded-top">
+                        {% if other_house.main_image %}
+                        <img src="{{ other_house.main_image.url }}" alt="Image" class="img-fluid rounded-top">
+                        {% else %}
+                            {% with other_first_image=other_house.images.all|first %}
+                                {% if other_first_image %}
+                                <img src="{{ other_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
+                                {% else %}
+                                <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid rounded-top">
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
                     </a>
                     <div class="p-3">
                         <div class="price mb-2 text-primary fw-bold"><span>{{ other_house.price|floatformat:0 }}
@@ -204,8 +231,17 @@
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="property-item bg-white shadow-sm border rounded">
                     <a href="{% url 'house_detail' related.id %}" class="img">
-                        <img src="{% if related.images.all %}{{ related.images.first.image.url }}{% else %}{% static 'images/img_4.jpg' %}{% endif %}"
-                            alt="Image" class="img-fluid rounded-top">
+                        {% if related.main_image %}
+                        <img src="{{ related.main_image.url }}" alt="Image" class="img-fluid rounded-top">
+                        {% else %}
+                            {% with related_first_image=related.images.all|first %}
+                                {% if related_first_image %}
+                                <img src="{{ related_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
+                                {% else %}
+                                <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid rounded-top">
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
                     </a>
                     <div class="p-3">
                         <div class="price mb-2 text-primary fw-bold"><span>{{ related.price|floatformat:0 }} VNĐ</span>
@@ -229,38 +265,6 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script>
-    (function () {
-        const lat = Number("{{ house.lat|default:'' }}");
-        const lng = Number("{{ house.lng|default:'' }}");
-
-        const mapElement = document.getElementById("house-location-map");
-        const fallbackElement = document.getElementById("house-location-fallback");
-
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-            mapElement.classList.add("d-none");
-            fallbackElement.classList.remove("d-none");
-            return;
-        }
-
-        const map = L.map("house-location-map", {
-            zoomControl: true,
-            scrollWheelZoom: true,
-        }).setView([lat, lng], 15);
-
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        }).addTo(map);
-
-        const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`
-            <div class="map-popup-content">
-                <strong>{{ house.name|escapejs }}</strong><br>
-                {{ house.address|escapejs }}, {{ house.get_district_display|escapejs }}
-            </div>
-        `).openPopup();
-    })();
-</script>
+<script src="{% static 'Js/house_detail.js' %}?v=20260405a"></script>
 
 {% endblock %}

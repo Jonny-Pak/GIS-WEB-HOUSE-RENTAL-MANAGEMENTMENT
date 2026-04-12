@@ -227,13 +227,11 @@ sequenceDiagram
 
 ## Yêu cầu
 
-1. Docker Desktop
-2. Git
-3. (Tùy chọn) Python 3.11+ nếu chạy local không dùng Docker
+1. Python 3.11+.
+2. Git.
+3. (Tùy chọn) PostgreSQL nếu muốn chạy với DB thật.
 
-## Chạy dự án bằng Docker
-
-Tất cả lệnh bên dưới chạy tại thư mục gốc dự án (nơi có `docker-compose.yml`).
+## Cài đặt và chạy nhanh (Local)
 
 ### 1. Clone source
 
@@ -242,25 +240,40 @@ git clone <repo-url>
 cd GIS-WEB-HOUSE-RENTAL-MANAGEMENTMENT
 ```
 
-### 2. Build và khởi động container
+### 2. Tạo môi trường ảo và cài thư viện
 
 ```bash
-docker compose up --build -d
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-### 3. Migrate database
+### 3. Tạo file `.env`
 
 ```bash
-docker compose exec web python website/manage.py migrate
+copy .env.example .env
 ```
 
-### 4. Tạo tài khoản admin
+Để chạy nhanh không cần PostgreSQL, chỉnh trong `.env`:
+
+```env
+DB_BACKEND=sqlite3
+```
+
+### 4. Migrate và tạo tài khoản admin
 
 ```bash
-docker compose exec web python website/manage.py createsuperuser
+python website/manage.py migrate
+python website/manage.py createsuperuser
 ```
 
-### 5. Truy cập
+### 5. Chạy server
+
+```bash
+python website/manage.py runserver
+```
+
+## Truy cập nhanh
 
 | Trang | URL |
 |-------|-----|
@@ -268,67 +281,54 @@ docker compose exec web python website/manage.py createsuperuser
 | Bản đồ | http://127.0.0.1:8000/map/ |
 | Django Admin | http://127.0.0.1:8000/admin/ |
 | Custom Admin | http://127.0.0.1:8000/custom-admin/ |
-| API tìm nhà | http://127.0.0.1:8000/api/v1/houses/?lat=10.78&lng=106.70&radius=5 |
+| API tìm nhà theo bán kính | http://127.0.0.1:8000/api/v1/houses/?lat=10.78&lng=106.70&radius=5 |
+| API tìm nhà theo polygon | http://127.0.0.1:8000/api/v1/houses/polygon-search/ |
 
-### 6. Lệnh hay dùng
+## Chạy với PostgreSQL (tùy chọn)
 
-```bash
-# Xem trạng thái container
-docker compose ps
+Nếu muốn dùng PostgreSQL local, giữ `DB_BACKEND=postgresql` và cấu hình thêm trong `.env`:
 
-# Xem log web
-docker compose logs -f web
-
-# Dừng hệ thống
-docker compose down
+```env
+DB_NAME=quanlythuenha
+DB_USER=postgres
+DB_PASSWORD=123456
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
-## Lưu ý về dữ liệu khi làm nhóm
-
-Dữ liệu PostgreSQL lưu trong Docker volume (`postgres_data`), không nằm trong Git. Thành viên mới clone code sẽ **không** tự động có data.
-
-### Cách 1: Chia sẻ bản sao database
-
-Tại máy đang có dữ liệu:
+## Lệnh hay dùng
 
 ```bash
-docker compose exec -T db pg_dump -U postgres -d quanlythuenha > backup.sql
-```
+# Tạo migration mới
+python website/manage.py makemigrations
 
-Gửi `backup.sql` cho thành viên khác:
-
-```bash
-docker compose up -d db
-docker compose exec -T db psql -U postgres -d quanlythuenha < backup.sql
-```
-
-### Cách 2: Dùng fixture (dữ liệu mẫu)
-
-Xuất:
-
-```bash
-docker compose exec web python website/manage.py dumpdata --indent 2 > seed_data.json
-```
-
-Nhập tại máy mới:
-
-```bash
-docker compose up -d
-docker compose exec web python website/manage.py migrate
-docker compose exec web python website/manage.py loaddata seed_data.json
-```
-
-## Chạy local không dùng Docker
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+# Chạy toàn bộ migration
 python website/manage.py migrate
-python website/manage.py runserver
+
+# Chạy test
+pytest
+
+# Format code
+black website
+
+# Sort import
+isort website
+
+# Lint
+flake8 website
 ```
 
-> Lưu ý: Cần có PostgreSQL local và cấu hình biến môi trường kết nối DB.
+## Lưu ý dữ liệu khi làm nhóm
+
+Data DB không nằm trong Git. Để chia sẻ dữ liệu giữa các máy, có thể dùng fixture:
+
+```bash
+# Xuất dữ liệu
+python website/manage.py dumpdata --indent 2 > seed_data.json
+
+# Nhập dữ liệu
+python website/manage.py loaddata seed_data.json
+```
 
 ## Quy trình làm việc nhóm với Git
 

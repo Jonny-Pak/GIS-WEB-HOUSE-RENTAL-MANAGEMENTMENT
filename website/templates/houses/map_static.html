@@ -6,12 +6,21 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{% static 'css/map.css' %}" />
 {% endblock %}
 
 {% block content %}
 <section class="map-page">
     <div class="container">
+        <div class="map-toolbar mb-3 p-3 rounded-4 shadow-sm">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <button type="button" id="btnLocateMeOnMap" class="btn btn-sm btn-outline-primary">Ví trí của tôi</button>
+                <button type="button" id="btnClearMapPolygon" class="btn btn-sm btn-outline-secondary">Xóa vùng</button>
+                <span id="mapFilterStatus" class="map-filter-status">Vẽ polygon trên bản đồ để lọc nhà theo vùng.</span>
+            </div>
+        </div>
         <div id="static-map" aria-label="Ban do nha cho thue"></div>
     </div>
 </section>
@@ -21,39 +30,10 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
 </script>
-<script>
-    const map = L.map("static-map", {
-        zoomControl: true,
-        scrollWheelZoom: true,
-    }).setView([10.7769, 106.7009], 12);
-
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    }).addTo(map);
-
-    const houses = JSON.parse(document.getElementById("houses-data").textContent || "[]");
-    const markerGroup = L.featureGroup().addTo(map);
-
-    houses.forEach((house) => {
-        if (house.lat == null || house.lng == null) return;
-
-        const marker = L.marker([house.lat, house.lng]);
-        marker.bindPopup(`
-            <div class="map-popup-content">
-                <strong>${house.name || "Nhà cho thuê"}</strong><br>
-                Giá: ${house.price || "Liên hệ"}<br>
-                Khu vực: ${house.district || "Không rõ khu vực"}<br>
-                Trạng thái: ${house.status || "Chưa cập nhật"}<br>
-                <a href="${house.detail_url || "#"}">Xem chi tiết</a>
-      </div>
-    `);
-        marker.addTo(markerGroup);
-    });
-
-    const bounds = markerGroup.getBounds();
-    if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [24, 24] });
-    }
-</script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+></script>
+<script src="{% static 'Js/map_static.js' %}?v=20260409b"></script>
 {% endblock %}

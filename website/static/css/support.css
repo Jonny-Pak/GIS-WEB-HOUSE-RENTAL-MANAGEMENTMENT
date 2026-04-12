@@ -1,0 +1,49 @@
+.support-page {
+    background: linear-gradient(180deg, #efedfb 0%, #f8f9ff 100%);
+}
+
+.support-hero p {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.support-card {
+    background: #fff;
+    border: 1px solid rgba(24, 20, 96, 0.12);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 12px 28px rgba(24, 20, 96, 0.08);
+}
+
+.support-contact-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.support-contact-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #f7f8ff;
+    border: 1px solid #e3e6ff;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.support-contact-item span {
+    color: #181460;
+    font-size: 20px;
+    line-height: 1;
+    margin-top: 3px;
+}
+
+.support-card .form-control {
+    border-radius: 10px;
+    border-color: #d9ddf8;
+}
+
+.support-card .form-control:focus {
+    border-color: #181460;
+    box-shadow: 0 0 0 0.2rem rgba(24, 20, 96, 0.15);
+}

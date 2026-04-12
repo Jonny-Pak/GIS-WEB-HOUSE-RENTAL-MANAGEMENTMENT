@@ -1,6 +1,7 @@
 import math
 from shapely.geometry import Point, Polygon
-from houses.models import House, HouseImage
+from houses.models import Furniture, House, HouseFurnitureItem, HouseImage
+from houses.services.geocoding import resolve_house_coordinates
 
 
 # ==================== GEO SERVICES ====================
@@ -71,9 +72,138 @@ def get_houses_in_polygon_qs(polygon_coords):
     return houses_in_poly
 
 
+def _parse_furniture_from_request(request):
+    selected_ids = request.POST.getlist('furniture_ids')
+    normalized = []
+    seen = set()
+
+    for item in selected_ids:
+        try:
+            furniture_id = int(item)
+        except (TypeError, ValueError):
+            continue
+
+        if furniture_id in seen:
+            continue
+
+        seen.add(furniture_id)
+        quantity_raw = (request.POST.get(f'quantity_{furniture_id}', '1') or '').strip()
+        try:
+            quantity = int(quantity_raw)
+        except (TypeError, ValueError):
+            quantity = 1
+
+        if quantity < 1:
+            quantity = 1
+
+        normalized.append((furniture_id, quantity))
+
+    return normalized
+
+
+def build_furniture_choices(request=None, house=None):
+    furnitures = Furniture.objects.order_by('name')
+    selected_quantities = {}
+
+    if house is not None:
+        selected_quantities = {
+            item.furniture_id: item.quantity
+            for item in house.furniture_items.all()
+        }
+
+    if request is not None and request.method == 'POST':
+        selected_quantities = {
+            furniture_id: quantity
+            for furniture_id, quantity in _parse_furniture_from_request(request)
+        }
+
+    return [
+        {
+            'id': furniture.id,
+            'name': furniture.name,
+            'selected': furniture.id in selected_quantities,
+            'quantity': selected_quantities.get(furniture.id, 1),
+        }
+        for furniture in furnitures
+    ]
+
+
+def save_house_furniture(house, request):
+    selected_pairs = _parse_furniture_from_request(request)
+    selected_ids = [furniture_id for furniture_id, _ in selected_pairs]
+
+    furniture_map = {
+        furniture.id: furniture
+        for furniture in Furniture.objects.filter(id__in=selected_ids)
+    }
+
+    HouseFurnitureItem.objects.filter(house=house).delete()
+    house.furniture.clear()
+
+    items_to_create = []
+    valid_ids = []
+    for furniture_id, quantity in selected_pairs:
+        if furniture_id not in furniture_map:
+            continue
+        valid_ids.append(furniture_id)
+        items_to_create.append(
+            HouseFurnitureItem(
+                house=house,
+                furniture=furniture_map[furniture_id],
+                quantity=quantity,
+            )
+        )
+
+    try:
+        HouseFurnitureItem.objects.filter(house=house).delete()
+        house.furniture.clear()
+
+        if items_to_create:
+            HouseFurnitureItem.objects.bulk_create(items_to_create)
+        house.furniture.set(valid_ids)
+    except Exception:
+        # Fall back to basic many-to-many if detail table is unavailable.
+        house.furniture.set(valid_ids)
+
+
+def _resolve_house_location(house):
+    district_display = ''
+    try:
+        district_display = house.get_district_display()
+    except Exception:
+        district_display = ''
+
+    return resolve_house_coordinates(
+        address=house.address or '',
+        district_code=house.district or '',
+        district_display=district_display,
+    )
+
+
+def _parse_manual_coordinates(request):
+    if request is None:
+        return None, None
+
+    lat_raw = (request.POST.get('manual_lat') or '').strip()
+    lng_raw = (request.POST.get('manual_lng') or '').strip()
+    if not lat_raw or not lng_raw:
+        return None, None
+
+    try:
+        lat = float(lat_raw)
+        lng = float(lng_raw)
+    except (TypeError, ValueError):
+        return None, None
+
+    if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+        return None, None
+
+    return lat, lng
+
+
 # ==================== LANDLORD SERVICES ====================
 
-def create_house(form, owner, images=None):
+def create_house(form, owner, images=None, request=None):
     """
     Tạo mới một bài đăng nhà.
     - Gán chủ nhà (owner)
@@ -83,21 +213,49 @@ def create_house(form, owner, images=None):
     """
     house = form.save(commit=False)
     house.owner = owner
-    house.status = 'no_coordinates'
-    house.lat = house.lng = None
-    house.requires_coordinates = True
+
+    manual_lat, manual_lng = _parse_manual_coordinates(request)
+    lat, lng, geocode_state = _resolve_house_location(house)
+
+    geocode_inexact = geocode_state in {
+        'failed',
+        'nominatim_rate_limited',
+        'district_center_fallback',
+        'district_center_fallback_rate_limited',
+    }
+    if manual_lat is not None and manual_lng is not None and ((lat is None or lng is None) or geocode_inexact):
+        lat, lng, geocode_state = manual_lat, manual_lng, 'manual_pin'
+
+    if lat is not None and lng is not None:
+        house.lat = lat
+        house.lng = lng
+        house.requires_coordinates = False
+        house.status = 'pending'
+    else:
+        house.status = 'no_coordinates'
+        house.lat = house.lng = None
+        house.requires_coordinates = True
+
     house.save()
+
+    if request is not None:
+        save_house_furniture(house, request)
 
     # Lưu ảnh phụ
     if images:
         for image in images:
             HouseImage.objects.create(house=house, image=image)
 
-    warning_msg = 'Tin đăng đang ở trạng thái Chưa có tọa độ. Admin sẽ nhập tọa độ thủ công trước khi duyệt.'
+    if geocode_state in {'geocoded_nominatim', 'cached', 'parsed_from_input'}:
+        warning_msg = 'Hệ thống đã tự động lấy tọa độ từ địa chỉ. Tin đăng đang chờ duyệt.'
+    elif geocode_state == 'manual_pin':
+        warning_msg = 'Không tìm được tọa độ tự động, hệ thống đã dùng vị trí bạn ghim trên bản đồ.'
+    else:
+        warning_msg = 'Không thể tự động xác định tọa độ từ địa chỉ. Vui lòng kiểm tra lại địa chỉ để hệ thống thử lại.'
     return house, warning_msg
 
 
-def update_house(form, owner, original_address):
+def update_house(form, owner, original_address, original_district, request=None):
     """
     Cập nhật thông tin bài đăng nhà.
     - Xử lý logic trạng thái tọa độ khi địa chỉ thay đổi
@@ -107,19 +265,58 @@ def update_house(form, owner, original_address):
     house.owner = owner
     warning_msg = None
 
-    # Nếu địa chỉ thay đổi -> reset tọa độ, chuyển về trạng thái chờ
-    if (original_address or '').strip() != (house.address or '').strip():
-        house.lat = house.lng = None
-        house.requires_coordinates = True
-        house.status = 'no_coordinates'
-        warning_msg = 'Bạn đã thay đổi địa chỉ. Tin đăng chuyển về trạng thái Chưa có tọa độ.'
-    elif house.lat is None or house.lng is None:
-        house.requires_coordinates = True
-        house.status = 'no_coordinates'
+    original_address_norm = (original_address or '').strip()
+    new_address_norm = (house.address or '').strip()
+    original_district_norm = (original_district or '').strip()
+    new_district_norm = (house.district or '').strip()
+
+    location_changed = (
+        original_address_norm != new_address_norm
+        or original_district_norm != new_district_norm
+    )
+
+    manual_lat, manual_lng = _parse_manual_coordinates(request)
+    need_geocode = location_changed or house.lat is None or house.lng is None
+    if need_geocode:
+        lat, lng, geocode_state = _resolve_house_location(house)
+
+        geocode_inexact = geocode_state in {
+            'failed',
+            'nominatim_rate_limited',
+            'district_center_fallback',
+            'district_center_fallback_rate_limited',
+        }
+
+        if manual_lat is not None and manual_lng is not None and ((lat is None or lng is None) or geocode_inexact):
+            lat, lng, geocode_state = manual_lat, manual_lng, 'manual_pin'
+
+        if lat is not None and lng is not None:
+            house.lat = lat
+            house.lng = lng
+            house.requires_coordinates = False
+            house.status = 'pending'
+            if geocode_state == 'manual_pin':
+                warning_msg = 'Hệ thống không tìm được địa chỉ chính xác, đã dùng vị trí bạn ghim thủ công trên bản đồ.'
+            elif location_changed:
+                warning_msg = 'Đã thay đổi vị trí và hệ thống đã tự động cập nhật tọa độ mới. Tin đăng đang chờ duyệt lại.'
+            else:
+                warning_msg = 'Hệ thống đã tự động bổ sung tọa độ cho tin đăng.'
+        else:
+            house.lat = house.lng = None
+            house.requires_coordinates = True
+            house.status = 'no_coordinates'
+            if location_changed:
+                warning_msg = 'Đã thay đổi vị trí nhưng chưa tự động lấy được tọa độ. Vui lòng kiểm tra lại địa chỉ để thử lại.'
+            else:
+                warning_msg = 'Tin đăng chưa có tọa độ và hệ thống chưa thể tự động xác định từ địa chỉ hiện tại.'
     else:
         house.requires_coordinates = False
 
     house.save()
+
+    if request is not None:
+        save_house_furniture(house, request)
+
     return house, warning_msg
 
 
@@ -198,9 +395,20 @@ def get_house_detail(house_id):
     Trả về: (house, related_houses)
     """
     from django.shortcuts import get_object_or_404
-    house = get_object_or_404(House, id=house_id)
-    related_houses = House.objects.filter(district=house.district).exclude(id=house_id)[:3]
-    return house, related_houses
+
+    house = get_object_or_404(
+        House.objects.prefetch_related('furniture_items__furniture'),
+        id=house_id,
+    )
+    related_houses = House.objects.filter(
+        status='available',
+        district=house.district,
+    ).exclude(id=house_id)[:3]
+    other_houses = House.objects.filter(
+        status='available',
+        owner=house.owner,
+    ).exclude(id=house_id).order_by('-created_at')[:6]
+    return house, related_houses, other_houses
 
 
 def get_map_houses():

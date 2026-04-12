@@ -5,18 +5,20 @@
 
 {% block header_title %}Hồ sơ cá nhân{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}?v=20260406e" />
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-4 mb-4">
-            <div class="card border-0 shadow-sm text-center p-4" style="border-radius: 15px;">
+            <div class="card border-0 shadow-sm text-center p-4 profile-panel">
                 <div class="avatar-wrapper mb-3">
-                    {% if user.profile.avatar %}
-                    <img src="{{ user.profile.avatar.url }}" class="rounded-circle shadow-sm"
-                        style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #f8f9fa;">
+                    {% if profile_form.instance.avatar %}
+                    <img src="{{ profile_form.instance.avatar.url }}" class="rounded-circle shadow-sm profile-avatar-image" alt="Ảnh đại diện" onerror="this.onerror=null;this.src='{% static 'images/avatar.jpg' %}';">
                     {% else %}
-                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto shadow-sm"
-                        style="width: 120px; height: 120px; color: white; font-size: 45px; font-weight: bold;">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto shadow-sm profile-avatar-fallback">
                         {{ user.username|first|upper }}
                     </div>
                     {% endif %}
@@ -32,46 +34,65 @@
         </div>
 
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+            <div class="card border-0 shadow-sm p-4 profile-panel">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Chi tiết tài khoản</h5>
-                    <a href="#" class="btn btn-primary btn-sm rounded-pill px-3">
-                        <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
-                    </a>
+                    <span class="badge bg-light text-dark">Có thể chỉnh sửa hồ sơ</span>
                 </div>
 
-                <div class="profile-details">
-                    <div class="row mb-4">
-                        <div class="col-sm-4">
-                            <label class="text-muted small text-uppercase fw-bold">Tên đăng nhập</label>
-                            <p class="mb-0 fw-semibold">{{ user.username }}</p>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Tên đăng nhập</label>
+                            {{ user_form.username }}
+                            <small class="text-muted d-block mt-1">Không thể chỉnh sửa</small>
                         </div>
-                        <div class="col-sm-8">
-                            <label class="text-muted small text-uppercase fw-bold">Địa chỉ Email</label>
-                            <p class="mb-0 fw-semibold">{{ user.email|default:"Chưa cập nhật" }}</p>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Địa chỉ Email</label>
+                            {{ user_form.email }}
+                            <small class="text-muted d-block mt-1">Không thể chỉnh sửa</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Họ</label>
+                            {{ user_form.first_name }}
+                            {% if user_form.first_name.errors %}
+                            <div class="text-danger small mt-1">{{ user_form.first_name.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Tên</label>
+                            {{ user_form.last_name }}
+                            {% if user_form.last_name.errors %}
+                            <div class="text-danger small mt-1">{{ user_form.last_name.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Số điện thoại</label>
+                            {{ profile_form.phone }}
+                            {% if profile_form.phone.errors %}
+                            <div class="text-danger small mt-1">{{ profile_form.phone.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Ảnh đại diện</label>
+                            {{ profile_form.avatar }}
+                            {% if profile_form.avatar.errors %}
+                            <div class="text-danger small mt-1">{{ profile_form.avatar.errors|striptags }}</div>
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="row mb-4">
-                        <div class="col-sm-4">
-                            <label class="text-muted small text-uppercase fw-bold">Số điện thoại</label>
-                            <p class="mb-0 fw-semibold">{{ user.profile.phone|default:"Chưa cập nhật" }}</p>
-                        </div>
-                        <div class="col-sm-8">
-                            <label class="text-muted small text-uppercase fw-bold">Họ và tên</label>
-                            <p class="mb-0 fw-semibold">
-                                {% if user.first_name or user.last_name %}
-                                {{ user.first_name }} {{ user.last_name }}
-                                {% else %}
-                                <span class="text-muted">Chưa cập nhật</span>
-                                {% endif %}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-0">
-                        <div class="col-sm-4">
-                            <label class="text-muted small text-uppercase fw-bold">Vai trò</label>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Vai trò tài khoản</label>
                             <p class="mb-0">
                                 {% if user.is_staff %}
                                 <span class="badge bg-danger-subtle text-danger px-3">Quản trị viên</span>
@@ -80,7 +101,7 @@
                                 {% endif %}
                             </p>
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-6">
                             <label class="text-muted small text-uppercase fw-bold">Mật khẩu</label>
                             <p class="mb-0">
                                 <a href="#" class="text-decoration-none small">
@@ -89,7 +110,11 @@
                             </p>
                         </div>
                     </div>
-                </div>
+
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i> Lưu thay đổi
+                    </button>
+                </form>
             </div>
         </div>
     </div>

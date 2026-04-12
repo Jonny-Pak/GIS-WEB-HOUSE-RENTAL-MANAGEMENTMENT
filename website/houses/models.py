@@ -91,6 +91,20 @@ class House(models.Model):
         return f"[{self.get_status_display()}] {self.name} - {self.get_district_display()}"
 
 
+class HouseFurnitureItem(models.Model):
+    house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='furniture_items')
+    furniture = models.ForeignKey(Furniture, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+
+    class Meta:
+        unique_together = ('house', 'furniture')
+        verbose_name = 'Nội thất theo nhà'
+        verbose_name_plural = 'Nội thất theo nhà'
+
+    def __str__(self):
+        return f"{self.house.name} - {self.furniture.name} x {self.quantity}"
+
+
 # Bảng Hình ảnh
 class HouseImage(models.Model):
     house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='images')

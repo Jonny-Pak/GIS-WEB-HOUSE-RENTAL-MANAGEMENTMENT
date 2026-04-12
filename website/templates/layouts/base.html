@@ -16,8 +16,8 @@
   <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
   <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
   <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
-  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-  <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260404e" />
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=20260405d" />
 
   {% block extra_css %}{% endblock %}
 </head>
@@ -33,16 +33,16 @@
     <div class="site-mobile-menu-body"></div>
   </div>
 
-  <nav class="site-nav">
+  <nav class="site-nav fixed-top">
     <div class="container">
       <div class="menu-bg-wrap">
         <div class="site-navigation">
 
-          <a href="{% url 'home' %}" class="logo m-0 float-start logo-wrapper">
-            <span class="text-white fw-bold">THUÊ NHÀ NHANH</span>
+          <a href="{% url 'home' %}" class="logo m-0 logo-wrapper">
+            <img src="{% static 'images/logo_web.png' %}" alt="Thuê Nhà Nhanh" class="logo-img">
           </a>
 
-          <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu float-end">
+          <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu">
             <li class="active"><a href="{% url 'home' %}">Trang chủ</a></li>
 
             <li class="has-children">
@@ -60,7 +60,14 @@
               </a>
             </li>
 
-            <li><a href="#">Dịch vụ</a></li>
+            <li><a href="{% url 'support' %}">Hỗ trợ</a></li>
+
+            <li class="nav-search-item">
+              <form action="{% url 'home' %}" method="GET" class="nav-search-form">
+                <span class="icon-search"></span>
+                <input type="text" name="search" placeholder="Tìm phòng..." value="{{ request.GET.search|default:'' }}">
+              </form>
+            </li>
 
             {% if user.is_authenticated %}
             <li>
@@ -71,19 +78,21 @@
 
             <li class="has-children">
               <a href="#">
-                <img src="{% static 'images/person_1-min.jpg' %}" class="user-avatar-nav" alt="User"
-                  style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin-right: 5px;">
+                <img src="{{ current_user_avatar_url }}" class="user-avatar-nav" alt="User"
+                  >
                 Chào, {{ user.username }}
               </a>
               <ul class="dropdown">
+                {% if user.is_superuser %}
+                <li><a href="{% url 'custom_admin_dashboard' %}">Trang quản trị</a></li>
+                {% endif %}
                 <li><a href="{% url 'profile' %}">Hồ sơ cá nhân</a></li>
                 <li><a href="{% url 'dashboard' %}">Quản lý tin đăng</a></li>
-                <hr style="margin: 5px 0; border-color: rgba(0,0,0,0.1);">
+                <hr class="nav-dropdown-divider">
                 <li>
-                  <form action="{% url 'logout' %}" method="post" style="padding: 5px 20px;">
+                  <form action="{% url 'logout' %}" method="post" class="nav-logout-form">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm text-danger w-100 text-start"
-                      style="background:none; border:none; padding:0; font-weight:normal; cursor: pointer;">
+                    <button type="submit" class="btn btn-sm text-danger w-100 text-start nav-logout-button">
                       Đăng xuất
                     </button>
                   </form>
@@ -102,7 +111,7 @@
           </ul>
 
           <a href="#"
-            class="burger light me-auto float-end mt-1 site-menu-toggle js-menu-toggle d-inline-block d-lg-none"
+            class="burger light me-auto mt-1 site-menu-toggle js-menu-toggle d-inline-block d-lg-none"
             data-toggle="collapse" data-target="#main-navbar">
             <span></span>
           </a>
@@ -113,6 +122,8 @@
 
   {% block content %}
   {% endblock %}
+
+  {% block extra_js %}{% endblock %}
 
   <div class="site-footer">
     <div class="container">
@@ -150,8 +161,7 @@
 
       <div class="row mt-5">
         <div class="col-12 text-center">
-          <p>Copyright &copy;
-            <script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed by
+          <p>Copyright &copy; {% now "Y" %}. All Rights Reserved. &mdash; Designed by
             Untree.co
           </p>
         </div>

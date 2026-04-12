@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
-    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}?v=20260406b">
 </head>
 
 <body class="admin-page">
@@ -83,7 +83,7 @@
                                 <td class="actions-cell">
                                     {% for action in row.extra_actions %}
                                     <form method="post" action="{% url action.url_name row.id %}"
-                                        onsubmit="return confirm('{{ action.confirm|default:"Xác nhận thao tác này?" }}');">
+                                            data-confirm-submit="{{ action.confirm|default:'Xác nhận thao tác này?' }}">
                                         {% csrf_token %}
                                         <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">
                                             {{ action.label }}</button>
@@ -94,7 +94,7 @@
                                     {% endif %}
                                     {% if delete_url_name %}
                                     <form method="post" action="{% url delete_url_name row.id %}"
-                                        onsubmit="return confirm('Xác nhận xóa dữ liệu này?');">
+                                        data-confirm-submit="Xác nhận xóa dữ liệu này?">
                                         {% csrf_token %}
                                         <button type="submit" class="mini-btn danger-btn">Xóa</button>
                                     </form>
@@ -113,6 +113,8 @@
             </section>
         </div>
     </main>
+
+<script src="{% static 'Js/form_helpers.js' %}?v=20260406e"></script>
 </body>
 
 </html>

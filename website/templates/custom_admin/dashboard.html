@@ -6,17 +6,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard quản trị</title>
-    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}?v=20260406b">
 </head>
 
 <body class="admin-page">
     <header class="admin-topbar">
         <div class="admin-topbar-title">
-            <h1>Dashboard quản trị</h1>
+            <h1>
+                <a href="{% url 'home' %}" aria-label="Về trang chủ" class="admin-brand-link">
+                    <img src="{% static 'images/logo_web.png' %}" alt="Thuê Nhà Nhanh" class="admin-brand-logo">
+                </a>
+            </h1>
             <p>Xin chào {{ request.user.username }}</p>
         </div>
         <div class="admin-topbar-actions">
-            <a href="/" class="outline-btn">Trang chủ</a>
+            <a href="/" class="outline-btn home-btn">Trang chủ</a>
             <a href="{% url 'custom_admin_logout' %}" class="primary-btn">Đăng xuất</a>
         </div>
     </header>

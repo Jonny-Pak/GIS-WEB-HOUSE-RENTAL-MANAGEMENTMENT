@@ -2,8 +2,10 @@
 
 /* Màu chủ đạo */
 :root {
-    --primary-color: #005555;
+    --primary-color: #181460;
+    --primary-hover: #232183;
     --text-color: #000000;
+    --muted-color: #6f7383;
 }
 
 .login-section {
@@ -11,7 +13,7 @@
     padding: 120px 0 80px 0;
 }
 
-.login-heading {
+.login-section .login-heading {
     color: var(--primary-color);
     font-weight: 700;
     font-size: 2.5rem;
@@ -43,7 +45,7 @@
 
 .custom-input:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 85, 85, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(24, 20, 96, 0.25);
 }
 
 .btn-custom-login {
@@ -58,9 +60,9 @@
 }
 
 .btn-custom-login:hover {
-    background-color: #004444;
+    background-color: #120f49;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 85, 85, 0.3);
+    box-shadow: 0 5px 15px rgba(24, 20, 96, 0.3);
 }
 
 /* Đường gạch ngang "Hoặc" */
@@ -73,7 +75,7 @@
 .separator-text {
     background: white;
     padding: 0 10px;
-    color: #999;
+    color: var(--muted-color);
     position: relative;
     z-index: 1;
 }
@@ -89,14 +91,39 @@
     z-index: 0;
 }
 
-.link-register {
+.login-section .link-register {
     color: var(--primary-color);
     font-weight: 700;
     text-decoration: none;
     transition: color 0.2s;
 }
 
-.link-register:hover {
-    color: #003333;
+.login-section .link-register:hover {
+    color: var(--primary-hover);
     text-decoration: underline;
 }
+
+.login-card p,
+.login-card small,
+.login-card .text-muted {
+    color: var(--muted-color) !important;
+}
+
+.login-card a.link-register,
+.login-card p .link-register {
+    color: var(--primary-color) !important;
+}
+
+.login-section .login-heading,
+.login-section a.link-register,
+.login-section a.link-register:visited {
+    color: var(--primary-color) !important;
+}
+
+.login-card a.link-register:hover,
+.login-card p .link-register:hover,
+.login-section a.link-register:focus,
+.login-section a.link-register:active {
+    color: var(--primary-hover) !important;
+}
+
