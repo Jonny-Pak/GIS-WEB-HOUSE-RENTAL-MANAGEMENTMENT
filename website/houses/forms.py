@@ -91,8 +91,9 @@ class HouseForm(forms.ModelForm):
         polygon_geojson = (self.data.get('polygon_geojson') or '').strip()
         estimated_area_raw = (self.data.get('estimated_area_m2') or '').strip()
 
+        # Allow manual area input when polygon is not provided.
         if not polygon_geojson:
-            self.add_error('area', 'Vui lòng vẽ polygon trên bản đồ để hệ thống tính diện tích trước.')
+            cleaned_data['estimated_area_m2'] = None
             return cleaned_data
 
         try:
