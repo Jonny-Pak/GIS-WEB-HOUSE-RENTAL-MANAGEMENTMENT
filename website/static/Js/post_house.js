@@ -1,4 +1,9 @@
 (function () {
+  if (window.__postHouseScriptInitialized) {
+    return;
+  }
+  window.__postHouseScriptInitialized = true;
+
   window.__postHouseGeocodeBound = true;
 
   function getCookie(name) {
@@ -37,7 +42,17 @@
     }
 
     emptyState.style.display = "none";
-    Array.from(files).forEach(function (file) {
+    const seen = new Set();
+    const uniqueFiles = Array.from(files).filter(function (file) {
+      const key = [file.name, file.size, file.lastModified].join("|");
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+
+    uniqueFiles.forEach(function (file) {
       const reader = new FileReader();
       reader.onload = function (e) {
         const div = document.createElement("div");
@@ -219,8 +234,7 @@
       }
       polygonGeoJson = null;
       if (areaInput) {
-        areaInput.value = "";
-        areaInput.readOnly = true;
+        areaInput.readOnly = false;
       }
       if (allowAreaManualEdit) {
         allowAreaManualEdit.checked = false;
@@ -365,8 +379,7 @@
       polygonLayer = null;
       polygonGeoJson = null;
       if (areaInput) {
-        areaInput.value = "";
-        areaInput.readOnly = true;
+        areaInput.readOnly = false;
       }
       if (allowAreaManualEdit) {
         allowAreaManualEdit.checked = false;
@@ -509,7 +522,7 @@
     });
 
     if (areaInput) {
-      areaInput.readOnly = !polygonGeoJson;
+      areaInput.readOnly = false;
     }
 
     if (allowAreaManualEdit && areaInput) {
@@ -536,26 +549,28 @@
         const enteredArea = Number(areaInput && areaInput.value ? areaInput.value : "");
         const hasPolygon = Boolean((polygonGeoInput.value || "").trim());
 
-        if (!hasPolygon || !Number.isFinite(estimated) || estimated <= 0) {
-          event.preventDefault();
-          showSubmitError("Vui long ve polygon tren ban do de tinh dien tich truoc khi dang tin.");
-          return;
-        }
-
-        const tolerance = Math.max(5, estimated * 0.1);
-        if (!Number.isFinite(enteredArea)) {
+        if (!Number.isFinite(enteredArea) || enteredArea <= 0) {
           event.preventDefault();
           showSubmitError("Dien tich khong hop le. Vui long kiem tra lai.");
           return;
         }
 
-        if (Math.abs(enteredArea - estimated) > tolerance) {
-          event.preventDefault();
-          showSubmitError(
-            "Dien tich nhap tay vuot nguong cho phep so voi polygon (toi da ±" +
-            tolerance.toFixed(1) +
-            " m²)."
-          );
+        if (hasPolygon) {
+          if (!Number.isFinite(estimated) || estimated <= 0) {
+            event.preventDefault();
+            showSubmitError("Khong doc duoc dien tich tu polygon. Vui long ve lai polygon.");
+            return;
+          }
+
+          const tolerance = Math.max(5, estimated * 0.1);
+          if (Math.abs(enteredArea - estimated) > tolerance) {
+            event.preventDefault();
+            showSubmitError(
+              "Dien tich nhap tay vuot nguong cho phep so voi polygon (toi da ±" +
+              tolerance.toFixed(1) +
+              " m²)."
+            );
+          }
         }
       });
     }
@@ -628,12 +643,12 @@
 
   const mainImageInput = document.getElementById("mainImageInput");
   if (mainImageInput) {
-    mainImageInput.addEventListener("change", previewMainImage);
+    mainImageInput.onchange = previewMainImage;
   }
 
   const detailImagesInput = document.getElementById("detailImagesInput");
   if (detailImagesInput) {
-    detailImagesInput.addEventListener("change", previewGalleryImages);
+    detailImagesInput.onchange = previewGalleryImages;
   }
 
   bindFurnitureQuantityInputs();
