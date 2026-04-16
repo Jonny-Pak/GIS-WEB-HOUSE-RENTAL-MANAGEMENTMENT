@@ -6,6 +6,8 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/post_house.css' %}?v=20260406e" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
 {% endblock %}
 
 {% block content %}
@@ -90,16 +92,13 @@
                         <i class="bi bi-geo-alt me-2"></i>Vị trí bất động sản
                     </h5>
                     <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <label class="fw-bold mb-2 text-dark">Quận / Huyện <span class="text-danger">*</span></label>
-                            {{ form.district }}
-                        </div>
-                        <div class="col-md-8 mb-4">
+                        <div class="col-md-12 mb-4">
                             <label class="fw-bold mb-2 text-dark">Địa chỉ chính xác <span class="text-danger">*</span></label>
                             {{ form.address }}
-                            <div class="form-text text-muted">
-                                Nhập đầy đủ: Số nhà, tên đường, phường/xã
-                            </div>
+                            <small class="text-muted d-block mt-1">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Nhập đầy đủ: Số nhà, tên đường, phường/xã. Hoặc sử dụng bản đồ bên dưới để tự động điền.
+                            </small>
                             {% if form.address.errors %}
                                 <div class="text-danger small mt-1">{{ form.address.errors|striptags }}</div>
                             {% endif %}
@@ -109,6 +108,7 @@
                     <div
                         class="map-wrapper mt-2"
                         data-geocode-url="{% url 'geocode_preview' %}"
+                        data-reverse-geocode-url="{% url 'reverse_geocode_preview' %}"
                         data-initial-lat="{{ form.instance.lat|default_if_none:'' }}"
                         data-initial-lng="{{ form.instance.lng|default_if_none:'' }}"
                     >
@@ -247,8 +247,8 @@
                         <label class="fw-bold mb-2 text-dark">1. Ảnh đại diện (Thumbnail) <span class="text-danger">*</span></label>
                         <input type="file" class="form-control" id="mainImageInput" name="main_image" accept="image/*">
                         
-                        <div class="mt-3 d-none" id="main-image-preview-box">
-                            <img id="main-img-preview" src="#" alt="Preview" class="rounded shadow-sm border main-img-preview">
+                        <div class="mt-3 {% if not form.instance.main_image %}d-none{% endif %}" id="main-image-preview-box">
+                            <img id="main-img-preview" src="{% if form.instance.main_image %}{{ form.instance.main_image.url }}{% else %}#{% endif %}" alt="Preview" class="rounded shadow-sm border main-img-preview">
                         </div>
                     </div>
 
@@ -259,11 +259,21 @@
                     </div>
 
                     <div class="p-3 border border-dashed rounded bg-light post-house-furniture-box">
-                        <div id="gallery-empty-state" class="text-center py-4">
+                        <div id="gallery-empty-state" class="text-center py-4 {% if form.instance.id and form.instance.images.all %}d-none{% endif %}">
                             <i class="bi bi-images fs-2 text-muted d-block"></i>
                             <small class="text-muted">Ảnh chi tiết sẽ hiển thị tại đây sau khi bạn chọn file</small>
                         </div>
-                        <div id="gallery-preview-container" class="row g-2"></div>
+                        <div id="gallery-preview-container" class="row g-2 mt-0 {% if not form.instance.id or not form.instance.images.all %}d-none{% endif %}">
+                            {% if form.instance.id %}
+                                {% for detail_img in form.instance.images.all %}
+                                <div class="col-4 col-md-3">
+                                    <div class="position-relative ratio ratio-1x1 border rounded overflow-hidden shadow-sm">
+                                      <img src="{{ detail_img.image.url }}" class="object-fit-cover w-100 h-100" alt="Detail preview">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -297,6 +307,6 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
 ></script>
-<script src="{% static 'Js/post_house.js' %}?v=20260406d"></script>
+<script src="{% static 'Js/post_house.js' %}?v=20260413d"></script>
 {% endblock %}
 {% endblock %}

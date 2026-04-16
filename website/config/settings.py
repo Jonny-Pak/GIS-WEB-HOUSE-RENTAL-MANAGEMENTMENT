@@ -202,3 +202,4 @@ SUPPORT_CONTACT_PHONE = os.getenv('SUPPORT_CONTACT_PHONE', '0900 123 456')
 
 # GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"
 # GEOS_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgeos_c.dll"
+

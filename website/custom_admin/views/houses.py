@@ -11,13 +11,15 @@ from custom_admin.views.helpers import _is_admin_user, _custom_admin_model_list,
 def custom_admin_houses(request):
     return _custom_admin_model_list(
         request, House.objects.select_related('owner'), 'Quản lý nhà', None,
-        ['Tên nhà', 'Chủ nhà', 'Quận', 'Trạng thái', 'Giá'],
+        ['Ảnh', 'Tên nhà', 'Chủ nhà', 'Trạng thái', 'Giá', 'Tọa độ'],
         {
             'search': lambda qs, q: qs.filter(name__icontains=q),
             'order_by': '-created_at',
             'columns': lambda obj: [
+                obj.main_image.url if obj.main_image else '/static/images/default.jpg',
                 obj.name, obj.owner.username if obj.owner else '-', 
-                obj.get_district_display(), obj.get_status_display(), f"{obj.price:,} VNĐ" if obj.price else 'Thỏa thuận'
+                obj.get_status_display(), f"{obj.price:,} VNĐ" if obj.price else 'Thỏa thuận',
+                f"{obj.lat:.5f}, {obj.lng:.5f}" if obj.lat and obj.lng else '❌ Chưa có'
             ],
             'extra_actions': lambda obj: [
                 {
@@ -82,4 +84,8 @@ def custom_admin_house_images(request):
 @require_POST
 @user_passes_test(_is_admin_user, login_url='custom_admin_login')
 def custom_admin_house_image_delete(request, object_id):
-    return _custom_admin_model_delete(request, HouseImage, object_id, 'custom_admin_house_images')
+    img = get_object_or_404(HouseImage, id=object_id)
+    house_id = img.house_id
+    img.delete()
+    messages.success(request, 'Đã xóa ảnh chi tiết thành công.')
+    return redirect('custom_admin_house_edit', object_id=house_id)

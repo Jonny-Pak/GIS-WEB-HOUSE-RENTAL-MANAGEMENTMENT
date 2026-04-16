@@ -35,8 +35,6 @@
                 class="admin-nav-link {% if '/custom-admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}"
                 class="admin-nav-link {% if '/custom-admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
-            <a href="{% url 'custom_admin_house_images' %}"
-                class="admin-nav-link {% if '/custom-admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
         </div>
     </nav>
 
@@ -77,10 +75,17 @@
                             {% for row in rows %}
                             <tr>
                                 {% for col in row.columns %}
-                                <td>{{ col }}</td>
+                                <td>
+                                    {% if col and col|stringformat:"s"|slice:":7" == "/media/" or col and col|stringformat:"s"|slice:":8" == "/static/" %}
+                                        <img src="{{ col }}" alt="img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    {% else %}
+                                        {{ col }}
+                                    {% endif %}
+                                </td>
                                 {% endfor %}
                                 {% if edit_url_name or delete_url_name %}
-                                <td class="actions-cell">
+                                <td>
+                                    <div class="actions-cell">
                                     {% for action in row.extra_actions %}
                                     <form method="post" action="{% url action.url_name row.id %}"
                                             data-confirm-submit="{{ action.confirm|default:'Xác nhận thao tác này?' }}">
@@ -99,6 +104,7 @@
                                         <button type="submit" class="mini-btn danger-btn">Xóa</button>
                                     </form>
                                     {% endif %}
+                                    </div>
                                 </td>
                                 {% endif %}
                             </tr>

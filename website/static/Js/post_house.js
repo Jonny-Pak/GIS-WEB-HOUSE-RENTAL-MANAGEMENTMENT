@@ -74,7 +74,6 @@
 
     const mapElement = document.getElementById("post-house-map");
     const addressInput = document.getElementById("id_address");
-    const districtInput = document.getElementById("id_district");
     const latInput = document.getElementById("id_lat");
     const lngInput = document.getElementById("id_lng");
     const latDisplay = document.getElementById("latDisplay");
@@ -91,8 +90,9 @@
     const postForm = mapElement.closest("form");
     const submitErrorBanner = document.getElementById("submitErrorBanner");
     const geocodeUrl = mapWrapper.dataset.geocodeUrl;
+    const reverseGeocodeUrl = mapWrapper.dataset.reverseGeocodeUrl;
 
-    if (!mapElement || !addressInput || !districtInput || !latInput || !lngInput || !geocodeUrl) return;
+    if (!mapElement || !addressInput || !latInput || !lngInput || !geocodeUrl) return;
     if (typeof L === "undefined") {
       geocodeStatus.textContent = "Khong the tai ban do tuong tac. Vui long tai lai trang.";
       return;
@@ -274,7 +274,7 @@
       return true;
     }
 
-    function updateCoordinateUI(lat, lng, message) {
+    function updateCoordinateUI(lat, lng, message, doNotPanMap) {
       latInput.value = lat.toFixed(6);
       lngInput.value = lng.toFixed(6);
       latDisplay.textContent = lat.toFixed(6);
@@ -286,14 +286,46 @@
         marker = L.marker([lat, lng]).addTo(map);
       }
 
-      map.setView([lat, lng], Math.max(map.getZoom(), 16));
+      if (!doNotPanMap) {
+        map.setView([lat, lng], Math.max(map.getZoom(), 16));
+      }
       if (message) {
         geocodeStatus.textContent = message;
       }
     }
 
-    function setCoordinate(lat, lng, message) {
-      updateCoordinateUI(lat, lng, message);
+    function setCoordinate(lat, lng, message, doNotPanMap) {
+      updateCoordinateUI(lat, lng, message, doNotPanMap);
+    }
+
+    function reverseGeocode(lat, lng) {
+      if (!reverseGeocodeUrl) return;
+      geocodeStatus.textContent = "Đang lấy địa chỉ từ tọa độ...";
+      
+      const formData = new FormData();
+      formData.append("lat", lat);
+      formData.append("lng", lng);
+
+      fetch(reverseGeocodeUrl, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && data.address) {
+          addressInput.value = data.address;
+          geocodeStatus.textContent = "Đã tự động điền địa chỉ vào ô bên trên từ vị trí bạn vừa ghim.";
+        } else {
+          geocodeStatus.textContent = "Đã ghim vị trí, nhưng không thể tìm thấy tên đường chính xác tự động.";
+        }
+      })
+      .catch(() => {
+        geocodeStatus.textContent = "Đã ghim vị trí thành công (có lỗi khi tìm tên đường).";
+      });
     }
 
     if (hasInitialCoords) {
@@ -303,7 +335,8 @@
     map.on("click", function (event) {
       const lat = Number(event.latlng.lat);
       const lng = Number(event.latlng.lng);
-      setCoordinate(lat, lng, "Da ghim vi tri thu cong tren ban do.");
+      setCoordinate(lat, lng, "Đã ghim vị trí. Hệ thống đang dò tìm địa chỉ...", true);
+      reverseGeocode(lat, lng);
     });
 
     map.on(L.Draw.Event.CREATED, function (event) {
@@ -360,7 +393,8 @@
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           latestUserLocation = { lat: lat, lng: lng };
-          setCoordinate(lat, lng, "Da lay vi tri hien tai. Ban co the tim theo dia chi hoac chinh toa do ben duoi.");
+          setCoordinate(lat, lng, "Đã lấy vị trí hiện tại. Đang dò tìm địa chỉ...");
+          reverseGeocode(lat, lng);
         },
         function (error) {
           if (error && error.code === 1) {
@@ -377,22 +411,22 @@
 
     function geocodeAddress() {
       const address = (addressInput.value || "").trim();
-      const district = (districtInput.value || "").trim();
 
-      if (!address || !district) {
-        geocodeStatus.textContent = "Vui long nhap dia chi va quan/huyen truoc khi tim toa do.";
+      if (!address) {
+        geocodeStatus.textContent = "Vui lòng nhập địa chỉ để tìm tọa độ.";
+        geocodeStatus.className = "text-danger mt-1 small d-inline-block fw-bold";
         return;
       }
 
+      geocodeStatus.textContent = "Đang tìm tọa độ...";
+      geocodeStatus.className = "text-primary mt-1 small d-inline-block fw-bold";
+      
       const formData = new FormData();
       formData.append("address", address);
-      formData.append("district", district);
       if (latestUserLocation) {
         formData.append("user_lat", String(latestUserLocation.lat));
         formData.append("user_lng", String(latestUserLocation.lng));
       }
-
-      geocodeStatus.textContent = "Dang tim toa do tu dia chi...";
 
       fetch(geocodeUrl, {
         method: "POST",
@@ -529,6 +563,66 @@
     const existingArea = parseFloat(areaInput && areaInput.value ? areaInput.value : '');
     if (Number.isFinite(existingArea) && existingArea > 0) {
       geocodeStatus.textContent = "Gia tri dien tich hien co: " + Math.round(existingArea) + " m². Ban co the ve polygon de cap nhat.";
+    }
+  }
+
+  function previewMainImage(event) {
+    const input = event.target;
+    const previewBox = document.getElementById("main-image-preview-box");
+    const previewImg = document.getElementById("main-img-preview");
+    
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        previewBox.classList.remove("d-none");
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      previewImg.src = "#";
+      previewBox.classList.add("d-none");
+    }
+  }
+
+  function previewGalleryImages(event) {
+    const input = event.target;
+    const container = document.getElementById("gallery-preview-container");
+    const emptyState = document.getElementById("gallery-empty-state");
+    
+    // Create the container if it doesn't exist
+    let gridContainer = container;
+    if (!gridContainer) {
+      gridContainer = document.createElement("div");
+      gridContainer.id = "gallery-preview-container";
+      gridContainer.className = "row g-2 mt-0";
+      emptyState.parentNode.appendChild(gridContainer);
+    }
+    
+    gridContainer.innerHTML = "";
+    
+    if (input.files && input.files.length > 0) {
+      emptyState.classList.add("d-none");
+      gridContainer.classList.remove("d-none");
+      
+      Array.from(input.files).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const col = document.createElement("div");
+          col.className = "col-4 col-md-3";
+          col.innerHTML = `
+            <div class="position-relative ratio ratio-1x1 border rounded overflow-hidden shadow-sm">
+              <img src="${e.target.result}" class="object-fit-cover w-100 h-100" alt="Detail preview">
+            </div>
+          `;
+          gridContainer.appendChild(col);
+        };
+        reader.readAsDataURL(file);
+      });
+    } else {
+      emptyState.classList.remove("d-none");
+      gridContainer.classList.add("d-none");
     }
   }
 

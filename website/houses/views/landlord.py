@@ -101,19 +101,29 @@ def delete_house_view(request, house_id):
 @login_required(login_url='login')
 def geocode_preview(request):
     address = (request.POST.get('address') or '').strip()
-    district_code = (request.POST.get('district') or '').strip()
 
-    if not address or not district_code:
+    if not address:
         return JsonResponse({
             'success': False,
-            'message': 'Vui lòng nhập đầy đủ địa chỉ và quận/huyện để lấy tọa độ.',
+            'message': 'Vui lòng nhập địa chỉ để lấy tọa độ.',
         })
 
-    district_display = dict(House.DISTRICT_CHOICES).get(district_code, district_code)
+    user_lat_str = request.POST.get('user_lat')
+    user_lng_str = request.POST.get('user_lng')
+    user_lat = None
+    user_lng = None
+    try:
+        if user_lat_str and user_lng_str:
+            user_lat = float(user_lat_str)
+            user_lng = float(user_lng_str)
+    except ValueError:
+        pass
+
+    from houses.services.geocoding import resolve_house_coordinates
     lat, lng, state = resolve_house_coordinates(
         address=address,
-        district_code=district_code,
-        district_display=district_display,
+        user_lat=user_lat,
+        user_lng=user_lng
     )
 
     approximate_states = {'district_center_fallback', 'district_center_fallback_rate_limited'}
@@ -152,3 +162,20 @@ def geocode_preview(request):
         'source': state,
         'message': message,
     })
+
+@require_POST
+@login_required(login_url='login')
+def reverse_geocode_preview(request):
+    try:
+        lat = float(request.POST.get('lat', ''))
+        lng = float(request.POST.get('lng', ''))
+    except ValueError:
+        return JsonResponse({'success': False, 'message': 'Tọa độ không hợp lệ.'})
+
+    from houses.services.geocoding import reverse_geocode_nominatim
+    address = reverse_geocode_nominatim(lat, lng)
+
+    if address:
+        return JsonResponse({'success': True, 'address': address})
+    else:
+        return JsonResponse({'success': False, 'message': 'Không thể lấy địa chỉ từ tọa độ này.'})

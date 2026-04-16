@@ -57,7 +57,7 @@ class HouseForm(forms.ModelForm):
 
     class Meta:
         model = House
-        exclude = ['owner', 'status', 'created_at', 'updated_at', 'lat', 'lng', 'furniture']
+        exclude = ['owner', 'status', 'created_at', 'updated_at', 'lat', 'lng', 'furniture', 'district']
         
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ví dụ: Nhà nguyên căn 3 phòng ngủ...'}),
@@ -65,8 +65,7 @@ class HouseForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VND/tháng'}),
             'deposit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VND'}),
             'area': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'm2'}),
-            'district': forms.Select(attrs={'class': 'form-select'}),
-            
+
             'address': forms.Textarea(attrs={
                 'class': 'form-control', 
                 'rows': 2, 

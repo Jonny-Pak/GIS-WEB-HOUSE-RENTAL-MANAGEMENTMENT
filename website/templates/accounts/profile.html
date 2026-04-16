@@ -7,6 +7,30 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=20260406e" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+<style>
+    /* Làm cho khung cắt của Cropper hiển thị thành hình tròn */
+    .cropper-view-box,
+    .cropper-face {
+      border-radius: 50%;
+    }
+    .cropper-modal {
+      opacity: 0.8;
+    }
+    #cropper-image-container {
+        max-height: 500px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background-color: #f8f9fa;
+        overflow: hidden;
+    }
+    #cropper-image {
+        max-width: 100%;
+        max-height: 500px;
+        display: block;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -15,20 +39,14 @@
         <div class="col-lg-4 mb-4">
             <div class="card border-0 shadow-sm text-center p-4 profile-panel">
                 <div class="avatar-wrapper mb-3">
-                    {% if profile_form.instance.avatar %}
-                    <img src="{{ profile_form.instance.avatar.url }}" class="rounded-circle shadow-sm profile-avatar-image" alt="Ảnh đại diện" onerror="this.onerror=null;this.src='{% static 'images/avatar.jpg' %}';">
-                    {% else %}
-                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto shadow-sm profile-avatar-fallback">
-                        {{ user.username|first|upper }}
-                    </div>
-                    {% endif %}
+                    <img src="{{ current_user_avatar_url }}" class="rounded-circle shadow-sm profile-avatar-image" style="width: 120px; height: 120px; object-fit: cover;" alt="Ảnh đại diện">
                 </div>
                 <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
                 <p class="text-muted small mb-3">
                     <i class="bi bi-calendar3 me-1"></i> Tham gia từ {{ user.date_joined|date:"d/m/Y" }}
                 </p>
                 <div class="d-grid">
-                    <button class="btn btn-outline-primary btn-sm rounded-pill">Thay đổi ảnh đại diện</button>
+                    <button type="button" id="btn-trigger-upload" class="btn btn-outline-primary btn-sm rounded-pill">Thay đổi ảnh đại diện</button>
                 </div>
             </div>
         </div>
@@ -83,7 +101,10 @@
                         </div>
                         <div class="col-md-6">
                             <label class="text-muted small text-uppercase fw-bold mb-1">Ảnh đại diện</label>
-                            {{ profile_form.avatar }}
+                            <div class="d-none">
+                                {{ profile_form.avatar }}
+                            </div>
+                            <p class="small text-muted mt-1 mb-0">Nhấp "Thay đổi ảnh đại diện" bên trái để chọn và cắt ảnh</p>
                             {% if profile_form.avatar.errors %}
                             <div class="text-danger small mt-1">{{ profile_form.avatar.errors|striptags }}</div>
                             {% endif %}
@@ -119,4 +140,137 @@
         </div>
     </div>
 </div>
+
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cropperModalLabel">Cắt Ảnh Đại Diện</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div id="cropper-image-container">
+            <img id="cropper-image" src="" alt="Avatar to crop">
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+        <button type="button" class="btn btn-primary px-4 fw-bold" id="btn-crop-save">Cắt & Áp Dụng</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnUpload = document.getElementById('btn-trigger-upload');
+    const avatarInput = document.querySelector('input[name="avatar"]');
+    const avatarImage = document.querySelector('.profile-avatar-image');
+    const dashboardAvatar = document.querySelector('.dashboard-avatar-image');
+    
+    const cropperModalEl = document.getElementById('cropperModal');
+    const cropperModal = new bootstrap.Modal(cropperModalEl);
+    const cropperImage = document.getElementById('cropper-image');
+    const btnCropSave = document.getElementById('btn-crop-save');
+    
+    let cropper = null;
+    let originalFileName = "avatar.jpg";
+    let originalFileType = "image/jpeg";
+
+    if (btnUpload && avatarInput) {
+        btnUpload.addEventListener('click', function() {
+            avatarInput.value = ''; // Reset to allow re-selection of the same file
+            avatarInput.click();
+        });
+
+        // Use a hidden temporary input to trigger the file dialog so we don't mess up the actual form input until crop is done
+        const tempInput = document.createElement('input');
+        tempInput.type = 'file';
+        tempInput.accept = 'image/*';
+        
+        btnUpload.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            tempInput.value = '';
+            tempInput.click();
+        }, true); // Use capture phase to intercept
+
+        tempInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                originalFileName = file.name;
+                originalFileType = file.type;
+                
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    cropperImage.src = evt.target.result;
+                    cropperModal.show();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        cropperModalEl.addEventListener('shown.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+            }
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 1, // Hình vuông (sẽ được CSS bo góc thành tròn)
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 0.9,
+                restore: false,
+                guides: false,
+                center: false,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        });
+
+        cropperModalEl.addEventListener('hidden.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        });
+
+        btnCropSave.addEventListener('click', function() {
+            if (!cropper) return;
+            
+            // Get a square canvas
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+            
+            canvas.toBlob(function(blob) {
+                // Update Previews
+                const url = URL.createObjectURL(blob);
+                if (avatarImage) avatarImage.src = url;
+                if (dashboardAvatar) dashboardAvatar.src = url;
+                
+                // Create File and add to the actual Django input
+                const croppedFile = new File([blob], originalFileName, {
+                    type: originalFileType,
+                    lastModified: new Date().getTime()
+                });
+                
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(croppedFile);
+                avatarInput.files = dataTransfer.files;
+                
+                cropperModal.hide();
+            }, originalFileType, 0.9);
+        });
+    }
+});
+</script>
 {% endblock %}

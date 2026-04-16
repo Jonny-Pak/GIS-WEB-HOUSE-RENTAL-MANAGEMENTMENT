@@ -66,19 +66,14 @@
             <div class="user-profile">
                 <div class="d-flex align-items-center gap-2">
                     <div class="text-end d-none d-md-block dashboard-user-meta">
-                        <small class="d-block fw-bold text-dark">{{ user.username }}</small>
+                        <small class="d-block fw-bold text-dark">{{ user.get_full_name|default:user.username }}</small>
                         <small class="text-muted dashboard-user-role">
                             {% if user.is_staff %}Quản trị viên{% else %}Thành viên{% endif %}
                         </small>
                     </div>
 
-                    <div class="avatar-circle {% if not current_user_has_custom_avatar %}bg-danger{% endif %} text-white d-flex align-items-center justify-content-center overflow-hidden"
-                        >
-                        {% if current_user_has_custom_avatar %}
-                        <img src="{{ current_user_avatar_url }}" class="dashboard-avatar-image" alt="Avatar của {{ user.username }}">
-                        {% else %}
-                        {{ user.username|first|upper }}
-                        {% endif %}
+                    <div class="avatar-circle overflow-hidden">
+                        <img src="{{ current_user_avatar_url }}" class="dashboard-avatar-image w-100 h-100" style="object-fit: cover;" alt="Avatar của {{ user.username }}">
                     </div>
                 </div>
             </div>

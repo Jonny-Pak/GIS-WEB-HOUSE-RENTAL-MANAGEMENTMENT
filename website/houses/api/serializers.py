@@ -7,10 +7,11 @@ class HouseSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     coords = serializers.SerializerMethodField()
     distance = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
     
     class Meta:
         model = House
-        fields = ['id', 'name', 'price', 'address', 'district', 'status', 'image', 'coords', 'distance']
+        fields = ['id', 'name', 'price', 'address', 'district', 'status', 'image', 'coords', 'distance', 'detail_url']
 
     def get_image(self, obj):
         if obj.main_image:
@@ -26,3 +27,7 @@ class HouseSerializer(serializers.ModelSerializer):
         if hasattr(obj, 'distance') and obj.distance is not None:
             return round(obj.distance, 2)
         return None
+
+    def get_detail_url(self, obj):
+        from django.urls import reverse
+        return reverse('house_detail', args=[obj.id])

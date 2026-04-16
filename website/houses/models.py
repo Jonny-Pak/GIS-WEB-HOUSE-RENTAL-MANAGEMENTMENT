@@ -71,7 +71,7 @@ class House(models.Model):
     max_people = models.IntegerField(verbose_name="Số người ở tối đa", default=4)
     furniture = models.ManyToManyField(Furniture, verbose_name="Nội thất đi kèm", blank=True)
 
-    district = models.CharField(max_length=10, choices=DISTRICT_CHOICES, verbose_name="Khu vực Quận/Huyện")
+    district = models.CharField(max_length=10, choices=DISTRICT_CHOICES, verbose_name="Khu vực Quận/Huyện", null=True, blank=True)
     address = models.TextField(verbose_name="Địa chỉ chi tiết (Số nhà, Ngõ/Hẻm, Đường)")
     
     # Bản đồ và vị trí

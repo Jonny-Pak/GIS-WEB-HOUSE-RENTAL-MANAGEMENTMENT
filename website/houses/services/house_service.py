@@ -167,16 +167,8 @@ def save_house_furniture(house, request):
 
 
 def _resolve_house_location(house):
-    district_display = ''
-    try:
-        district_display = house.get_district_display()
-    except Exception:
-        district_display = ''
-
     return resolve_house_coordinates(
         address=house.address or '',
-        district_code=house.district or '',
-        district_display=district_display,
     )
 
 
@@ -267,12 +259,9 @@ def update_house(form, owner, original_address, original_district, request=None)
 
     original_address_norm = (original_address or '').strip()
     new_address_norm = (house.address or '').strip()
-    original_district_norm = (original_district or '').strip()
-    new_district_norm = (house.district or '').strip()
 
     location_changed = (
         original_address_norm != new_address_norm
-        or original_district_norm != new_district_norm
     )
 
     manual_lat, manual_lng = _parse_manual_coordinates(request)
@@ -402,7 +391,6 @@ def get_house_detail(house_id):
     )
     related_houses = House.objects.filter(
         status='available',
-        district=house.district,
     ).exclude(id=house_id)[:3]
     other_houses = House.objects.filter(
         status='available',

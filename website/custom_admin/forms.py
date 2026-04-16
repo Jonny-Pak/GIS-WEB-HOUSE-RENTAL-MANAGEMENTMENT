@@ -47,7 +47,7 @@ class AdminUserUpdateForm(forms.ModelForm):
 class AdminHouseForm(forms.ModelForm):
     class Meta:
         model = House
-        exclude = ["created_at", "updated_at"]
+        exclude = ["created_at", "updated_at", "district", "requires_coordinates", "polygon_geojson", "estimated_area_m2"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'owner': forms.Select(attrs={'class': 'form-select'}),
@@ -55,7 +55,6 @@ class AdminHouseForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control'}),
             'deposit': forms.NumberInput(attrs={'class': 'form-control'}),
             'area': forms.NumberInput(attrs={'class': 'form-control'}),
-            'district': forms.Select(attrs={'class': 'form-select'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'owner_phone': forms.TextInput(attrs={'class': 'form-control'}),
@@ -69,6 +68,7 @@ class AdminHouseForm(forms.ModelForm):
             'lat': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
             'lng': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
             'furniture': forms.CheckboxSelectMultiple(),
+            'main_image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 

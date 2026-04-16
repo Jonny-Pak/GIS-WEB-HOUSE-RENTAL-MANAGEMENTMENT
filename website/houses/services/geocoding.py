@@ -138,7 +138,7 @@ def _pick_best_ward_segment(segments: list[str]) -> str:
     return ward_segments[0]
 
 
-def _build_priority_candidates(address: str, district_display: str) -> list[str]:
+def _build_priority_candidates(address: str) -> list[str]:
     segments = _normalize_address_segments(_clean_google_maps_address(address))
     if not segments:
         return []
@@ -153,10 +153,8 @@ def _build_priority_candidates(address: str, district_display: str) -> list[str]
     candidates = []
     for city in city_variants:
         for country in country_variants:
-            if district_display and ward:
-                candidates.append(f'{street}, {ward}, {district_display}, {city}, {country}')
-            if district_display:
-                candidates.append(f'{street}, {district_display}, {city}, {country}')
+            if ward:
+                candidates.append(f'{street}, {ward}, {city}, {country}')
             candidates.append(f'{street}, {city}, {country}')
 
     return candidates
@@ -217,39 +215,20 @@ def _build_shortened_address_variants(address: str) -> list[str]:
     return deduped
 
 
-def _build_candidates(address: str, district_code: str, district_display: str) -> list[str]:
+def _build_candidates(address: str) -> list[str]:
     cleaned_address = _clean_google_maps_address(address)
     address_variants = _expand_vn_abbreviations(cleaned_address)
     for short_variant in _build_shortened_address_variants(address):
         address_variants.extend(_expand_vn_abbreviations(short_variant))
-    address_variants.extend(_expand_vn_abbreviations(f'{cleaned_address}, {district_display}'))
-    district_names = [district_display] if district_display else []
-    district_names.extend(DISTRICT_ALIASES.get(district_code, []))
-    district_names = [name for name in district_names if name]
 
-    candidates = _build_priority_candidates(cleaned_address, district_display)
-
-    # Prefer concise and district-guided queries first.
-    for address_variant in address_variants:
-        for district_name in district_names[:2]:
-            candidates.append(f'{address_variant}, {district_name}, Thành phố Hồ Chí Minh, Việt Nam')
-            candidates.append(f'{address_variant}, {district_name}, Ho Chi Minh City, Vietnam')
+    candidates = _build_priority_candidates(cleaned_address)
 
     for address_variant in address_variants:
         candidates.append(address_variant)
+        candidates.append(f'{address_variant}, Thành phố Hồ Chí Minh, Việt Nam')
+        candidates.append(f'{address_variant}, Ho Chi Minh City, Vietnam')
         candidates.append(f'{address_variant}, Việt Nam')
         candidates.append(f'{address_variant}, Vietnam')
-
-        for district_name in district_names:
-            candidates.append(f'{address_variant}, {district_name}')
-            candidates.append(f'{address_variant}, {district_name}, Việt Nam')
-            candidates.append(f'{address_variant}, {district_name}, Vietnam')
-
-    for address_variant in address_variants:
-        for district_name in district_names:
-            for city_name in CITY_ALIASES:
-                candidates.append(f'{address_variant}, {district_name}, {city_name}, Việt Nam')
-                candidates.append(f'{address_variant}, {district_name}, {city_name}, Vietnam')
 
     candidates.extend([_ascii_fold(item) for item in candidates if item])
 
@@ -276,8 +255,8 @@ def _get_nominatim_endpoints() -> list[str]:
     ]
 
 
-def _build_cache_key(address: str, district_code: str, district_display: str) -> str:
-    fingerprint = _ascii_fold(f'{address}|{district_code}|{district_display}').lower()
+def _build_cache_key(address: str) -> str:
+    fingerprint = _ascii_fold(f'{address}').lower()
     digest = hashlib.sha256(fingerprint.encode('utf-8')).hexdigest()
     return f'geocode:hcm:{digest}'
 
@@ -297,22 +276,13 @@ def _build_street_tokens(address: str) -> list[str]:
     return _tokenize(target)
 
 
-def _score_nominatim_result(result: dict, district_display: str, district_code: str, address: str) -> float:
+def _score_nominatim_result(result: dict, address: str) -> float:
     display_name = _ascii_fold(result.get('display_name', '')).lower()
     address_obj = result.get('address') or {}
     address_text = _ascii_fold(' '.join(str(v) for v in address_obj.values())).lower()
     merged = f'{display_name} {address_text}'
 
     score = 0.0
-    district_fold = _ascii_fold(district_display).lower() if district_display else ''
-
-    if district_fold and district_fold in merged:
-        score += 4.0
-
-    for alias in DISTRICT_ALIASES.get(district_code, []):
-        alias_fold = _ascii_fold(alias).lower()
-        if alias_fold and alias_fold in merged:
-            score += 2.0
 
     for token in _build_street_tokens(address)[:6]:
         if token in merged:
@@ -369,12 +339,12 @@ def _is_in_hcmc_bounds(lat: float, lng: float) -> bool:
     )
 
 
-def _geocode_nominatim(query: str, district_code: str, district_display: str, address: str) -> tuple[float | None, float | None, str]:
+def _geocode_nominatim(query: str, address: str) -> tuple[float | None, float | None, str]:
     timeout = int(getattr(settings, 'GEOCODING_TIMEOUT', 6))
-    user_agent = getattr(settings, 'GEOCODING_USER_AGENT', 'ltgis-house-rental/1.0')
+    import uuid
+    dynamic_suffix = str(uuid.uuid4())[:8]
+    user_agent = getattr(settings, 'GEOCODING_USER_AGENT', f'viet-house-rental/{dynamic_suffix} (admin@example.com)')
     had_rate_limit = False
-
-    district_center = DISTRICT_CENTER_COORDS.get((district_code or '').strip())
 
     for endpoint in _get_nominatim_endpoints():
         params = {
@@ -386,14 +356,14 @@ def _geocode_nominatim(query: str, district_code: str, district_display: str, ad
             'dedupe': '1',
         }
 
-        if district_center is not None:
-            center_lat, center_lng = district_center
-            delta = 0.12
-            min_lng = center_lng - delta
-            min_lat = center_lat - delta
-            max_lng = center_lng + delta
-            max_lat = center_lat + delta
-            params['viewbox'] = f'{min_lng},{min_lat},{max_lng},{max_lat}'
+        # Apply HCMC Viewbox to bias search
+        center_lat, center_lng = (10.762622, 106.660172)
+        delta = 0.25
+        min_lng = center_lng - delta
+        min_lat = center_lat - delta
+        max_lng = center_lng + delta
+        max_lat = center_lat + delta
+        params['viewbox'] = f'{min_lng},{min_lat},{max_lng},{max_lat}'
 
         url = f"{endpoint}/search?{urlencode(params)}"
 
@@ -424,12 +394,14 @@ def _geocode_nominatim(query: str, district_code: str, district_display: str, ad
             if not _is_in_hcmc_bounds(lat, lng):
                 continue
 
-            score = _score_nominatim_result(item, district_display, district_code, address)
+            score = _score_nominatim_result(item, address)
             if score > best_score:
                 best_score = score
                 best_result = (lat, lng)
 
-        if best_result and best_score >= 2.2:
+        # Removed 4.2 constraint because we don't naturally score District keywords (+4.0) anymore!
+        # Now relying on bounding box and street segment match.
+        if best_result and best_score >= 0.5:
             return best_result[0], best_result[1], 'geocoded_nominatim'
 
     if had_rate_limit:
@@ -438,8 +410,15 @@ def _geocode_nominatim(query: str, district_code: str, district_display: str, ad
     return None, None, 'no_result'
 
 
-def resolve_house_coordinates(address: str, district_code: str, district_display: str) -> tuple[float | None, float | None, str]:
-    cache_key = _build_cache_key(address, district_code, district_display)
+def resolve_house_coordinates(
+    address: str, 
+    user_lat: float | None = None, 
+    user_lng: float | None = None
+) -> tuple[float | None, float | None, str]:
+    if user_lat is not None and user_lng is not None and _is_in_hcmc_bounds(user_lat, user_lng):
+        return user_lat, user_lng, 'gps_location'
+
+    cache_key = _build_cache_key(address)
     cached_value = cache.get(cache_key)
     if cached_value:
         return cached_value[0], cached_value[1], 'cached'
@@ -450,21 +429,31 @@ def resolve_house_coordinates(address: str, district_code: str, district_display
         cache.set(cache_key, (parsed_lat, parsed_lng), int(getattr(settings, 'GEOCODING_CACHE_TIMEOUT', 86400)))
         return result
 
-    candidates = _build_candidates(address, district_code, district_display)
+    candidates = _build_candidates(address)
 
-    nominatim_candidates = 12
+    nominatim_candidates = 3
     nominatim_attempted = 0
     saw_rate_limit = False
 
-    for candidate in candidates[:16]:
+    cleaned_address = _clean_google_maps_address(address)
+    minimal_search = f"{cleaned_address}, Thành phố Hồ Chí Minh, Việt Nam"
+    
+    prioritized_candidates = [
+        minimal_search,
+        cleaned_address
+    ]
+
+    for candidate in prioritized_candidates:
         if nominatim_attempted >= nominatim_candidates:
-            continue
+            break
         try:
+            import time
+            if nominatim_attempted > 0:
+                time.sleep(1.2)
+            
             nominatim_attempted += 1
             lat, lng, state = _geocode_nominatim(
                 query=candidate,
-                district_code=district_code,
-                district_display=district_display,
                 address=address,
             )
             if lat is not None and lng is not None:
@@ -472,15 +461,63 @@ def resolve_house_coordinates(address: str, district_code: str, district_display
                 return lat, lng, state
             if state == 'nominatim_rate_limited':
                 saw_rate_limit = True
+                break
         except (ValueError, KeyError, TimeoutError, HTTPError, URLError):
             continue
-
-    district_center = DISTRICT_CENTER_COORDS.get((district_code or '').strip())
-    if district_center:
-        state = 'district_center_fallback_rate_limited' if saw_rate_limit else 'district_center_fallback'
-        return district_center[0], district_center[1], state
 
     if saw_rate_limit:
         return None, None, 'nominatim_rate_limited'
 
-    return None, None, 'failed'
+    # Fallback to center of HCMC
+    return 10.762622, 106.660172, 'hcmc_center_fallback'
+
+def reverse_geocode_nominatim(lat: float, lng: float) -> str | None:
+    timeout = int(getattr(settings, 'GEOCODING_TIMEOUT', 6))
+    import uuid
+    dynamic_suffix = str(uuid.uuid4())[:8]
+    user_agent = getattr(settings, 'GEOCODING_USER_AGENT', f'viet-house-rental-reverse/{dynamic_suffix} (admin@example.com)')
+
+    for endpoint in _get_nominatim_endpoints():
+        params = {
+            'lat': str(lat),
+            'lon': str(lng),
+            'format': 'jsonv2',
+            'addressdetails': '1',
+            'zoom': '18'
+        }
+        url = f"{endpoint}/reverse?{urlencode(params)}"
+        
+        try:
+            import time
+            time.sleep(1.2)  # Respect OSM limits
+            request = Request(url, headers={'User-Agent': user_agent})
+            with urlopen(request, timeout=timeout) as response:
+                payload = json.loads(response.read().decode('utf-8'))
+                
+            if payload and 'address' in payload:
+                addr = payload['address']
+                parts = []
+                
+                if 'house_number' in addr:
+                    parts.append(addr['house_number'])
+                
+                if 'road' in addr:
+                    parts.append(addr['road'])
+                elif 'pedestrian' in addr:
+                    parts.append(addr['pedestrian'])
+                elif 'path' in addr:
+                    parts.append(addr['path'])
+                    
+                ward = addr.get('suburb') or addr.get('quarter') or addr.get('neighbourhood')
+                if ward:
+                    parts.append(ward)
+                    
+                if parts:
+                    return ', '.join(parts)
+                elif 'display_name' in payload:
+                    name = payload['display_name'].split(',')[0]
+                    return name
+        except Exception:
+            continue
+            
+    return None

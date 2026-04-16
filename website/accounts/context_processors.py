@@ -8,19 +8,22 @@ def current_user_profile(request):
     if not request.user.is_authenticated:
         return {}
 
-    default_avatar_url = static('images/person_1-min.jpg')
+    default_avatar_url = static('images/avatar.jpg')
     avatar_url = default_avatar_url
     has_custom_avatar = False
 
     profile = Profile.objects.filter(user=request.user).only('avatar').first()
     if profile and profile.avatar and getattr(profile.avatar, 'name', ''):
         avatar_name = profile.avatar.name.strip().lower()
-        if avatar_name not in {'default.png', 'avatars/default.png'}:
-            has_custom_avatar = True
-        try:
-            avatar_url = profile.avatar.url
-        except (ValueError, OSError):
+        if avatar_name in {'default.png', 'avatars/default.png', 'avatar.jpg', 'avatars/avatar.jpg'}:
+            has_custom_avatar = False
             avatar_url = default_avatar_url
+        else:
+            has_custom_avatar = True
+            try:
+                avatar_url = profile.avatar.url
+            except (ValueError, OSError):
+                avatar_url = default_avatar_url
 
     return {
         'current_user_avatar_url': avatar_url,

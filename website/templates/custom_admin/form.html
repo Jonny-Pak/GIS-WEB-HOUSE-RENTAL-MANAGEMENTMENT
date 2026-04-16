@@ -35,8 +35,6 @@
                 class="admin-nav-link {% if '/custom-admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}"
                 class="admin-nav-link {% if '/custom-admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
-            <a href="{% url 'custom_admin_house_images' %}"
-                class="admin-nav-link {% if '/custom-admin/house-images/' in request.path %}active{% endif %}">Ảnh nhà</a>
         </div>
     </nav>
 
@@ -57,6 +55,11 @@
                     <div class="admin-field-group">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
+                        {% if field.name == 'main_image' and form.instance.main_image %}
+                        <div style="margin-top: 10px; margin-bottom: 10px;">
+                            <img src="{{ form.instance.main_image.url }}" alt="Ảnh chính" style="width: 140px; height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        </div>
+                        {% endif %}
                         {% if field.help_text %}
                         <small class="field-help">{{ field.help_text }}</small>
                         {% endif %}
@@ -64,12 +67,53 @@
                         <small class="field-error">{{ error }}</small>
                         {% endfor %}
                     </div>
+                    {% if field.name == 'lng' and page_title == 'Chỉnh sửa nhà' %}
+                    <div class="admin-field-group" style="padding: 16px; background-color: #f8f9fa; border-radius: 8px; border: 1px dashed #ced4da;">
+                        <label style="font-weight: 600; margin-bottom: 12px; display: block;">Vị trí trên bản đồ</label>
+                        {% if form.instance.lat and form.instance.lng %}
+                            <div id="admin-house-map" style="height: 350px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                            <small class="field-help" style="margin-top: 8px; display: block;">Tọa độ: {{ form.instance.lat }}, {{ form.instance.lng }}</small>
+                        {% else %}
+                            <small class="field-help" style="color: #dc2626;">⚠️ Căn nhà này chưa có tọa độ. Hãy nhập kinh độ/vĩ độ ở phía trên rồi lưu lại.</small>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     {% endfor %}
 
                     {% if form.non_field_errors %}
                     {% for error in form.non_field_errors %}
                     <p class="field-error">{{ error }}</p>
                     {% endfor %}
+                    {% endif %}
+
+                    {% if page_title == 'Chỉnh sửa nhà' %}
+                    <!-- Ảnh chi tiết -->
+                    <div class="admin-field-group" style="margin-top: 24px; padding: 16px; background-color: #f8f9fa; border-radius: 8px; border: 1px dashed #ced4da;">
+                        <label style="font-weight: 600; margin-bottom: 12px; display: block;">Ảnh chi tiết của căn nhà</label>
+                        {% if form.instance.images.all %}
+                            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                                {% for detail_img in form.instance.images.all %}
+                                    <div style="position: relative; width: 110px;">
+                                        <div style="width: 110px; height: 110px; border-radius: 6px; overflow: hidden; border: 1px solid #ddd;">
+                                            <img src="{{ detail_img.image.url }}" alt="Chi tiết" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                        <button type="button" 
+                                                onclick="if(confirm('Xóa ảnh chi tiết này?')) { 
+                                                    var f = document.createElement('form'); 
+                                                    f.method='post'; f.action='{% url "custom_admin_house_image_delete" detail_img.id %}'; 
+                                                    var c = document.createElement('input'); c.type='hidden'; c.name='csrfmiddlewaretoken'; c.value='{{ csrf_token }}'; 
+                                                    f.appendChild(c); document.body.appendChild(f); f.submit(); 
+                                                }"
+                                                style="position: absolute; top: -6px; right: -6px; background: #dc2626; color: #fff; border: 2px solid #fff; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
+                                            ✕
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <small class="field-help" style="color: #6c757d;">Chủ nhà chưa tải lên ảnh chi tiết nào.</small>
+                        {% endif %}
+                    </div>
                     {% endif %}
 
                     <div class="admin-form-actions">
@@ -80,6 +124,27 @@
             </section>
         </div>
     </main>
+
+{% if page_title == 'Chỉnh sửa nhà' and form.instance.lat and form.instance.lng %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var lat = {{ form.instance.lat }};
+    var lng = {{ form.instance.lng }};
+    var map = L.map('admin-house-map').setView([lat, lng], 16);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap & CartoDB',
+        maxZoom: 19
+    }).addTo(map);
+    L.marker([lat, lng]).addTo(map)
+        .bindPopup('<strong>{{ form.instance.name|escapejs }}</strong><br>{{ form.instance.address|escapejs }}')
+        .openPopup();
+});
+</script>
+{% endif %}
+
+<script src="{% static 'Js/form_helpers.js' %}?v=20260406e"></script>
 </body>
 
 </html>
