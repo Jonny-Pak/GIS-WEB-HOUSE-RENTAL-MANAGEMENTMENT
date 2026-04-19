@@ -380,7 +380,18 @@
     applyPolygonFilter();
   });
 
+  let isDrawingShape = false;
+  map.on(L.Draw.Event.DRAWSTART, function () {
+    isDrawingShape = true;
+  });
+  map.on(L.Draw.Event.DRAWSTOP, function () {
+    setTimeout(function() {
+      isDrawingShape = false;
+    }, 200);
+  });
+
   map.on('click', function (e) {
+    if (isDrawingShape) return;
     if (!inputSearchRadius) return;
     const radius = parseFloat(inputSearchRadius.value) || 2000;
     setCustomPinAndSearch(e.latlng.lat, e.latlng.lng, radius);

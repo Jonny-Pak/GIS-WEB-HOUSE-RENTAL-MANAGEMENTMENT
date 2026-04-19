@@ -346,7 +346,18 @@
       setCoordinate(initialLat, initialLng, "Da nap toa do hien co cua tin dang.");
     }
 
+    let isDrawingShape = false;
+    map.on(L.Draw.Event.DRAWSTART, function () {
+      isDrawingShape = true;
+    });
+    map.on(L.Draw.Event.DRAWSTOP, function () {
+      setTimeout(function() {
+        isDrawingShape = false;
+      }, 200);
+    });
+
     map.on("click", function (event) {
+      if (isDrawingShape) return;
       const lat = Number(event.latlng.lat);
       const lng = Number(event.latlng.lng);
       setCoordinate(lat, lng, "Đã ghim vị trí. Hệ thống đang dò tìm địa chỉ...", true);
