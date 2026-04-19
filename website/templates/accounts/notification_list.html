@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Thông báo của bạn</h2>
+  <form method="post" action="{% url 'notification_delete' %}">
+    {% csrf_token %}
+    <div class="mb-2 text-end">
+      <button type="submit" class="btn btn-danger btn-sm" id="delete-selected-btn" style="display:none">Xóa các thông báo đã chọn</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" id="toggle-delete-mode">Xóa thông báo</button>
+    </div>
+    <ul class="list-group" id="notification-list">
+      {% for n in notifications %}
+      <li class="list-group-item d-flex align-items-center justify-content-between {% if not n.is_read %}fw-bold bg-light{% endif %}">
+        <div class="d-flex align-items-center">
+          <input type="checkbox" name="notification_ids" value="{{ n.id }}" class="form-check-input me-2 delete-checkbox" style="display:none">
+          <a href="{% url 'notification_detail' n.id %}" class="text-decoration-none text-dark">
+            {{ n.title }}
+            <span class="small text-muted ms-2">{{ n.created_at|date:'d/m/Y H:i' }}</span>
+            {% if not n.is_read %}<span class="badge bg-warning text-dark ms-2">Mới</span>{% endif %}
+          </a>
+        </div>
+        <a href="{% url 'notification_detail' n.id %}" class="btn btn-link btn-sm">Xem chi tiết</a>
+      </li>
+      {% empty %}
+      <li class="list-group-item">Không có thông báo nào.</li>
+      {% endfor %}
+    </ul>
+  </form>
+</div>
+<script>
+const toggleBtn = document.getElementById('toggle-delete-mode');
+const checkboxes = document.querySelectorAll('.delete-checkbox');
+const deleteBtn = document.getElementById('delete-selected-btn');
+let deleteMode = false;
+toggleBtn.addEventListener('click', function() {
+  deleteMode = !deleteMode;
+  checkboxes.forEach(cb => cb.style.display = deleteMode ? 'inline-block' : 'none');
+  deleteBtn.style.display = deleteMode ? 'inline-block' : 'none';
+  toggleBtn.textContent = deleteMode ? 'Hủy xóa' : 'Xóa thông báo';
+});
+</script>
+{% endblock %}

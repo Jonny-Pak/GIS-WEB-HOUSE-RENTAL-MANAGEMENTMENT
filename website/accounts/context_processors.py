@@ -1,6 +1,7 @@
 from django.templatetags.static import static
 
 from .models import Profile
+from accounts.models import Notification
 
 
 def current_user_profile(request):
@@ -25,4 +26,18 @@ def current_user_profile(request):
     return {
         'current_user_avatar_url': avatar_url,
         'current_user_has_custom_avatar': has_custom_avatar,
+    }
+
+
+def notification_count(request):
+    """Expose notification count for authenticated users in all templates."""
+    if request.user.is_authenticated:
+        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+        notifications_preview = Notification.objects.filter(user=request.user).order_by('-created_at')[:4]
+    else:
+        unread_count = 0
+        notifications_preview = []
+    return {
+        'notification_unread_count': unread_count,
+        'notification_preview': notifications_preview,
     }

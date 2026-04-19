@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">{{ notification.title }}</h4>
+      <div class="mb-2 text-muted small">{{ notification.created_at|date:'d/m/Y H:i' }}</div>
+      <div class="mb-3">{{ notification.message }}</div>
+      {% if notification.url %}
+      <a href="{{ notification.url }}" class="btn btn-primary">Xem chi tiết bài đăng</a>
+      {% endif %}
+      <a href="{% url 'notification_list' %}" class="btn btn-link">Quay lại danh sách thông báo</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

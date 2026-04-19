@@ -1,0 +1,245 @@
+/* Đẩy bộ lọc xuống dưới header (cao hơn để không bị che) */
+.home-discovery,
+.discovery-grid {
+    margin-top: 180px !important;
+}
+/* home.css - CSS dành riêng cho trang chủ (home.html) */
+
+/* Tiện ích chung box */
+.utilities-section {
+    margin: 40px auto 32px auto;
+    max-width: 1200px;
+}
+.utilities-box {
+    background: var(--brand-primary);
+    border-radius: 16px;
+    padding: 32px 24px 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    box-shadow: 0 4px 24px rgba(24,20,96,0.08);
+    margin-bottom: 32px;
+}
+.utilities-box .utility-item {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+    gap: 8px;
+}
+.utilities-box .utility-item i,
+.utilities-box .utility-item svg {
+    font-size: 2.2rem;
+    color: #ffd600;
+    margin-bottom: 8px;
+}
+.utilities-box .utility-item span {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Card phòng trọ */
+.room-card-item {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(24,20,96,0.10);
+    overflow: hidden;
+    transition: box-shadow 0.18s, transform 0.18s;
+    border: 1.5px solid #f2f2f7;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    min-width: 260px;
+    max-width: 340px;
+}
+.room-card-item:hover {
+    box-shadow: 0 8px 32px rgba(24,20,96,0.18);
+    transform: translateY(-4px) scale(1.025);
+    border-color: #e0e0f7;
+}
+.room-card-image-link {
+    display: block;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: #f7f7fa;
+}
+.room-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+    transition: transform 0.18s;
+}
+.room-card-item:hover .room-card-image {
+    transform: scale(1.06);
+}
+.room-card-body {
+    padding: 18px 18px 14px 18px;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.room-vacancy-badge {
+    display: inline-block;
+    background: #ffe6b0;
+    color: #b97a00;
+    font-size: 0.98rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 3px 18px 3px 8px;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+    min-width: unset;
+    width: auto;
+    max-width: 120px;
+    text-align: left;
+}
+.room-card-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: var(--brand-primary);
+    margin-bottom: 2px;
+}
+.room-card-address {
+    color: #5a5a7a;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+.room-card-meta {
+    color: #7a7a9a;
+    font-size: 0.98rem;
+    margin-bottom: 0;
+}
+.room-card-meta-highlight {
+    color: #1976d2;
+    background: #e3f2fd;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 1.01rem;
+    margin-right: 4px;
+    display: inline-block;
+}
+.room-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+.room-action-link {
+    color: #6c63ff;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.18s;
+}
+.room-action-link:hover {
+    color: #181460;
+    text-decoration: underline;
+}
+.room-card-actions .btn {
+    background: var(--brand-primary);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 6px 18px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(24,20,96,0.08);
+    transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.room-card-actions .btn:hover {
+    background: #2d278a;
+    color: #ffd600;
+    transform: scale(1.04);
+}
+
+/* Section heading */
+.rooms-section-head h2 {
+    color: var(--brand-primary);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+.rooms-section-head .rooms-see-all {
+    color: #181460;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.18s;
+}
+.rooms-section-head .rooms-see-all:hover {
+    color: #6c63ff;
+    text-decoration: underline;
+}
+
+/* Responsive card grid */
+.room-cards-scroll {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    justify-content: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .utilities-box { flex-wrap: wrap; gap: 12px; }
+    .room-cards-scroll { gap: 18px; }
+}
+@media (max-width: 900px) {
+    .utilities-box { flex-direction: column; align-items: stretch; }
+    .room-cards-scroll { flex-direction: column; gap: 18px; }
+    .room-card-item { max-width: 100%; min-width: 0; }
+}
+
+/* Badge phòng trống màu cam nhạt */
+.room-vacancy-badge {
+    background: #ffe6b0;
+    color: #b97a00;
+}
+
+/* Giá thuê nổi bật */
+.room-price-highlight {
+    color: #181818;
+    background: #ffd600;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 1.08rem;
+    box-shadow: 0 2px 8px rgba(255,193,7,0.10);
+    margin-right: 4px;
+    display: inline-block;
+}
+.room-area-highlight {
+    color: #1976d2;
+    background: #e3f2fd;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 1.01rem;
+    margin-right: 4px;
+    display: inline-block;
+}
+.room-people-highlight {
+    color: #6c63ff;
+    background: #f3f0ff;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 1.01rem;
+    display: inline-block;
+}
+
+/* --- END HOME PAGE CUSTOM STYLE --- */

@@ -16,9 +16,14 @@
     <div class="container">
         <div class="map-toolbar mb-3 p-3 rounded-4 shadow-sm">
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <button type="button" id="btnLocateMeOnMap" class="btn btn-sm btn-outline-primary">Ví trí của tôi</button>
+                <button type="button" id="btnLocateMeOnMap" class="btn btn-sm btn-outline-primary">Vị trí của tôi</button>
+                <button type="button" id="btnPinLocation" class="btn btn-sm btn-outline-success">Ghim vị trí</button>
                 <button type="button" id="btnClearMapPolygon" class="btn btn-sm btn-outline-secondary">Xóa vùng</button>
-                <span id="mapFilterStatus" class="map-filter-status">Vẽ polygon trên bản đồ để lọc nhà theo vùng.</span>
+                                <div id="radiusInputWrapper" style="display:none;align-items:center;gap:4px">
+                                    <label for="pinRadiusInput" class="form-label mb-0" style="font-size:13px">Bán kính (km):</label>
+                                    <input type="number" id="pinRadiusInput" min="1" max="100" value="20" style="width:70px" class="form-control form-control-sm" />
+                                </div>
+                <span id="mapFilterStatus" class="map-filter-status">Vẽ polygon hoặc ghim vị trí để lọc nhà quanh bán kính 20km.</span>
             </div>
         </div>
         <div id="static-map" aria-label="Ban do nha cho thue"></div>

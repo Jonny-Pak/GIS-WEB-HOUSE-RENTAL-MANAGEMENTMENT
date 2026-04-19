@@ -90,9 +90,76 @@
   const drawnItems = new L.FeatureGroup().addTo(map);
   const btnClearPolygon = document.getElementById("btnClearMapPolygon");
   const btnLocateMeOnMap = document.getElementById("btnLocateMeOnMap");
+  const btnPinLocation = document.getElementById("btnPinLocation");
   const mapFilterStatus = document.getElementById("mapFilterStatus");
   let userLocationMarker = null;
   let userAccuracyCircle = null;
+  let pinMarker = null;
+  let pinCircle = null;
+  function clearPinMarker() {
+    if (pinMarker) {
+      map.removeLayer(pinMarker);
+      pinMarker = null;
+    }
+    if (pinCircle) {
+      map.removeLayer(pinCircle);
+      pinCircle = null;
+    }
+  }
+
+  function filterHousesByRadius(center, radiusKm) {
+    if (!center) return houses;
+    const radiusMeters = radiusKm * 1000;
+    return houses.filter(function (house) {
+      const d = map.distance([house.lat, house.lng], center);
+      return d <= radiusMeters;
+    });
+  }
+
+  function handlePinLocation() {
+    map.once('click', function (e) {
+      clearPinMarker();
+      const latlng = e.latlng;
+      // Hiện input bán kính
+      const radiusInputWrapper = document.getElementById('radiusInputWrapper');
+      const pinRadiusInput = document.getElementById('pinRadiusInput');
+      if (radiusInputWrapper) radiusInputWrapper.style.display = 'flex';
+      let radiusKm = parseFloat(pinRadiusInput ? pinRadiusInput.value : 20) || 20;
+      let lastLatLng = latlng;
+      pinMarker = L.marker(latlng, { draggable: true }).addTo(map);
+      pinCircle = L.circle(latlng, { radius: radiusKm * 1000, color: '#e74c3c', fillColor: '#e74c3c', fillOpacity: 0.08 }).addTo(map);
+      // Lọc nhà trong bán kính
+      const filtered = filterHousesByRadius([latlng.lat, latlng.lng], radiusKm);
+      renderHouses(filtered, true);
+      statusState.filter = `Đã ghim vị trí, lọc ${filtered.length}/${houses.length} nhà trong bán kính ${radiusKm}km.`;
+      renderStatus();
+
+      // Khi kéo marker
+      pinMarker.on('drag', function (ev) {
+        const newLatLng = ev.target.getLatLng();
+        lastLatLng = newLatLng;
+        pinCircle.setLatLng(newLatLng);
+        const filtered2 = filterHousesByRadius([newLatLng.lat, newLatLng.lng], radiusKm);
+        renderHouses(filtered2, true);
+        statusState.filter = `Đã ghim vị trí, lọc ${filtered2.length}/${houses.length} nhà trong bán kính ${radiusKm}km.`;
+        renderStatus();
+      });
+
+      // Khi đổi bán kính
+      if (pinRadiusInput) {
+        pinRadiusInput.oninput = function () {
+          radiusKm = parseFloat(pinRadiusInput.value) || 1;
+          pinCircle.setRadius(radiusKm * 1000);
+          const filtered3 = filterHousesByRadius([lastLatLng.lat, lastLatLng.lng], radiusKm);
+          renderHouses(filtered3, true);
+          statusState.filter = `Đã ghim vị trí, lọc ${filtered3.length}/${houses.length} nhà trong bán kính ${radiusKm}km.`;
+          renderStatus();
+        };
+      }
+    });
+    statusState.filter = 'Click lên bản đồ để ghim vị trí, sẽ hiện bán kính tuỳ chỉnh.';
+    renderStatus();
+  }
 
   const statusState = {
     filter: "",
@@ -290,15 +357,24 @@
     applyPolygonFilter();
   });
 
+
   if (btnClearPolygon) {
     btnClearPolygon.addEventListener("click", function () {
       drawnItems.clearLayers();
+      clearPinMarker();
       applyPolygonFilter();
     });
   }
 
   if (btnLocateMeOnMap) {
     btnLocateMeOnMap.addEventListener("click", locateCurrentUser);
+  }
+
+  if (btnPinLocation) {
+    btnPinLocation.addEventListener("click", function () {
+      clearPinMarker();
+      handlePinLocation();
+    });
   }
 
   renderHouses(houses, true);

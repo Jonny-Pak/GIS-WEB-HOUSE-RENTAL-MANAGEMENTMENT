@@ -82,6 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'accounts.context_processors.current_user_profile',
+                'accounts.context_processors.notification_count',
             ],
         },
     },
@@ -124,16 +125,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'accounts.validators.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'accounts.validators.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'accounts.validators.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'accounts.validators.NumericPasswordValidator',
     },
 ]
 
@@ -141,9 +142,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'vi'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 

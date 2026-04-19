@@ -22,7 +22,7 @@ def home(request):
     houses_qs = House.objects.filter(status='available').order_by('-created_at')
 
     search_query = request.GET.get('search', '').strip()
-    district = request.GET.get('district', '').strip()
+    # district đã loại bỏ
     price_range = request.GET.get('price_range', '').strip()
     house_type = request.GET.get('house_type', '').strip()
 
@@ -67,9 +67,7 @@ def home(request):
             | Q(description__icontains=search_query)
         )
 
-    valid_districts = {choice[0] for choice in House.DISTRICT_CHOICES}
-    if district in valid_districts:
-        houses_qs = houses_qs.filter(district=district)
+
 
     selected_price_range = next(
         (item for item in price_range_items if item['value'] == price_range),
@@ -101,37 +99,16 @@ def home(request):
     if has_more_houses:
         houses = houses[:per_page]
 
-    district_counts = {
-        row['district']: row['total']
-        for row in House.objects.filter(status='available').values('district').annotate(total=Count('id'))
-    }
-
-    district_items = [
-        {
-            'value': value,
-            'label': label,
-            'count': district_counts.get(value, 0),
-            'selected': district == value,
-        }
-        for value, label in House.DISTRICT_CHOICES
-    ]
-
-    selected_district_label = ''
-    if district:
-        selected_district_label = dict(House.DISTRICT_CHOICES).get(district, '')
 
     context = {
         'houses': houses,
         'has_more_houses': has_more_houses,
         'next_page': page + 1,
         'total_available_rooms': total_available_rooms,
-        'district_items': district_items,
         'price_range_items': price_range_items,
         'house_type_items': house_type_items,
-        'selected_district_label': selected_district_label,
         'filters': {
             'search': search_query,
-            'district': district,
             'price_range': price_range,
             'house_type': house_type,
         },

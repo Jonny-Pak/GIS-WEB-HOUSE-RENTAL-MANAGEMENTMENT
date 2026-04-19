@@ -89,7 +89,6 @@
 
     const mapElement = document.getElementById("post-house-map");
     const addressInput = document.getElementById("id_address");
-    const districtInput = document.getElementById("id_district");
     const latInput = document.getElementById("id_lat");
     const lngInput = document.getElementById("id_lng");
     const latDisplay = document.getElementById("latDisplay");
@@ -103,11 +102,11 @@
     const allowAreaManualEdit = document.getElementById("allowAreaManualEdit");
     const estimatedAreaInput = document.getElementById("id_estimated_area_m2");
     const polygonGeoInput = document.getElementById("id_polygon_geojson");
-    const postForm = mapElement.closest("form");
+    const postForm = mapElement ? mapElement.closest("form") : null;
     const submitErrorBanner = document.getElementById("submitErrorBanner");
     const geocodeUrl = mapWrapper.dataset.geocodeUrl;
 
-    if (!mapElement || !addressInput || !districtInput || !latInput || !lngInput || !geocodeUrl) return;
+    if (!mapElement || !addressInput || !latInput || !lngInput || !geocodeUrl) return;
     if (typeof L === "undefined") {
       geocodeStatus.textContent = "Khong the tai ban do tuong tac. Vui long tai lai trang.";
       return;
@@ -390,16 +389,12 @@
 
     function geocodeAddress() {
       const address = (addressInput.value || "").trim();
-      const district = (districtInput.value || "").trim();
-
-      if (!address || !district) {
-        geocodeStatus.textContent = "Vui long nhap dia chi va quan/huyen truoc khi tim toa do.";
+      if (!address) {
+        geocodeStatus.textContent = "Vui lòng nhập địa chỉ trước khi tìm tọa độ.";
         return;
       }
-
       const formData = new FormData();
       formData.append("address", address);
-      formData.append("district", district);
       if (latestUserLocation) {
         formData.append("user_lat", String(latestUserLocation.lat));
         formData.append("user_lng", String(latestUserLocation.lng));
@@ -481,10 +476,6 @@
         event.preventDefault();
         geocodeAddress();
       }
-    });
-
-    districtInput.addEventListener("change", function () {
-      geocodeStatus.textContent = "Da cap nhat quan/huyen. Bam 'Tim toa do tu dia chi' hoac click ban do de ghim thu cong.";
     });
 
     if (areaInput) {

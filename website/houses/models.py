@@ -27,32 +27,6 @@ class House(models.Model):
         ('rejected', 'Bị từ chối'),
     ]
 
-    DISTRICT_CHOICES = [
-        ('q1', 'Quận 1'),
-        ('q2', 'Quận 2'),
-        ('q3', 'Quận 3'),
-        ('q4', 'Quận 4'),
-        ('q5', 'Quận 5'),
-        ('q6', 'Quận 6'),
-        ('q7', 'Quận 7'),
-        ('q8', 'Quận 8'),
-        ('q9', 'Quận 9'),
-        ('q10', 'Quận 10'),
-        ('q11', 'Quận 11'),
-        ('q12', 'Quận 12'),
-        ('qbt', 'Quận Bình Thạnh'),
-        ('qtb', 'Quận Tân Bình'),
-        ('qtp', 'Quận Tân Phú'),
-        ('qp', 'Quận Phú Nhuận'),
-        ('qgv', 'Quận Gò Vấp'),
-        ('qbtan', 'Quận Bình Tân'),
-        ('td', 'Thành phố Thủ Đức'),
-        ('hbc', 'Huyện Bình Chánh'),
-        ('hhm', 'Huyện Hóc Môn'),
-        ('hcc', 'Huyện Củ Chi'),
-        ('hnb', 'Huyện Nhà Bè'),
-        ('hcg', 'Huyện Cần Giờ'),
-    ]
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name="Chủ nhà", null=True, blank=True)
     owner_phone = models.CharField(max_length=15, verbose_name="Số điện thoại liên hệ")
@@ -71,7 +45,6 @@ class House(models.Model):
     max_people = models.IntegerField(verbose_name="Số người ở tối đa", default=4)
     furniture = models.ManyToManyField(Furniture, verbose_name="Nội thất đi kèm", blank=True)
 
-    district = models.CharField(max_length=10, choices=DISTRICT_CHOICES, verbose_name="Khu vực Quận/Huyện")
     address = models.TextField(verbose_name="Địa chỉ chi tiết (Số nhà, Ngõ/Hẻm, Đường)")
     
     # Bản đồ và vị trí
@@ -88,7 +61,7 @@ class House(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
 
     def __str__(self):
-        return f"[{self.get_status_display()}] {self.name} - {self.get_district_display()}"
+        return f"[{self.get_status_display()}] {self.name}"
 
 
 class HouseFurnitureItem(models.Model):

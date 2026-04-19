@@ -5,6 +5,28 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/login.css' %}?v=20260411a">
+    <style>
+    .position-relative { position: relative; }
+    .toggle-password {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+        color: #888;
+        font-size: 1.25rem;
+        padding: 0 14px;
+        border-radius: 0 4px 4px 0;
+        transition: background 0.2s;
+    }
+    .toggle-password:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -37,13 +59,18 @@
                         {% endif %}
 
                         <div class="mb-3">
-                            <label class="form-label" for="username">Tên đăng nhập</label>
-                            <input type="text" class="form-control custom-input" id="username" name="username" placeholder="Nhập tên đăng nhập..." required>
+                            <label class="form-label" for="username">Tên đăng nhập hoặc email</label>
+                            <input type="text" class="form-control custom-input" id="username" name="username" placeholder="Nhập tên đăng nhập hoặc email..." required>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label" for="password">Mật khẩu</label>
-                            <input type="password" class="form-control custom-input" id="password" name="password" placeholder="********" required>
+                            <div class="position-relative">
+                                <input type="password" class="form-control custom-input" id="password" name="password" placeholder="********" required>
+                                <span class="toggle-password" onclick="togglePassword('password', 'eyeLoginPassword')">
+                                    <i class="bi bi-eye-slash" id="eyeLoginPassword"></i>
+                                </span>
+                            </div>
                             <div class="text-end mt-2">
                                 <a href="{% url 'forgot_password' %}" class="link-register">Quên mật khẩu?</a>
                             </div>
@@ -73,4 +100,21 @@
         </div>
     </div>
 </div>
+<script>
+function togglePassword(inputId, eyeId) {
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+    if (input.type === "password") {
+        input.type = "text";
+        eye.classList.remove("bi-eye-slash");
+        eye.classList.add("bi-eye");
+        eye.style.color = '#007bff';
+    } else {
+        input.type = "password";
+        eye.classList.remove("bi-eye");
+        eye.classList.add("bi-eye-slash");
+        eye.style.color = '#888';
+    }
+}
+</script>
 {% endblock %}

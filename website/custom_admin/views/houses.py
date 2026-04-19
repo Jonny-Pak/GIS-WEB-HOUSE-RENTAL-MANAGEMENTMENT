@@ -1,3 +1,4 @@
+from accounts.models import Notification
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
@@ -11,13 +12,13 @@ from custom_admin.views.helpers import _is_admin_user, _custom_admin_model_list,
 def custom_admin_houses(request):
     return _custom_admin_model_list(
         request, House.objects.select_related('owner'), 'Quản lý nhà', None,
-        ['Tên nhà', 'Chủ nhà', 'Quận', 'Trạng thái', 'Giá'],
+        ['Tên nhà', 'Chủ nhà', 'Trạng thái', 'Giá'],
         {
             'search': lambda qs, q: qs.filter(name__icontains=q),
             'order_by': '-created_at',
             'columns': lambda obj: [
-                obj.name, obj.owner.username if obj.owner else '-', 
-                obj.get_district_display(), obj.get_status_display(), f"{obj.price:,} VNĐ" if obj.price else 'Thỏa thuận'
+                obj.name, obj.owner.username if obj.owner else '-',
+                obj.get_status_display(), f"{obj.price:,} VNĐ" if obj.price else 'Thỏa thuận'
             ],
             'extra_actions': lambda obj: [
                 {
@@ -54,6 +55,14 @@ def custom_admin_house_approve(request, object_id):
     success, msg = approve_house(house)
     if success:
         messages.success(request, msg)
+        # Gửi thông báo cho chủ nhà
+        if house.owner:
+            Notification.objects.create(
+                user=house.owner,
+                title="Tin đăng của bạn đã được duyệt",
+                message=f"Tin đăng '{house.name}' của bạn đã được duyệt thành công.",
+                url=""
+            )
     else:
         messages.error(request, msg)
     return redirect('custom_admin_houses')

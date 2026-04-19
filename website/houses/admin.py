@@ -59,16 +59,16 @@ class HouseImageInline(admin.TabularInline):
 # Cấu hình quản lý nhà
 @admin.register(House)
 class HouseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'price', 'district', 'status', 'requires_coordinates', 'created_at')
+    list_display = ('name', 'owner', 'price', 'status', 'requires_coordinates', 'created_at')
     search_fields = ('name', 'address', 'owner__username', 'owner_phone')
-    list_filter = ('status', 'district', 'house_type', RequiresCoordinatesFilter)
+    list_filter = ('status', 'house_type', RequiresCoordinatesFilter)
     inlines = [HouseImageInline]
     actions = [make_available, make_rejected]
     filter_horizontal = ('furniture',)
 
     fieldsets = (
         ('Thông tin cơ bản', {
-            'fields': ('name', 'owner', 'owner_phone', 'house_type', 'district', 'status')
+            'fields': ('name', 'owner', 'owner_phone', 'house_type', 'status')
         }),
         ('Địa chỉ & Tọa độ', {
             'fields': ('address', 'lat', 'lng', 'requires_coordinates'),

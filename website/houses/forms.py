@@ -65,7 +65,6 @@ class HouseForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VND/tháng'}),
             'deposit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VND'}),
             'area': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'm2'}),
-            'district': forms.Select(attrs={'class': 'form-select'}),
             
             'address': forms.Textarea(attrs={
                 'class': 'form-control', 

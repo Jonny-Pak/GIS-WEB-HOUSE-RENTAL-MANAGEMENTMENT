@@ -167,16 +167,11 @@ def save_house_furniture(house, request):
 
 
 def _resolve_house_location(house):
-    district_display = ''
-    try:
-        district_display = house.get_district_display()
-    except Exception:
-        district_display = ''
-
+    # District đã bị loại bỏ hoàn toàn
     return resolve_house_coordinates(
         address=house.address or '',
-        district_code=house.district or '',
-        district_display=district_display,
+        district_code='',
+        district_display=''
     )
 
 
@@ -255,7 +250,7 @@ def create_house(form, owner, images=None, request=None):
     return house, warning_msg
 
 
-def update_house(form, owner, original_address, original_district, request=None):
+def update_house(form, owner, original_address, request=None):
     """
     Cập nhật thông tin bài đăng nhà.
     - Xử lý logic trạng thái tọa độ khi địa chỉ thay đổi
@@ -265,15 +260,10 @@ def update_house(form, owner, original_address, original_district, request=None)
     house.owner = owner
     warning_msg = None
 
+
     original_address_norm = (original_address or '').strip()
     new_address_norm = (house.address or '').strip()
-    original_district_norm = (original_district or '').strip()
-    new_district_norm = (house.district or '').strip()
-
-    location_changed = (
-        original_address_norm != new_address_norm
-        or original_district_norm != new_district_norm
-    )
+    location_changed = (original_address_norm != new_address_norm)
 
     manual_lat, manual_lng = _parse_manual_coordinates(request)
     need_geocode = location_changed or house.lat is None or house.lng is None
@@ -283,8 +273,6 @@ def update_house(form, owner, original_address, original_district, request=None)
         geocode_inexact = geocode_state in {
             'failed',
             'nominatim_rate_limited',
-            'district_center_fallback',
-            'district_center_fallback_rate_limited',
         }
 
         if manual_lat is not None and manual_lng is not None and ((lat is None or lng is None) or geocode_inexact):
@@ -427,7 +415,6 @@ def get_map_houses():
     return [{
         'name': house.name,
         'price': f"{house.price:,} VNĐ/tháng" if house.price else 'Thỏa thuận',
-        'district': house.get_district_display(),
         'status': house.get_status_display(),
         'lat': house.lat,
         'lng': house.lng,
