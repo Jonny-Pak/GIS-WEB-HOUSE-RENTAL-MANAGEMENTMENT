@@ -27,13 +27,11 @@ def custom_admin_houses(request):
                     'url_name': 'custom_admin_house_approve',
                     'label': 'Duyệt',
                     'class_name': 'success-btn',
-                    'confirm': f'Xác nhận duyệt bài đăng: {obj.name}?',
                 },
                 {
                     'url_name': 'custom_admin_house_reject',
                     'label': 'Từ chối',
                     'class_name': 'danger-btn',
-                    'confirm': f'Xác nhận từ chối bài đăng: {obj.name}?',
                 },
             ] if obj.status in ['pending', 'no_coordinates'] else [],
         },

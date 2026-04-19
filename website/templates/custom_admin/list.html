@@ -88,7 +88,7 @@
                                     <div class="actions-cell">
                                     {% for action in row.extra_actions %}
                                     <form method="post" action="{% url action.url_name row.id %}"
-                                            data-confirm-submit="{{ action.confirm|default:'Xác nhận thao tác này?' }}">
+                                            {% if action.confirm %}data-confirm-submit="{{ action.confirm }}"{% endif %}>
                                         {% csrf_token %}
                                         <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">
                                             {{ action.label }}</button>

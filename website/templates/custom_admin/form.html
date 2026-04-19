@@ -130,16 +130,21 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var lat = {{ form.instance.lat }};
-    var lng = {{ form.instance.lng }};
-    var map = L.map('admin-house-map').setView([lat, lng], 16);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap & CartoDB',
-        maxZoom: 19
-    }).addTo(map);
-    L.marker([lat, lng]).addTo(map)
-        .bindPopup('<strong>{{ form.instance.name|escapejs }}</strong><br>{{ form.instance.address|escapejs }}')
-        .openPopup();
+    var latStr = "{{ form.instance.lat|default_if_none:'' }}".replace(',', '.');
+    var lngStr = "{{ form.instance.lng|default_if_none:'' }}".replace(',', '.');
+    var lat = parseFloat(latStr);
+    var lng = parseFloat(lngStr);
+    
+    if (!isNaN(lat) && !isNaN(lng)) {
+        var map = L.map('admin-house-map').setView([lat, lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup('<strong>{{ form.instance.name|escapejs }}</strong><br>{{ form.instance.address|escapejs }}')
+            .openPopup();
+    }
 });
 </script>
 {% endif %}

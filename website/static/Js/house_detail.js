@@ -130,8 +130,11 @@
   const fallbackElement = document.getElementById("house-location-fallback");
   if (!mapElement) return;
 
-  const lat = Number(mapElement.dataset.lat || "");
-  const lng = Number(mapElement.dataset.lng || "");
+  const latText = (mapElement.dataset.lat || "").replace(',', '.');
+  const lngText = (mapElement.dataset.lng || "").replace(',', '.');
+  
+  const lat = parseFloat(latText);
+  const lng = parseFloat(lngText);
 
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
     mapElement.classList.add("d-none");
@@ -144,14 +147,40 @@
     scrollWheelZoom: true,
   }).setView([lat, lng], 15);
 
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+  let baseLayer = null;
+  let switchedToFallbackTiles = false;
+  let tileErrorCount = 0;
+
+  function attachFallbackTiles() {
+    if (switchedToFallbackTiles) return;
+    switchedToFallbackTiles = true;
+    if (baseLayer && map.hasLayer(baseLayer)) {
+      map.removeLayer(baseLayer);
+    }
+    baseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 20,
+      subdomains: "abcd",
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    }).addTo(map);
+  }
+
+  baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-  }).addTo(map);
+    attribution: "&copy; OpenStreetMap contributors",
+    referrerPolicy: "strict-origin-when-cross-origin",
+  });
+
+  baseLayer.on("tileerror", function () {
+    tileErrorCount += 1;
+    if (tileErrorCount >= 2) {
+      attachFallbackTiles();
+    }
+  });
+
+  baseLayer.addTo(map);
 
   const houseName = escapeHtml(mapElement.dataset.name || "Nha cho thue");
   const houseAddress = escapeHtml(mapElement.dataset.address || "");
-  const houseDistrict = escapeHtml(mapElement.dataset.district || "");
 
   const marker = L.marker([lat, lng]).addTo(map);
   marker
@@ -160,7 +189,6 @@
         houseName +
         "</strong><br>" +
         houseAddress +
-        (houseDistrict ? ", " + houseDistrict : "") +
         "</div>"
     )
     .openPopup();

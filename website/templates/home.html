@@ -19,12 +19,6 @@
       <div class="discovery-filter-controls">
         <form class="discovery-filter-form" method="get">
           <div class="discovery-filter-row">
-            <select name="district" class="form-select" title="Chọn quận">
-              <option value="">Tất cả quận</option>
-              {% for item in district_items %}
-              <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
-              {% endfor %}
-            </select>
 
             <select name="house_type" class="form-select" title="Chọn loại nhà">
               <option value="">Tất cả loại nhà</option>
@@ -87,7 +81,7 @@
         <div class="room-card-body">
           <span class="room-vacancy-badge">Còn trống</span>
           <h3 class="room-card-title">{{ house.name }}</h3>
-          <p class="room-card-address">• {{ house.address }}, {{ house.get_district_display }},  Diện tích {{ house.area }} m²</p>
+          <p class="room-card-address">• {{ house.address }}, Diện tích {{ house.area }} m²</p>
           <p class="room-card-meta">
           <span class="room-price-highlight">Giá thuê: {{ house.price|floatformat:0 }} VNĐ / Tháng</span>
           </p>
@@ -101,14 +95,14 @@
       {% empty %}
       <div class="w-100 text-center py-5 bg-white rounded border">
         <h4 class="text-muted">Không có phòng phù hợp</h4>
-        <p class="text-muted mb-0">Bạn hãy thử tìm với quận hoặc từ khóa khác.</p>
+        <p class="text-muted mb-0">Bạn hãy thử tìm với từ khóa khác.</p>
       </div>
       {% endfor %}
     </div>
 
     <div class="text-center mt-4">
       <a
-        href="{% url 'home' %}?page={{ next_page }}{% if filters.search %}&search={{ filters.search|urlencode }}{% endif %}{% if filters.district %}&district={{ filters.district|urlencode }}{% endif %}{% if filters.house_type %}&house_type={{ filters.house_type|urlencode }}{% endif %}{% if filters.price_range %}&price_range={{ filters.price_range|urlencode }}{% endif %}"
+        href="{% url 'home' %}?page={{ next_page }}{% if filters.search %}&search={{ filters.search|urlencode }}{% endif %}{% if filters.house_type %}&house_type={{ filters.house_type|urlencode }}{% endif %}{% if filters.price_range %}&price_range={{ filters.price_range|urlencode }}{% endif %}"
         class="btn btn-outline-primary btn-lg px-5"
       >
         Xem thêm phòng

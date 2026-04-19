@@ -47,7 +47,7 @@ class AdminUserUpdateForm(forms.ModelForm):
 class AdminHouseForm(forms.ModelForm):
     class Meta:
         model = House
-        exclude = ["created_at", "updated_at", "district", "requires_coordinates", "polygon_geojson", "estimated_area_m2"]
+        exclude = ["created_at", "updated_at", "requires_coordinates", "polygon_geojson", "estimated_area_m2"]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'owner': forms.Select(attrs={'class': 'form-select'}),

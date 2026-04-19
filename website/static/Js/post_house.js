@@ -115,9 +115,16 @@
 
     const defaultLat = 10.8231;
     const defaultLng = 106.6297;
-    const initialLat = parseFloat(mapWrapper.dataset.initialLat || latInput.value);
-    const initialLng = parseFloat(mapWrapper.dataset.initialLng || lngInput.value);
+    const latVal = mapWrapper.dataset.initialLat || latInput.value;
+    const lngVal = mapWrapper.dataset.initialLng || lngInput.value;
+    const initialLat = parseFloat(String(latVal).replace(',', '.'));
+    const initialLng = parseFloat(String(lngVal).replace(',', '.'));
     const hasInitialCoords = Number.isFinite(initialLat) && Number.isFinite(initialLng);
+
+    // Vô hiệu hóa cảm ứng của Leaflet trên desktop để sửa lỗi double-click trên Chrome khi vẽ
+    if (window.navigator.userAgent.indexOf('Chrome') > -1 && navigator.maxTouchPoints > 0) {
+      L.Browser.touch = false;
+    }
 
     let latestUserLocation = null;
     const map = L.map(mapElement).setView(
@@ -137,14 +144,15 @@
         map.removeLayer(baseLayer);
       }
 
-      baseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      baseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
         maxZoom: 20,
         subdomains: "abcd",
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
       }).addTo(map);
 
-      geocodeStatus.textContent =
-        "May chu OpenStreetMap dang chan tile (403). He thong da tu dong chuyen sang tile du phong de ban tiep tuc ghim vi tri.";
+      if (geocodeStatus) {
+        geocodeStatus.textContent = "Hệ thống đang tự chuyển sang server bản đồ dự phòng (CartoDB) vì OSM chặn tải ảnh quá nhạy.";
+      }
     }
 
     baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -161,6 +169,7 @@
     });
 
     baseLayer.addTo(map);
+
     let marker = null;
     let polygonLayer = null;
     let polygonGeoJson = null;
@@ -317,7 +326,7 @@
     function reverseGeocode(lat, lng) {
       if (!reverseGeocodeUrl) return;
       geocodeStatus.textContent = "Đang lấy địa chỉ từ tọa độ...";
-      
+
       const formData = new FormData();
       formData.append("lat", lat);
       formData.append("lng", lng);
@@ -330,18 +339,18 @@
         },
         body: formData,
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success && data.address) {
-          addressInput.value = data.address;
-          geocodeStatus.textContent = "Đã tự động điền địa chỉ vào ô bên trên từ vị trí bạn vừa ghim.";
-        } else {
-          geocodeStatus.textContent = "Đã ghim vị trí, nhưng không thể tìm thấy tên đường chính xác tự động.";
-        }
-      })
-      .catch(() => {
-        geocodeStatus.textContent = "Đã ghim vị trí thành công (có lỗi khi tìm tên đường).";
-      });
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.address) {
+            addressInput.value = data.address;
+            geocodeStatus.textContent = "Đã tự động điền địa chỉ vào ô bên trên từ vị trí bạn vừa ghim.";
+          } else {
+            geocodeStatus.textContent = "Đã ghim vị trí, nhưng không thể tìm thấy tên đường chính xác tự động.";
+          }
+        })
+        .catch(() => {
+          geocodeStatus.textContent = "Đã ghim vị trí thành công (có lỗi khi tìm tên đường).";
+        });
     }
 
     if (hasInitialCoords) {
@@ -353,7 +362,7 @@
       isDrawingShape = true;
     });
     map.on(L.Draw.Event.DRAWSTOP, function () {
-      setTimeout(function() {
+      setTimeout(function () {
         isDrawingShape = false;
       }, 200);
     });
@@ -439,8 +448,11 @@
             geocodeStatus.textContent = "Lay vi tri hien tai bi het thoi gian. Hay thu lai hoac chon tim theo dia chi.";
           }
         },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
+        {
+          enableHighAccuracy: false,
+          timeout: 6000,
+          maximumAge: 60000,
+        });
     }
 
     function geocodeAddress() {
@@ -454,7 +466,7 @@
 
       geocodeStatus.textContent = "Đang tìm tọa độ...";
       geocodeStatus.className = "text-primary mt-1 small d-inline-block fw-bold";
-      
+
       const formData = new FormData();
       formData.append("address", address);
       if (latestUserLocation) {
@@ -488,8 +500,8 @@
           let sourceMessage = "Da lay toa do tu dia chi thanh cong.";
           if (data.source === "user_location_fallback") {
             sourceMessage = "Khong tim thay dia chi chinh xac, da dung vi tri hien tai cua ban.";
-          } else if (data.source === "district_center_fallback" || data.source === "district_center_fallback_rate_limited") {
-            sourceMessage = "Khong tim thay dia chi chinh xac, da tam thoi dung tam quan/huyen da chon.";
+          } else if (data.source === "hcmc_center_fallback") {
+            sourceMessage = "Khong tim thay dia chi chinh xac, da tam dung vi tri trung tam TPHCM.";
           } else if (data.source === "parsed_from_input") {
             sourceMessage = "Da doc truc tiep toa do tu noi dung ban vua nhap.";
           } else if (data.source === "cached") {
@@ -602,10 +614,10 @@
     const input = event.target;
     const previewBox = document.getElementById("main-image-preview-box");
     const previewImg = document.getElementById("main-img-preview");
-    
+
     if (input.files && input.files[0]) {
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         previewImg.src = e.target.result;
         previewBox.classList.remove("d-none");
       };
@@ -620,7 +632,7 @@
     const input = event.target;
     const container = document.getElementById("gallery-preview-container");
     const emptyState = document.getElementById("gallery-empty-state");
-    
+
     // Create the container if it doesn't exist
     let gridContainer = container;
     if (!gridContainer) {
@@ -629,18 +641,18 @@
       gridContainer.className = "row g-2 mt-0";
       emptyState.parentNode.appendChild(gridContainer);
     }
-    
+
     gridContainer.innerHTML = "";
-    
+
     if (input.files && input.files.length > 0) {
       emptyState.classList.add("d-none");
       gridContainer.classList.remove("d-none");
-      
+
       Array.from(input.files).forEach(file => {
         if (!file.type.startsWith('image/')) return;
-        
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
           const col = document.createElement("div");
           col.className = "col-4 col-md-3";
           col.innerHTML = `

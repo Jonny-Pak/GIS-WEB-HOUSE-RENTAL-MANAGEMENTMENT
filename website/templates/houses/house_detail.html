@@ -19,7 +19,6 @@
                 <nav aria-label="breadcrumb" class="house-breadcrumb mb-3">
                     <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ > </a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'home' %}?district={{ house.district|urlencode }}">{{ house.get_district_display }} ></a></li>
                         <li class="breadcrumb-item active" aria-current="page"> {{ house.name }}</li>
                     </ol>
                 </nav>
@@ -30,15 +29,18 @@
                             <span class="icon-chevron-left"></span>
                         </button>
                         {% if house.main_image %}
-                        <img src="{{ house.main_image.url }}" alt="{{ house.name }}" class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        <img src="{{ house.main_image.url }}" alt="{{ house.name }}"
+                            class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
                         {% else %}
-                            {% with first_image=house.images.all|first %}
-                                {% if first_image %}
-                                <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
-                                {% else %}
-                                <img src="{% static 'images/img_3.jpg' %}" alt="Default Image" class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
-                                {% endif %}
-                            {% endwith %}
+                        {% with first_image=house.images.all|first %}
+                        {% if first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ house.name }}"
+                            class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        {% else %}
+                        <img src="{% static 'images/img_3.jpg' %}" alt="Default Image"
+                            class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        {% endif %}
+                        {% endwith %}
                         {% endif %}
                         <button type="button" class="house-main-nav" id="houseMainNext" aria-label="Ảnh kế tiếp">
                             <span class="icon-chevron-right"></span>
@@ -56,8 +58,10 @@
 
                     <div class="house-gallery-strip" id="houseGalleryStrip" aria-label="Ảnh phụ của căn nhà">
                         {% for img in house.images.all %}
-                        <button type="button" class="house-gallery-item" data-src="{{ img.image.url }}" data-alt="Gallery Image {{ forloop.counter }}">
-                            <img src="{{ img.image.url }}" alt="Gallery Image {{ forloop.counter }}" class="house-gallery-image">
+                        <button type="button" class="house-gallery-item" data-src="{{ img.image.url }}"
+                            data-alt="Gallery Image {{ forloop.counter }}">
+                            <img src="{{ img.image.url }}" alt="Gallery Image {{ forloop.counter }}"
+                                class="house-gallery-image">
                         </button>
                         {% empty %}
                         <div class="w-100">
@@ -72,7 +76,7 @@
                 </div>
 
                 <h2 class="heading text-primary">Thông tin chi tiết</h2>
-                <p class="text-black-50"><span class="icon-map-marker me-1"></span> {{ house.address }}, {{ house.get_district_display }}</p>
+                <p class="text-black-50"><span class="icon-map-marker me-1"></span> {{ house.address }}</p>
 
                 <div class="row mt-4 mb-4">
                     <div class="col-md-6 col-lg-4 mb-3">
@@ -98,7 +102,8 @@
                             <span class="icon-users me-2 text-primary display-6"></span>
                             <div>
                                 <span class="d-block fw-bold">Số người tối đa</span>
-                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else %}Không giới hạn{% endif %}</span>
+                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else
+                                    %}Không giới hạn{% endif %}</span>
                             </div>
                         </div>
                     </div>
@@ -114,7 +119,8 @@
                         <div class="p-3 border rounded bg-light h-100">
                             <ul class="list-unstyled mb-0">
                                 {% for item in house.furniture_items.all %}
-                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{ item.furniture.name }} (x{{ item.quantity }})</li>
+                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{
+                                    item.furniture.name }} (x{{ item.quantity }})</li>
                                 {% empty %}
                                 <li class="text-muted">Chưa cập nhật thông tin nội thất.</li>
                                 {% endfor %}
@@ -124,18 +130,16 @@
                 </div>
 
                 <h3 class="heading text-primary mt-5">Vị trí trên bản đồ</h3>
+                {% load l10n %}
                 <div id="house-location-map" class="house-map-wrapper shadow-sm"
-                    data-lat="{{ house.lat|default_if_none:'' }}"
-                    data-lng="{{ house.lng|default_if_none:'' }}"
-                    data-name="{{ house.name|escape }}"
-                    data-address="{{ house.address|escape }}"
-                    data-district="{{ house.get_district_display|escape }}"></div>
+                    data-lat="{{ house.lat|unlocalize|default_if_none:'' }}" data-lng="{{ house.lng|unlocalize|default_if_none:'' }}"
+                    data-name="{{ house.name|escape }}" data-address="{{ house.address|escape }}"></div>
                 <div id="house-location-fallback" class="house-map-fallback mt-3 p-3 rounded border bg-light d-none">
                     <span class="icon-map-marker text-danger me-2"></span>
                     Chưa có tọa độ chính xác cho căn nhà này.
                 </div>
-                <small class="d-block mt-2 text-muted">Lat: {{ house.lat|default:"N/A" }} | Long: {{
-                    house.lng|default:"N/A" }}</small>
+                <small class="d-block mt-2 text-muted">Lat: {{ house.lat|default:"N/A" }} | Long:
+                    {{house.lng|default:"N/A" }}</small>
             </div>
 
             <div class="col-lg-4">
@@ -188,13 +192,13 @@
                         {% if other_house.main_image %}
                         <img src="{{ other_house.main_image.url }}" alt="Image" class="img-fluid rounded-top">
                         {% else %}
-                            {% with other_first_image=other_house.images.all|first %}
-                                {% if other_first_image %}
-                                <img src="{{ other_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
-                                {% else %}
-                                <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid rounded-top">
-                                {% endif %}
-                            {% endwith %}
+                        {% with other_first_image=other_house.images.all|first %}
+                        {% if other_first_image %}
+                        <img src="{{ other_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
+                        {% else %}
+                        <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid rounded-top">
+                        {% endif %}
+                        {% endwith %}
                         {% endif %}
                     </a>
                     <div class="p-3">
@@ -203,7 +207,7 @@
                         <h5 class="mb-2"><a href="{% url 'house_detail' other_house.id %}" class="text-black">{{
                                 other_house.name }}</a></h5>
                         <span class="city d-block mb-3 text-muted small"><span class="icon-map-marker me-1"></span>{{
-                            other_house.get_district_display }}</span>
+                            other_house.address }}</span>
                         <a href="{% url 'house_detail' other_house.id %}"
                             class="btn btn-primary btn-sm px-3 text-white">Chi tiết</a>
                     </div>
@@ -223,7 +227,7 @@
         <div class="row mb-4">
             <div class="col-md-12 text-center">
                 <h2 class="font-weight-bold text-primary heading">Có thể bạn quan tâm</h2>
-                <p class="text-muted">Những căn nhà tương tự tại khu vực {{ house.get_district_display }}</p>
+                <p class="text-muted">Những căn nhà tương tự có thể bạn sẽ thích</p>
             </div>
         </div>
         <div class="row">
@@ -234,13 +238,13 @@
                         {% if related.main_image %}
                         <img src="{{ related.main_image.url }}" alt="Image" class="img-fluid rounded-top">
                         {% else %}
-                            {% with related_first_image=related.images.all|first %}
-                                {% if related_first_image %}
-                                <img src="{{ related_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
-                                {% else %}
-                                <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid rounded-top">
-                                {% endif %}
-                            {% endwith %}
+                        {% with related_first_image=related.images.all|first %}
+                        {% if related_first_image %}
+                        <img src="{{ related_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
+                        {% else %}
+                        <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid rounded-top">
+                        {% endif %}
+                        {% endwith %}
                         {% endif %}
                     </a>
                     <div class="p-3">
@@ -265,6 +269,6 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="{% static 'Js/house_detail.js' %}?v=20260405a"></script>
+<script src="{% static 'Js/house_detail.js' %}?v=20260419x"></script>
 
 {% endblock %}

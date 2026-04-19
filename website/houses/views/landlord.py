@@ -64,7 +64,6 @@ def manage_post(request):
 def edit_house(request, house_id):
     house = get_object_or_404(House.objects.prefetch_related('furniture_items'), id=house_id, owner=request.user)
     original_address = house.address
-    original_district = house.district
     if request.method == 'POST':
         form = HouseForm(request.POST, request.FILES, instance=house)
         if form.is_valid():
@@ -72,7 +71,6 @@ def edit_house(request, house_id):
                 form=form,
                 owner=request.user,
                 original_address=original_address,
-                original_district=original_district,
                 request=request,
             )
             if warning_msg:
@@ -126,13 +124,13 @@ def geocode_preview(request):
         user_lng=user_lng
     )
 
-    approximate_states = {'district_center_fallback', 'district_center_fallback_rate_limited'}
+    approximate_states = {'hcmc_center_fallback'}
 
     if lat is None or lng is None or state in approximate_states:
         if state == 'nominatim_rate_limited':
             message = 'Dịch vụ bản đồ OpenStreetMap đang quá tải (429). Hãy thử lại sau ít phút.'
         elif state in approximate_states:
-            message = 'Không tìm được tọa độ chính xác theo địa chỉ. Hãy click lên bản đồ để ghim vị trí thủ công.'
+            message = 'Không tìm được tọa độ chính xác theo địa chỉ. Hệ thống lấy tạm vị trí trung tâm, hãy ghim lại bằng tay.'
         else:
             message = 'Chưa tìm thấy tọa độ phù hợp từ địa chỉ này. Hãy thêm chi tiết số nhà, đường và phường/xã.'
 
@@ -144,10 +142,8 @@ def geocode_preview(request):
             'approximate_lng': float(lng) if lng is not None else None,
         })
 
-    if state == 'district_center_fallback':
-        message = 'OpenStreetMap chưa định vị chính xác được chuỗi địa chỉ này. Hệ thống tạm lấy tọa độ trung tâm quận/huyện đã chọn.'
-    elif state == 'district_center_fallback_rate_limited':
-        message = 'OpenStreetMap đang quá tải tạm thời. Hệ thống đã dùng tọa độ trung tâm quận/huyện để bạn không bị gián đoạn.'
+    if state == 'hcmc_center_fallback':
+        message = 'Hệ thống tạm lấy tọa độ trung tâm TP.HCM do chưa khớp chính xác địa chỉ.'
     elif state == 'parsed_from_input':
         message = 'Đã đọc trực tiếp tọa độ từ nội dung bạn nhập.'
     elif state == 'cached':

@@ -176,8 +176,8 @@ def _parse_manual_coordinates(request):
     if request is None:
         return None, None
 
-    lat_raw = (request.POST.get('manual_lat') or '').strip()
-    lng_raw = (request.POST.get('manual_lng') or '').strip()
+    lat_raw = (request.POST.get('manual_lat') or '').strip().replace(',', '.')
+    lng_raw = (request.POST.get('manual_lng') or '').strip().replace(',', '.')
     if not lat_raw or not lng_raw:
         return None, None
 
@@ -205,18 +205,11 @@ def create_house(form, owner, images=None, request=None):
     """
     house = form.save(commit=False)
     house.owner = owner
-
     manual_lat, manual_lng = _parse_manual_coordinates(request)
-    lat, lng, geocode_state = _resolve_house_location(house)
-
-    geocode_inexact = geocode_state in {
-        'failed',
-        'nominatim_rate_limited',
-        'district_center_fallback',
-        'district_center_fallback_rate_limited',
-    }
-    if manual_lat is not None and manual_lng is not None and ((lat is None or lng is None) or geocode_inexact):
+    if manual_lat is not None and manual_lng is not None:
         lat, lng, geocode_state = manual_lat, manual_lng, 'manual_pin'
+    else:
+        lat, lng, geocode_state = _resolve_house_location(house)
 
     if lat is not None and lng is not None:
         house.lat = lat
@@ -241,7 +234,7 @@ def create_house(form, owner, images=None, request=None):
     if geocode_state in {'geocoded_nominatim', 'cached', 'parsed_from_input'}:
         warning_msg = 'Hệ thống đã tự động lấy tọa độ từ địa chỉ. Tin đăng đang chờ duyệt.'
     elif geocode_state == 'manual_pin':
-        warning_msg = 'Không tìm được tọa độ tự động, hệ thống đã dùng vị trí bạn ghim trên bản đồ.'
+        warning_msg = 'Hệ thống đã ghi nhận tọa độ theo vị trí bạn ghim trên bản đồ. Tin đăng đang chờ duyệt.'
     else:
         warning_msg = 'Không thể tự động xác định tọa độ từ địa chỉ. Vui lòng kiểm tra lại địa chỉ để hệ thống thử lại.'
     return house, warning_msg
@@ -266,17 +259,20 @@ def update_house(form, owner, original_address, request=None):
     )
 
     manual_lat, manual_lng = _parse_manual_coordinates(request)
-    need_geocode = location_changed or house.lat is None or house.lng is None
+    
+    pin_moved = False
+    if manual_lat is not None and manual_lng is not None:
+        if house.lat is None or house.lng is None:
+            pin_moved = True
+        elif abs(house.lat - manual_lat) > 0.0001 or abs(house.lng - manual_lng) > 0.0001:
+            pin_moved = True
+
+    need_geocode = location_changed or house.lat is None or house.lng is None or pin_moved
     if need_geocode:
-        lat, lng, geocode_state = _resolve_house_location(house)
-
-        geocode_inexact = geocode_state in {
-            'failed',
-            'nominatim_rate_limited',
-        }
-
-        if manual_lat is not None and manual_lng is not None and ((lat is None or lng is None) or geocode_inexact):
+        if pin_moved:
             lat, lng, geocode_state = manual_lat, manual_lng, 'manual_pin'
+        else:
+            lat, lng, geocode_state = _resolve_house_location(house)
 
         if lat is not None and lng is not None:
             house.lat = lat
@@ -284,17 +280,27 @@ def update_house(form, owner, original_address, request=None):
             house.requires_coordinates = False
             house.status = 'pending'
             if geocode_state == 'manual_pin':
-                warning_msg = 'Hệ thống không tìm được địa chỉ chính xác, đã dùng vị trí bạn ghim thủ công trên bản đồ.'
+                if not location_changed:
+                    warning_msg = 'Đã cập nhật tọa độ theo vị trí bạn ghim trên bản đồ. Tin đăng đang chờ duyệt lại.'
+                else:
+                    warning_msg = 'Đã cập nhật vị trí theo điểm bạn ghim trên bản đồ. Tin đăng đang chờ duyệt lại.'
             elif location_changed:
                 warning_msg = 'Đã thay đổi vị trí và hệ thống đã tự động cập nhật tọa độ mới. Tin đăng đang chờ duyệt lại.'
             else:
                 warning_msg = 'Hệ thống đã tự động bổ sung tọa độ cho tin đăng.'
+        elif manual_lat is not None and manual_lng is not None:
+            # Fallback to the pin that was already on the map if geocoding fails
+            house.lat = manual_lat
+            house.lng = manual_lng
+            house.requires_coordinates = False
+            house.status = 'pending'
+            warning_msg = 'Không tự động tìm được tọa độ từ địa chỉ mới, hệ thống giữ lại vị trí ghim hiện tại trên bản đồ.'
         else:
             house.lat = house.lng = None
             house.requires_coordinates = True
             house.status = 'no_coordinates'
             if location_changed:
-                warning_msg = 'Đã thay đổi vị trí nhưng chưa tự động lấy được tọa độ. Vui lòng kiểm tra lại địa chỉ để thử lại.'
+                warning_msg = 'Đã thay đổi vị trí nhưng chưa tự động lấy được tọa độ. Vui lòng kiểm tra lại địa chỉ hoặc ghim thủ công trên bản đồ.'
             else:
                 warning_msg = 'Tin đăng chưa có tọa độ và hệ thống chưa thể tự động xác định từ địa chỉ hiện tại.'
     else:

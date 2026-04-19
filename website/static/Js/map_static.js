@@ -13,7 +13,6 @@
         id: house.id,
         name: house.name,
         price: house.price,
-        district: house.district,
         status: house.status,
         lat: house.coords.lat,
         lng: house.coords.lng,
@@ -68,6 +67,11 @@
     }
   }
 
+  // Vô hiệu hóa cảm ứng của Leaflet trên desktop để sửa lỗi double-click trên Chrome khi vẽ
+  if (window.navigator.userAgent.indexOf('Chrome') > -1 && navigator.maxTouchPoints > 0) {
+    L.Browser.touch = false;
+  }
+
   const map = L.map("static-map", {
     zoomControl: true,
     scrollWheelZoom: true,
@@ -93,6 +97,7 @@
   baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap contributors',
+    referrerPolicy: "strict-origin-when-cross-origin",
   });
 
   baseLayer.on("tileerror", function () {
@@ -184,9 +189,9 @@
       '<div class="map-popup-content">'
       + "<strong>" + (house.name || "Nha cho thue") + "</strong><br>"
       + "Gia: " + (house.price || "Lien he") + "<br>"
-      + "Khu vuc: " + (house.district || "Khong ro khu vuc") + "<br>"
       + "Trang thai: " + (house.status || "Chua cap nhat") + "<br>"
-      + '<a href="' + (house.detail_url || "#") + '">Xem chi tiet</a>'
+      + '<a href="' + (house.detail_url || "#") + '" class="d-block mt-1">Xem chi tiet</a>'
+      + '<button onclick="window.routeToHouse(' + house.lat + ', ' + house.lng + ')" class="btn btn-sm btn-outline-success mt-2 w-100" style="font-weight: 500;">🚩 Chỉ đường đến đây</button>'
       + "</div>"
     );
   }
@@ -202,7 +207,7 @@
 
     const bounds = markerGroup.getBounds();
     if (shouldFitBounds && bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [24, 24] });
+      map.fitBounds(bounds, { padding: [24, 24], maxZoom: 16 });
     }
   }
 
@@ -231,7 +236,8 @@
       return isPointInsidePolygon(house, ring);
     });
 
-    renderHouses(filtered, true);
+    // When filtering by manually drawn polygon, do not force zoom
+    renderHouses(filtered, false);
     statusState.filter = "Da loc theo vung: " + filtered.length + "/" + houses.length + " nha nam trong polygon.";
     renderStatus();
   }
@@ -304,8 +310,9 @@
         renderStatus();
       },
       {
-        enableHighAccuracy: true,
-        timeout: 12000,
+        enableHighAccuracy: false,
+        timeout: 6000,
+        maximumAge: 60000,
       }
     );
   }
@@ -315,7 +322,7 @@
     drawnItems.addLayer(layer);
   }
 
-  function setCustomPinAndSearch(lat, lng, radius) {
+  function setCustomPinAndSearch(lat, lng, radius, forceFitBounds = false) {
     const position = [lat, lng];
 
     // Clear user location when custom pin is dropped
@@ -330,7 +337,6 @@
       customPinMarker = L.marker(position).addTo(map);
       customPinMarker.bindPopup("<strong>Vị trí đã ghim</strong>").openPopup();
     }
-    map.setView(position, 14);
 
     const circleLayer = L.circle(position, {
       radius: radius,
@@ -340,6 +346,13 @@
       fillOpacity: 0.15,
     });
     replacePolygonLayer(circleLayer);
+
+    if (forceFitBounds) {
+      map.fitBounds(circleLayer.getBounds(), { padding: [24, 24] });
+    } else {
+      map.panTo(position);
+    }
+
     fetchHousesByRadius(lat, lng, radius);
   }
 
@@ -351,7 +364,8 @@
       .then(response => response.json())
       .then(data => {
         houses = data.map(normalizeMapHouse).filter(h => h != null);
-        renderHouses(houses, true);
+        // Do not force fit bounds to houses! The circle/pan logic handles zoom.
+        renderHouses(houses, false);
         statusState.filter = `Tìm thấy ${houses.length} nhà trong bán kính ${Math.round(radius)}m`;
         renderStatus();
       })
@@ -387,7 +401,7 @@
     isDrawingShape = true;
   });
   map.on(L.Draw.Event.DRAWSTOP, function () {
-    setTimeout(function() {
+    setTimeout(function () {
       isDrawingShape = false;
     }, 200);
   });
@@ -469,7 +483,8 @@
             const lat = parseFloat(data[0].lat);
             const lng = parseFloat(data[0].lon);
             const radius = parseFloat(inputSearchRadius.value) || 2000;
-            setCustomPinAndSearch(lat, lng, radius);
+            // Force fit bounds when searching by text so it scales right to the circle
+            setCustomPinAndSearch(lat, lng, radius, true);
             statusState.filter = "Đã tìm thấy địa chỉ.";
           } else {
             alert("Không tìm thấy địa chỉ này.");
@@ -491,6 +506,94 @@
     });
   }
 
+  let routingControl = null;
+
+  window.routeToHouse = function (lat, lng) {
+    let startLat = null;
+    let startLng = null;
+
+    if (customPinMarker) {
+      startLat = customPinMarker.getLatLng().lat;
+      startLng = customPinMarker.getLatLng().lng;
+    } else if (userLocationMarker) {
+      startLat = userLocationMarker.getLatLng().lat;
+      startLng = userLocationMarker.getLatLng().lng;
+    }
+
+    if (!startLat || !startLng) {
+      alert("Vui lòng ghim một điểm hoặc bật 'Vị trí của tôi' để làm điểm xuất phát trước khi xem đường đi.");
+      return;
+    }
+
+    if (!routingControl) {
+      routingControl = L.Routing.control({
+        waypoints: [],
+        routeWhileDragging: false,
+        addWaypoints: false,
+        fitSelectedRoutes: true,
+        showAlternatives: false,
+        show: false,
+        router: L.Routing.osrmv1({
+          serviceUrl: 'https://router.project-osrm.org/route/v1'
+        }),
+        lineOptions: {
+          styles: [{ color: '#198754', opacity: 0.8, weight: 6 }]
+        },
+        createMarker: function () { return null; }
+      }).addTo(map);
+
+      routingControl.on('routingerror', function (err) {
+        console.error("Routing error:", err);
+        statusState.filter = "Máy chủ tìm đường đang quá tải. Hãy thử lại.";
+        renderStatus();
+      });
+
+      routingControl.on('routesfound', function (e) {
+        if (e.routes && e.routes.length > 0) {
+          const summary = e.routes[0].summary;
+          let distText = "";
+          if (summary.totalDistance < 1000) {
+            distText = Math.round(summary.totalDistance) + " m";
+          } else {
+            distText = (summary.totalDistance / 1000).toFixed(1) + " km";
+          }
+          const timeText = Math.round(summary.totalTime / 60) + " phút";
+          
+          statusState.filter = "Đã tìm đường xong: " + distText + " (khoảng " + timeText + ").";
+          renderStatus();
+        }
+      });
+    }
+
+    statusState.filter = "Đang tính toán đường đi...";
+    renderStatus();
+
+    routingControl.setWaypoints([
+      L.latLng(startLat, startLng),
+      L.latLng(lat, lng)
+    ]);
+
+    const btnClearRoute = document.getElementById("btnClearMapRoute");
+    if (btnClearRoute) btnClearRoute.style.display = 'inline-block';
+
+    // Close the popup nicely
+    map.closePopup();
+  };
+
+  const btnClearMapRoute = document.getElementById("btnClearMapRoute");
+  if (btnClearMapRoute) {
+    btnClearMapRoute.addEventListener('click', function () {
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      this.style.display = 'none';
+
+      // Auto re-center basically by refreshing filter status bounds if we want, but doing nothing is fine too
+      statusState.filter = "Đã tắt chỉ đường.";
+      renderStatus();
+    });
+  }
 
   renderHouses(houses, true);
   statusState.filter = "Nhấn vào bản đồ để ghim vị trí hoặc tìm kiếm địa chỉ. Bán kính mặc định là " + inputSearchRadius.value + "m.";

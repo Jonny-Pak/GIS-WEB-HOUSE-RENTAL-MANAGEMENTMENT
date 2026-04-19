@@ -10,40 +10,6 @@ from django.conf import settings
 from django.core.cache import cache
 
 
-DISTRICT_CENTER_COORDS = {
-    'q1': (10.7769, 106.7009),
-    'q2': (10.7872, 106.7498),
-    'q3': (10.7829, 106.6871),
-    'q4': (10.7577, 106.7015),
-    'q5': (10.7540, 106.6670),
-    'q6': (10.7460, 106.6350),
-    'q7': (10.7298, 106.7219),
-    'q8': (10.7247, 106.6286),
-    'q9': (10.8427, 106.8287),
-    'q10': (10.7731, 106.6676),
-    'q11': (10.7633, 106.6504),
-    'q12': (10.8617, 106.7610),
-    'qbt': (10.8036, 106.7077),
-    'qtb': (10.8039, 106.6522),
-    'qtp': (10.7908, 106.6282),
-    'qp': (10.8008, 106.6798),
-    'qgv': (10.8388, 106.6653),
-    'qbtan': (10.7653, 106.6006),
-    'td': (10.8413, 106.8099),
-    'hbc': (10.6953, 106.5938),
-    'hhm': (10.8890, 106.5955),
-    'hcc': (10.9733, 106.4936),
-    'hnb': (10.6795, 106.7327),
-    'hcg': (10.4114, 106.9547),
-}
-
-DISTRICT_ALIASES = {
-    'td': ['Thành phố Thủ Đức', 'TP Thủ Đức', 'Quận 2', 'Quận 9'],
-    'qbt': ['Quận Bình Thạnh', 'Bình Thạnh'],
-    'qtp': ['Quận Tân Phú', 'Tân Phú'],
-    'qtb': ['Quận Tân Bình', 'Tân Bình'],
-}
-
 CITY_ALIASES = [
     'Thành phố Hồ Chí Minh',
     'TP Hồ Chí Minh',
@@ -477,6 +443,7 @@ def reverse_geocode_nominatim(lat: float, lng: float) -> str | None:
     dynamic_suffix = str(uuid.uuid4())[:8]
     user_agent = getattr(settings, 'GEOCODING_USER_AGENT', f'viet-house-rental-reverse/{dynamic_suffix} (admin@example.com)')
 
+    attempted = 0
     for endpoint in _get_nominatim_endpoints():
         params = {
             'lat': str(lat),
@@ -489,7 +456,9 @@ def reverse_geocode_nominatim(lat: float, lng: float) -> str | None:
         
         try:
             import time
-            time.sleep(1.2)  # Respect OSM limits
+            if attempted > 0:
+                time.sleep(1.2)  # Respect OSM limits when retrying
+            attempted += 1
             request = Request(url, headers={'User-Agent': user_agent})
             with urlopen(request, timeout=timeout) as response:
                 payload = json.loads(response.read().decode('utf-8'))

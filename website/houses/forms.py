@@ -57,7 +57,7 @@ class HouseForm(forms.ModelForm):
 
     class Meta:
         model = House
-        exclude = ['owner', 'status', 'created_at', 'updated_at', 'lat', 'lng', 'furniture', 'district']
+        exclude = ['owner', 'status', 'created_at', 'updated_at', 'lat', 'lng', 'furniture']
         
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ví dụ: Nhà nguyên căn 3 phòng ngủ...'}),
