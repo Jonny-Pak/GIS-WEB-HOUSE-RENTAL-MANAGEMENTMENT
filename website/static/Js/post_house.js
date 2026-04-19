@@ -167,10 +167,7 @@
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
-    // Fix bug click 2 lần khi vẽ đa giác trên Chrome
-    if (window.L && L.Draw && L.Draw.Polyline) {
-      L.Draw.Polyline.prototype._onTouch = L.Util.falseFn;
-    }
+    // Code _onTouch removed because it broke the Finish button.
 
     const drawControl = new L.Control.Draw({
       position: "topright",
