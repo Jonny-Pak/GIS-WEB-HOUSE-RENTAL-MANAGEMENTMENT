@@ -117,6 +117,11 @@
 
   const markerGroup = L.featureGroup().addTo(map);
   const drawnItems = new L.FeatureGroup().addTo(map);
+
+  // Fix bug click 2 lần khi vẽ đa giác trên Chrome
+  if (window.L && L.Draw && L.Draw.Polyline) {
+    L.Draw.Polyline.prototype._onTouch = L.Util.falseFn;
+  }
   const btnClearPolygon = document.getElementById("btnClearMapPolygon");
   const btnLocateMeOnMap = document.getElementById("btnLocateMeOnMap");
   const inputSearchRadius = document.getElementById("inputSearchRadius");
