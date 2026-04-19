@@ -365,12 +365,20 @@
       polygonLayer = event.layer;
       drawnItems.addLayer(polygonLayer);
       updateAreaFromPolygon(polygonLayer);
+
+      // Tự động ghim pin tại trung tâm polygon
+      var center = polygonLayer.getBounds().getCenter();
+      setCoordinate(center.lat, center.lng, "Đã tính diện tích và ghim vị trí tại trung tâm vùng đất.", true);
+      reverseGeocode(center.lat, center.lng);
     });
 
     map.on(L.Draw.Event.EDITED, function (event) {
       event.layers.eachLayer(function (layer) {
         if (layer === polygonLayer) {
           updateAreaFromPolygon(layer);
+          // Cập nhật lại pin khi chỉnh polygon
+          var center = layer.getBounds().getCenter();
+          setCoordinate(center.lat, center.lng, "Đã cập nhật diện tích và vị trí ghim theo polygon mới.", true);
         }
       });
     });

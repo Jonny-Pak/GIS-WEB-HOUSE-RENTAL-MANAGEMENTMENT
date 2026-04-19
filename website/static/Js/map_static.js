@@ -73,10 +73,36 @@
     scrollWheelZoom: true,
   }).setView([10.7769, 106.7009], 12);
 
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+  let baseLayer = null;
+  let switchedToFallbackTiles = false;
+  let tileErrorCount = 0;
+
+  function attachFallbackTiles() {
+    if (switchedToFallbackTiles) return;
+    switchedToFallbackTiles = true;
+    if (baseLayer && map.hasLayer(baseLayer)) {
+      map.removeLayer(baseLayer);
+    }
+    baseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 20,
+      subdomains: "abcd",
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    }).addTo(map);
+  }
+
+  baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-  }).addTo(map);
+    attribution: '&copy; OpenStreetMap contributors',
+  });
+
+  baseLayer.on("tileerror", function () {
+    tileErrorCount += 1;
+    if (tileErrorCount >= 2) {
+      attachFallbackTiles();
+    }
+  });
+
+  baseLayer.addTo(map);
 
   const mapElement = document.getElementById("static-map");
   const apiUrl = mapElement ? mapElement.dataset.apiUrl : '/api/v1/houses/';
