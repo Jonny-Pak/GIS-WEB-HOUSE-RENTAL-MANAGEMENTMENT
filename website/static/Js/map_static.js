@@ -452,6 +452,7 @@
     });
   }
 
+
   renderHouses(houses, true);
   statusState.filter = "Nhấn vào bản đồ để ghim vị trí hoặc tìm kiếm địa chỉ. Bán kính mặc định là " + inputSearchRadius.value + "m.";
   renderStatus();

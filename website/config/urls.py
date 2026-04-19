@@ -19,6 +19,9 @@ urlpatterns = [
     # Accounts
     path('auth/', include('accounts.urls.auth')),
     path('auth/', include('accounts.urls.profile')),
+
+    # Notifications
+    path('auth/', include('accounts.urls.notification')),
     
     # API
     path('api/v1/', include('houses.api.urls')),

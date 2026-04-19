@@ -247,7 +247,7 @@ def create_house(form, owner, images=None, request=None):
     return house, warning_msg
 
 
-def update_house(form, owner, original_address, original_district, request=None):
+def update_house(form, owner, original_address, request=None):
     """
     Cập nhật thông tin bài đăng nhà.
     - Xử lý logic trạng thái tọa độ khi địa chỉ thay đổi
@@ -256,6 +256,7 @@ def update_house(form, owner, original_address, original_district, request=None)
     house = form.save(commit=False)
     house.owner = owner
     warning_msg = None
+
 
     original_address_norm = (original_address or '').strip()
     new_address_norm = (house.address or '').strip()
@@ -272,8 +273,6 @@ def update_house(form, owner, original_address, original_district, request=None)
         geocode_inexact = geocode_state in {
             'failed',
             'nominatim_rate_limited',
-            'district_center_fallback',
-            'district_center_fallback_rate_limited',
         }
 
         if manual_lat is not None and manual_lng is not None and ((lat is None or lng is None) or geocode_inexact):
@@ -415,7 +414,6 @@ def get_map_houses():
     return [{
         'name': house.name,
         'price': f"{house.price:,} VNĐ/tháng" if house.price else 'Thỏa thuận',
-        'district': house.get_district_display(),
         'status': house.get_status_display(),
         'lat': house.lat,
         'lng': house.lng,

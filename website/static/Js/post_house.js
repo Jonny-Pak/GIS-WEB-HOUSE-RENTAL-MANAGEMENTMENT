@@ -102,7 +102,7 @@
     const allowAreaManualEdit = document.getElementById("allowAreaManualEdit");
     const estimatedAreaInput = document.getElementById("id_estimated_area_m2");
     const polygonGeoInput = document.getElementById("id_polygon_geojson");
-    const postForm = mapElement.closest("form");
+    const postForm = mapElement ? mapElement.closest("form") : null;
     const submitErrorBanner = document.getElementById("submitErrorBanner");
     const geocodeUrl = mapWrapper.dataset.geocodeUrl;
     const reverseGeocodeUrl = mapWrapper.dataset.reverseGeocodeUrl;
@@ -515,10 +515,6 @@
         event.preventDefault();
         geocodeAddress();
       }
-    });
-
-    districtInput.addEventListener("change", function () {
-      geocodeStatus.textContent = "Da cap nhat quan/huyen. Bam 'Tim toa do tu dia chi' hoac click ban do de ghim thu cong.";
     });
 
     if (areaInput) {

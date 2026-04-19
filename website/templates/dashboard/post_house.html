@@ -121,6 +121,7 @@
                         data-reverse-geocode-url="{% url 'reverse_geocode_preview' %}"
                         data-initial-lat="{{ form.instance.lat|default_if_none:'' }}"
                         data-initial-lng="{{ form.instance.lng|default_if_none:'' }}"
+                        style="min-height: 350px;"
                     >
                         <div class="d-flex flex-wrap gap-2 mb-2">
                             <button type="button" class="btn btn-outline-primary btn-sm" id="btnFindAddress">
@@ -147,7 +148,7 @@
                         </div>
 
                         <div id="geocodeStatus" class="small text-muted mb-2">
-                            Chọn Quận/Huyện và nhập địa chỉ để tìm tự động. Nếu không tìm được, hãy click trực tiếp trên bản đồ để ghim tay hoặc vẽ polygon để tính diện tích.
+                            Nhập địa chỉ chi tiết để tìm tọa độ tự động. Nếu không tìm được, hãy click trực tiếp trên bản đồ để ghim tay hoặc vẽ polygon để tính diện tích.
                         </div>
 
                         <div class="small text-muted mb-2">
@@ -157,6 +158,7 @@
                         <div
                             id="post-house-map"
                             class="w-100 rounded border post-house-map-container"
+                            style="min-height: 320px; height: 320px;"
                         ></div>
                     </div>
                 </div>

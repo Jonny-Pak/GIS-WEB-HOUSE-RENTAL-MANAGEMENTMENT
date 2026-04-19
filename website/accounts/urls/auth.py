@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from accounts.forms import EmailOrUsernameAuthenticationForm
 from accounts.views.auth import (
     forgot_password_request,
     forgot_password_reset,
@@ -9,7 +10,14 @@ from accounts.views.auth import (
 )
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
+    path(
+        'login/',
+        auth_views.LoginView.as_view(
+            template_name='accounts/login.html',
+            authentication_form=EmailOrUsernameAuthenticationForm,
+        ),
+        name='login',
+    ),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('register/', register, name='register'),
     path('register/verify-otp/', register_verify_otp, name='register_verify_otp'),

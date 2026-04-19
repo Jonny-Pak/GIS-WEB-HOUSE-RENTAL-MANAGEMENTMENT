@@ -66,6 +66,7 @@ class HouseForm(forms.ModelForm):
             'deposit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VND'}),
             'area': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'm2'}),
 
+
             'address': forms.Textarea(attrs={
                 'class': 'form-control', 
                 'rows': 2, 

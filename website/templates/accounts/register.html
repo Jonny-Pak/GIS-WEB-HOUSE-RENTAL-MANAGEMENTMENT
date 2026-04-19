@@ -5,6 +5,28 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <style>
+    .position-relative { position: relative; }
+    .toggle-password {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+        color: #888;
+        font-size: 1.25rem;
+        padding: 0 14px;
+        border-radius: 0 4px 4px 0;
+        transition: background 0.2s;
+    }
+    .toggle-password:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -48,15 +70,27 @@
                             <input type="text" name="phone" class="form-control register-input" placeholder="Số điện thoại" value="{{ form_data.phone|default:'' }}" required>
                         </div>
 
+
                         <div class="mb-3">
                             <label class="form-label">Mật khẩu</label>
-                            <input type="password" name="password" class="form-control register-input" placeholder="Mật khẩu" required>
+                            <div class="position-relative">
+                                <input type="password" name="password" class="form-control register-input" id="regPassword" placeholder="Mật khẩu" required>
+                                <span class="toggle-password" onclick="togglePassword('regPassword', 'eyeRegPassword')">
+                                    <i class="bi bi-eye-slash" id="eyeRegPassword"></i>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Xác nhận mật khẩu</label>
-                            <input type="password" name="confirm_password" class="form-control register-input" placeholder="Nhập lại mật khẩu" required>
+                            <div class="position-relative">
+                                <input type="password" name="confirm_password" class="form-control register-input" id="regPassword2" placeholder="Nhập lại mật khẩu" required>
+                                <span class="toggle-password" onclick="togglePassword('regPassword2', 'eyeRegPassword2')">
+                                    <i class="bi bi-eye-slash" id="eyeRegPassword2"></i>
+                                </span>
+                            </div>
                         </div>
+
 
                         {% comment %} <div class="mb-4">
                             <div class="form-check">
@@ -97,3 +131,20 @@
     </div>
 </div>
 {% endblock %}
+<script>
+function togglePassword(inputId, eyeId) {
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+    if (input.type === "password") {
+        input.type = "text";
+        eye.classList.remove("bi-eye-slash");
+        eye.classList.add("bi-eye");
+        eye.style.color = '#007bff';
+    } else {
+        input.type = "password";
+        eye.classList.remove("bi-eye");
+        eye.classList.add("bi-eye-slash");
+        eye.style.color = '#888';
+    }
+}
+</script>

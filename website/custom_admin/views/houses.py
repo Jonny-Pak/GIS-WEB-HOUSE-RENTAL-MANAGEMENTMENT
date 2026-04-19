@@ -1,3 +1,4 @@
+from accounts.models import Notification
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
@@ -56,6 +57,14 @@ def custom_admin_house_approve(request, object_id):
     success, msg = approve_house(house)
     if success:
         messages.success(request, msg)
+        # Gửi thông báo cho chủ nhà
+        if house.owner:
+            Notification.objects.create(
+                user=house.owner,
+                title="Tin đăng của bạn đã được duyệt",
+                message=f"Tin đăng '{house.name}' của bạn đã được duyệt thành công.",
+                url=""
+            )
     else:
         messages.error(request, msg)
     return redirect('custom_admin_houses')

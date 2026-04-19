@@ -3,6 +3,10 @@
 
 {% block title %}Trang chủ - Thuê Nhà Nhanh{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260418a" />
+{% endblock %}
+
 {% block content %}
 <section class="home-discovery">
   <div class="container">
@@ -83,8 +87,10 @@
         <div class="room-card-body">
           <span class="room-vacancy-badge">Còn trống</span>
           <h3 class="room-card-title">{{ house.name }}</h3>
-          <p class="room-card-address">• {{ house.address }}, {{ house.get_district_display }}</p>
-          <p class="room-card-meta">• Giá từ {{ house.price|floatformat:0 }} VNĐ, diện tích {{ house.area }}m², tối đa {{ house.max_people }} người</p>
+          <p class="room-card-address">• {{ house.address }}, {{ house.get_district_display }},  Diện tích {{ house.area }} m²</p>
+          <p class="room-card-meta">
+          <span class="room-price-highlight">Giá thuê: {{ house.price|floatformat:0 }} VNĐ / Tháng</span>
+          </p>
 
           <div class="room-card-actions">
             <a href="{% url 'map_view' %}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
@@ -100,7 +106,6 @@
       {% endfor %}
     </div>
 
-    {% if has_more_houses %}
     <div class="text-center mt-4">
       <a
         href="{% url 'home' %}?page={{ next_page }}{% if filters.search %}&search={{ filters.search|urlencode }}{% endif %}{% if filters.district %}&district={{ filters.district|urlencode }}{% endif %}{% if filters.house_type %}&house_type={{ filters.house_type|urlencode }}{% endif %}{% if filters.price_range %}&price_range={{ filters.price_range|urlencode }}{% endif %}"
@@ -109,83 +114,39 @@
         Xem thêm phòng
       </a>
     </div>
-    {% endif %}
   </div>
 </section>
 
-<section class="section sec-testimonials bg-light">
-  <div class="container">
-    <div class="row mb-4 align-items-center">
-      <div class="col-md-6">
-        <h2 class="font-weight-bold heading text-primary mb-0">Đánh giá hệ thống</h2>
-      </div>
-      <div class="col-md-6 text-md-end mt-3 mt-md-0">
-        <button type="button" class="btn btn-outline-primary" id="toggleReviewsBtn">Xem thêm đánh giá</button>
-      </div>
+
+<!-- Tiện ích chung section -->
+<section class="utilities-section">
+  <div class="utilities-box">
+    <div class="utility-item" style="flex:1 1 0; min-width:120px;">
+      <span style="font-size:1.4rem;font-weight:700;color:#fff;">Tiện ích chung</span>
     </div>
-
-    <div class="row" id="reviewsWrap">
-      <div class="col-md-6 col-lg-4 mb-4">
-        <div class="testimonial bg-white p-4 rounded shadow-sm">
-          <img src="{% static 'images/tinh.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
-          <div class="rate text-warning mb-2">
-            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
-          </div>
-          <h3 class="h5 text-primary">Lê Thanh Tính</h3>
-          <blockquote><p>&ldquo;Dịch vụ rất tốt, tìm nhà nhanh chóng!&rdquo;</p></blockquote>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4">
-        <div class="testimonial bg-white p-4 rounded shadow-sm">
-          <img src="{% static 'images/thuan.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
-          <div class="rate text-warning mb-2">
-            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
-          </div>
-          <h3 class="h5 text-primary">Lê Ngọc Thuận</h3>
-          <blockquote><p>&ldquo;Giao diện web đẹp và rất dễ sử dụng.&rdquo;</p></blockquote>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4">
-        <div class="testimonial bg-white p-4 rounded shadow-sm">
-          <img src="{% static 'images/triet.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
-          <div class="rate text-warning mb-2">
-            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
-          </div>
-          <h3 class="h5 text-primary">Dương Minh Triết</h3>
-          <blockquote><p>&ldquo;Hỗ trợ nhiệt tình, thông tin nhà chính xác.&rdquo;</p></blockquote>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-4 mb-4 review-extra d-none">
-        <div class="testimonial bg-white p-4 rounded shadow-sm">
-          <img src="{% static 'images/person_2-min.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
-          <div class="rate text-warning mb-2">
-            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
-          </div>
-          <h3 class="h5 text-primary">Ngọc Minh</h3>
-          <blockquote><p>&ldquo;Danh mục theo quận rất tiện, tìm phòng nhanh hơn trước rất nhiều.&rdquo;</p></blockquote>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 review-extra d-none">
-        <div class="testimonial bg-white p-4 rounded shadow-sm">
-          <img src="{% static 'images/person_3-min.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
-          <div class="rate text-warning mb-2">
-            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
-          </div>
-          <h3 class="h5 text-primary">Bảo Trâm</h3>
-          <blockquote><p>&ldquo;Thông tin rõ ràng, xem chi tiết phòng và liên hệ chủ trọ cực kỳ dễ.&rdquo;</p></blockquote>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 mb-4 review-extra d-none">
-        <div class="testimonial bg-white p-4 rounded shadow-sm">
-          <img src="{% static 'images/person_4-min.jpg' %}" alt="Image" class="img-fluid rounded-circle mb-3" style="width: 70px;" />
-          <div class="rate text-warning mb-2">
-            <span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span>
-          </div>
-          <h3 class="h5 text-primary">Hoàng Nam</h3>
-          <blockquote><p>&ldquo;Giao diện mượt, phân loại theo quận giúp mình chọn khu phù hợp rất nhanh.&rdquo;</p></blockquote>
-        </div>
-      </div>
+    <div class="utility-item">
+      <i class="icon-staff"></i>
+      <span>Nhân viên<br>trực 24/7</span>
+    </div>
+    <div class="utility-item">
+      <i class="icon-fingerprint"></i>
+      <span>Khoá cổng<br>vân tay</span>
+    </div>
+    <div class="utility-item">
+      <i class="icon-camera"></i>
+      <span>Camera an<br>ninh</span>
+    </div>
+    <div class="utility-item">
+      <i class="icon-wifi"></i>
+      <span>Wifi tốc độ<br>cao</span>
+    </div>
+    <div class="utility-item">
+      <i class="icon-repair"></i>
+      <span>Sửa chữa<br>nhanh</span>
+    </div>
+    <div class="utility-item">
+      <i class="icon-clean"></i>
+      <span>Vệ sinh<br>hàng ngày</span>
     </div>
   </div>
 </section>

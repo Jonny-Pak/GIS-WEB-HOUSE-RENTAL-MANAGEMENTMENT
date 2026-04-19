@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth import authenticate
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 
 from accounts.models import Profile
@@ -102,3 +104,40 @@ class ResetPasswordForm(forms.Form):
             }
         ),
     )
+
+
+class EmailOrUsernameAuthenticationForm(AuthenticationForm):
+    error_messages = {
+        'invalid_login': 'Tên đăng nhập hoặc email hoặc mật khẩu không đúng.',
+        'inactive': 'Tài khoản này đang bị vô hiệu hóa.',
+    }
+
+    def clean(self):
+        username_input = (self.cleaned_data.get('username') or '').strip()
+        password = self.cleaned_data.get('password')
+
+        if not username_input:
+            raise forms.ValidationError('Vui lòng nhập tên đăng nhập hoặc email.', code='required')
+        if not password:
+            raise forms.ValidationError('Vui lòng nhập mật khẩu.', code='required')
+
+        if username_input and '@' in username_input:
+            matched_user = User.objects.filter(email__iexact=username_input).order_by('id').first()
+            if matched_user is not None:
+                username_input = matched_user.get_username()
+
+        if username_input and password:
+            self.user_cache = authenticate(
+                self.request,
+                username=username_input,
+                password=password,
+            )
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                )
+            self.confirm_login_allowed(self.user_cache)
+
+        self.cleaned_data['username'] = username_input
+        return self.cleaned_data
