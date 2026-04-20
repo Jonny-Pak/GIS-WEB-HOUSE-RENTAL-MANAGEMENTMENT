@@ -57,13 +57,12 @@
         <li class="{% if request.resolver_match.url_name == 'support' %}active{% endif %}">
           <a href="{% url 'support' %}">Hỗ trợ</a>
         </li>
-        {% if user.is_authenticated %}
         <li>
           <a href="{% url 'post_house' %}" class="btn-post-news">
             <span class="icon-plus-circle me-1"></span> Đăng tin
           </a>
         </li>
-        {% else %}
+        {% if not user.is_authenticated %}
         <li><a href="{% url 'login' %}">Đăng nhập</a></li>
         <li><a href="{% url 'register' %}">Đăng ký</a></li>
         {% endif %}
@@ -106,6 +105,11 @@
           </ul>
 
           <div class="user-nav-group">
+            <div class="post-news-wrapper">
+              <a href="{% url 'post_house' %}" class="btn-post-news">
+                <span class="icon-plus-circle me-1"></span> Đăng tin
+              </a>
+            </div>
             {% if user.is_authenticated %}
             <div class="notification-group">
               <div class="dropdown" style="display:inline-block;">
@@ -168,11 +172,6 @@
             </div>
             {% else %}
             <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu">
-              <li>
-                <a href="{% url 'login' %}" class="btn-post-news">
-                  <span class="icon-plus-circle me-1"></span> Đăng tin
-                </a>
-              </li>
               <li><a href="{% url 'login' %}">Đăng nhập</a></li>
               <li><a href="{% url 'register' %}">Đăng ký</a></li>
             </ul>
@@ -205,7 +204,7 @@
             <address>236B Lê Văn Sỹ, Phường Tân Sơn Hòa, TP.HCM</address>
             <ul class="list-unstyled links">
               <li><a href="tel://0123456789">+84 097 195 3531</a></li>
-              <li><a href="mailto:admin@thuenha.com">tle19072005@gmail.com</a></li>
+              <li><a href="mailto:admin@thuenha.com">tkhoa1933@gmail.com</a></li>
             </ul>
           </div>
         </div>

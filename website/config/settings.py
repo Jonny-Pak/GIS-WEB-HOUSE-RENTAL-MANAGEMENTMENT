@@ -200,7 +200,7 @@ else:
     EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '0') == '1'
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'hello@demomailtrap.co')
-SUPPORT_INBOX_EMAIL = os.getenv('SUPPORT_INBOX_EMAIL', 'tle19072005@gmail.com')
+SUPPORT_INBOX_EMAIL = os.getenv('SUPPORT_INBOX_EMAIL', 'tkhoa1933@gmail.com')
 SUPPORT_CONTACT_PHONE = os.getenv('SUPPORT_CONTACT_PHONE', '0900 123 456')
 
 # GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"
