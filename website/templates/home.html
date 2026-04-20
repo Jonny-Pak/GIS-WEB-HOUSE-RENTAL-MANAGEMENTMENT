@@ -19,25 +19,30 @@
       <div class="discovery-filter-controls">
         <form class="discovery-filter-form" method="get">
           <div class="discovery-filter-row">
-
+            <div class="filter-search-wrap">
+              <input type="text" name="search" class="form-control filter-search-input"
+                placeholder="Tìm phòng, địa chỉ..." value="{{ filters.search|default:'' }}">
+              <button type="submit" class="filter-search-icon-btn" aria-label="Tìm kiếm"><span
+                  class="icon-search filter-search-icon"></span></button>
+            </div>
             <select name="house_type" class="form-select" title="Chọn loại nhà">
               <option value="">Tất cả loại nhà</option>
               {% for item in house_type_items %}
               <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
               {% endfor %}
             </select>
-
             <select name="price_range" class="form-select" title="Chọn mức giá">
               <option value="">Tất cả giá</option>
               {% for item in price_range_items %}
               <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
               {% endfor %}
             </select>
-          </div>
-
-          <div class="discovery-filter-actions">
-            <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Xóa</a>
+            <input type="number" name="area" class="form-control filter-area-input" placeholder="Diện tích (m²)" min="0"
+              value="{{ filters.area|default:'' }}">
+            <div class="discovery-filter-actions">
+              <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+              <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Xóa</a>
+            </div>
           </div>
         </form>
       </div>
@@ -45,11 +50,14 @@
   </div>
 </section>
 
+
+
 <section class="section rooms-section">
   <div class="container">
     <div class="rooms-section-head">
-      <h2 class="heading text-primary mb-0">Có <span>{{ total_available_rooms }}</span> phòng đang trống</h2>
-      <a href="{% url 'home' %}" class="rooms-see-all">Xem tất cả <span class="icon-chevron-right"></span></a>
+      <h2 class="heading text-primary mb-0">Đang có <span>{{ total_available_rooms }}</span> phòng đang trống</h2>
+      {% comment %} <a href="{% url 'home' %}" class="rooms-see-all">Xem tất cả <span
+          class="icon-chevron-right"></span></a> {% endcomment %}
     </div>
 
     <div class="district-scroll-controls rooms">
@@ -68,13 +76,13 @@
           {% if house.main_image %}
           <img src="{{ house.main_image.url }}" alt="{{ house.name }}" class="room-card-image">
           {% else %}
-            {% with first_image=house.images.all|first %}
-              {% if first_image %}
-              <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="room-card-image">
-              {% else %}
-              <img src="{% static 'images/img_1.jpg' %}" alt="{{ house.name }}" class="room-card-image">
-              {% endif %}
-            {% endwith %}
+          {% with first_image=house.images.all|first %}
+          {% if first_image %}
+          <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="room-card-image">
+          {% else %}
+          <img src="{% static 'images/img_1.jpg' %}" alt="{{ house.name }}" class="room-card-image">
+          {% endif %}
+          {% endwith %}
           {% endif %}
         </a>
 
@@ -83,7 +91,7 @@
           <h3 class="room-card-title">{{ house.name }}</h3>
           <p class="room-card-address">• {{ house.address }}, Diện tích {{ house.area }} m²</p>
           <p class="room-card-meta">
-          <span class="room-price-highlight">Giá thuê: {{ house.price|floatformat:0 }} VNĐ / Tháng</span>
+            <span class="room-price-highlight">Giá thuê: {{ house.price|floatformat:0 }} VNĐ</span>
           </p>
 
           <div class="room-card-actions">
@@ -99,18 +107,8 @@
       </div>
       {% endfor %}
     </div>
-
-    <div class="text-center mt-4">
-      <a
-        href="{% url 'home' %}?page={{ next_page }}{% if filters.search %}&search={{ filters.search|urlencode }}{% endif %}{% if filters.house_type %}&house_type={{ filters.house_type|urlencode }}{% endif %}{% if filters.price_range %}&price_range={{ filters.price_range|urlencode }}{% endif %}"
-        class="btn btn-outline-primary btn-lg px-5"
-      >
-        Xem thêm phòng
-      </a>
-    </div>
   </div>
 </section>
-
 
 <!-- Tiện ích chung section -->
 <section class="utilities-section">
@@ -144,6 +142,7 @@
     </div>
   </div>
 </section>
+
 
 <script src="{% static 'Js/home.js' %}?v=20260405a"></script>
 {% endblock %}

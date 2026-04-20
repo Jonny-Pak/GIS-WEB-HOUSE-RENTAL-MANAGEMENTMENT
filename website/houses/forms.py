@@ -84,6 +84,33 @@ class HouseForm(forms.ModelForm):
             'is_negotiable': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Bắt buộc các trường không được để trống
+        self.fields['name'].required = True
+        self.fields['house_type'].required = True
+        self.fields['price'].required = True
+        self.fields['deposit'].required = True
+        self.fields['owner_phone'].required = True
+        self.fields['address'].required = True
+
+        # Bắt buộc main_image đối với nhà mới, hoặc nhà đang không có ảnh
+        if not self.instance.pk or not self.instance.main_image:
+            if 'main_image' in self.fields:
+                self.fields['main_image'].required = True
+
+    def clean_owner_phone(self):
+        phone = self.cleaned_data.get('owner_phone', '').strip()
+        if not phone:
+            raise forms.ValidationError("Số điện thoại không được để trống.")
+        if not phone.isdigit():
+            raise forms.ValidationError("Số điện thoại chỉ được chứa ký tự số.")
+        if not phone.startswith('0'):
+            raise forms.ValidationError("Số điện thoại phải bắt đầu bằng số 0.")
+        if len(phone) != 10:
+            raise forms.ValidationError("Số điện thoại phải có đúng 10 số.")
+        return phone
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -107,7 +134,7 @@ class HouseForm(forms.ModelForm):
             return cleaned_data
 
         if area is None:
-            self.add_error('area', 'Diện tích là bắt buộc.')
+            self.add_error('area', 'Vui lòng nhập diện tích.')
             return cleaned_data
 
         tolerance = max(5.0, estimated_area * self.AREA_TOLERANCE_RATIO)

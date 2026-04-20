@@ -5,7 +5,7 @@ try:
     server.set_debuglevel(1)
     server.ehlo()
     server.starttls()
-    server.login('thuenhanhanh.gis@gmail.com', 'tiutqvgiwpacegqc')
+    server.login('tle19072005@gmail.com', 'tiutqvgiwpacegqc')
     print("Login successful!")
     server.quit()
 except Exception as e:

@@ -77,52 +77,77 @@ body.admin-page {
     box-shadow: 0 0 0 3px rgba(24, 20, 96, .16);
 }
 
+.admin-form button {
+    margin-top: 10px;
+}
+
 .admin-form button,
 .primary-btn {
-    margin-top: 10px;
-    border: none;
+    border: 1px solid var(--brand-primary);
     background: var(--brand-primary);
     color: #fff;
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 700;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    height: 42px;
+    box-shadow: 0 4px 8px rgba(24, 20, 96, 0.2);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.primary-btn:hover,
+.admin-form button:hover {
+    background: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(24, 20, 96, 0.3);
 }
 
 .back-link,
 .outline-btn {
-    display: inline-block;
-    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
     color: var(--brand-primary);
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .outline-btn {
     margin: 0;
-    border: 1px solid rgba(255, 191, 47, .75);
-    background: rgba(255, 191, 47, .14);
-    border-radius: 10px;
-    padding: 10px 14px;
+    border: 1px solid var(--brand-primary);
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px 20px;
+    height: 42px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .outline-btn:hover {
-    background: rgba(255, 191, 47, .24);
+    background: var(--brand-primary);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(24, 20, 96, 0.25);
 }
 
 .home-btn {
-    background: #ffffff;
-    border-color: #ffffff;
-    color: #111111;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
 }
 
 .home-btn:hover {
-    background: #f3f4f6;
-    border-color: #f3f4f6;
-    color: #111111;
+    background: #ffffff;
+    color: var(--brand-primary);
+    border-color: #ffffff;
 }
 
 .admin-topbar {

@@ -18,6 +18,7 @@ from importlib.util import find_spec
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from project root .env when available.
+# (Triggering django auto-reload to pick up updated .env)
 ENV_FILE = BASE_DIR.parent / '.env'
 if ENV_FILE.exists():
     for raw_line in ENV_FILE.read_text(encoding='utf-8').splitlines():
@@ -83,6 +84,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'accounts.context_processors.current_user_profile',
                 'accounts.context_processors.notification_count',
+                'houses.context_processors.house_categories',
             ],
         },
     },
@@ -198,7 +200,7 @@ else:
     EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', '0') == '1'
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'hello@demomailtrap.co')
-SUPPORT_INBOX_EMAIL = os.getenv('SUPPORT_INBOX_EMAIL', 'thuenhanhanh.gis@gmail.com')
+SUPPORT_INBOX_EMAIL = os.getenv('SUPPORT_INBOX_EMAIL', 'tle19072005@gmail.com')
 SUPPORT_CONTACT_PHONE = os.getenv('SUPPORT_CONTACT_PHONE', '0900 123 456')
 
 # GDAL_LIBRARY_PATH = r"D:\Program Files\PostgreSQL\18\bin\libgdal-35.dll"

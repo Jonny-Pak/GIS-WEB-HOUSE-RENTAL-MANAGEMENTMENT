@@ -12,8 +12,12 @@
 <body class="admin-page">
     <header class="admin-topbar">
         <div class="admin-topbar-title">
-            <h1>{{ page_title }}</h1>
-            <p>Biểu mẫu quản trị</p>
+            <h1>
+                <a href="{% url 'home' %}" aria-label="Về trang chủ" class="admin-brand-link">
+                    <img src="{% static 'images/logo_web.png' %}" alt="Thuê Nhà Nhanh" class="admin-brand-logo">
+                </a>
+            </h1>
+            <p>{{ page_title }} - Quản trị hệ thống</p>
         </div>
         <div class="admin-topbar-actions">
             <a href="{% url back_url %}" class="outline-btn">Quay lại</a>

@@ -52,9 +52,6 @@
                 </div>
 
                 <div class="house-gallery-wrap mb-5">
-                    <button type="button" class="house-gallery-nav" id="houseGalleryPrev" aria-label="Xem ảnh trước">
-                        <span class="icon-chevron-left"></span>
-                    </button>
 
                     <div class="house-gallery-strip" id="houseGalleryStrip" aria-label="Ảnh phụ của căn nhà">
                         {% for img in house.images.all %}
@@ -70,9 +67,6 @@
                         {% endfor %}
                     </div>
 
-                    <button type="button" class="house-gallery-nav" id="houseGalleryNext" aria-label="Xem ảnh kế tiếp">
-                        <span class="icon-chevron-right"></span>
-                    </button>
                 </div>
 
                 <h2 class="heading text-primary">Thông tin chi tiết</h2>
@@ -102,8 +96,7 @@
                             <span class="icon-users me-2 text-primary display-6"></span>
                             <div>
                                 <span class="d-block fw-bold">Số người tối đa</span>
-                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else
-                                    %}Không giới hạn{% endif %}</span>
+                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else %}Không giới hạn{% endif %}</span>
                             </div>
                         </div>
                     </div>
@@ -119,8 +112,7 @@
                         <div class="p-3 border rounded bg-light h-100">
                             <ul class="list-unstyled mb-0">
                                 {% for item in house.furniture_items.all %}
-                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{
-                                    item.furniture.name }} (x{{ item.quantity }})</li>
+                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{ item.furniture.name }} (x{{ item.quantity }})</li>
                                 {% empty %}
                                 <li class="text-muted">Chưa cập nhật thông tin nội thất.</li>
                                 {% endfor %}
@@ -132,8 +124,9 @@
                 <h3 class="heading text-primary mt-5">Vị trí trên bản đồ</h3>
                 {% load l10n %}
                 <div id="house-location-map" class="house-map-wrapper shadow-sm"
-                    data-lat="{{ house.lat|unlocalize|default_if_none:'' }}" data-lng="{{ house.lng|unlocalize|default_if_none:'' }}"
-                    data-name="{{ house.name|escape }}" data-address="{{ house.address|escape }}"></div>
+                    data-lat="{{ house.lat|unlocalize|default_if_none:'' }}"
+                    data-lng="{{ house.lng|unlocalize|default_if_none:'' }}" data-name="{{ house.name|escape }}"
+                    data-address="{{ house.address|escape }}"></div>
                 <div id="house-location-fallback" class="house-map-fallback mt-3 p-3 rounded border bg-light d-none">
                     <span class="icon-map-marker text-danger me-2"></span>
                     Chưa có tọa độ chính xác cho căn nhà này.
@@ -162,8 +155,13 @@
                 <div class="bg-white widget border rounded p-4 shadow-sm mt-5">
                     <h3 class="h4 text-black widget-title mb-3">Người đăng tin</h3>
                     <div class="d-flex align-items-center mb-4">
+                        {% if house.owner.profile.avatar %}
+                        <img src="{{ house.owner.profile.avatar.url }}" alt="Owner"
+                            class="img-fluid rounded-circle me-3 owner-avatar">
+                        {% else %}
                         <img src="{% static 'images/person_1-min.jpg' %}" alt="Owner"
                             class="img-fluid rounded-circle me-3 owner-avatar">
+                        {% endif %}
                         <div>
                             <h5 class="mb-0 text-black fw-bold">{{ house.owner.username }}</h5>
                             <span class="text-muted small">Chủ sở hữu</span>

@@ -16,7 +16,20 @@ from houses.services.house_service import (
 
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'dashboard/overview.html')
+    # Lấy nhà đang chờ duyệt
+    pending_houses = House.objects.filter(owner=request.user, status='pending').order_by('-created_at')[:4]
+    pending_count = House.objects.filter(owner=request.user, status='pending').count()
+    
+    # Lấy nhà đã hiển thị (tức là còn trống hoặc đã cho thuê nhưng được publish)
+    active_houses = House.objects.filter(owner=request.user, status__in=['available', 'rented']).order_by('-created_at')[:4]
+    active_count = House.objects.filter(owner=request.user, status__in=['available', 'rented']).count()
+
+    return render(request, 'dashboard/overview.html', {
+        'pending_houses': pending_houses,
+        'pending_count': pending_count,
+        'active_houses': active_houses,
+        'active_count': active_count,
+    })
 
 @login_required(login_url='login')
 def post_house(request):

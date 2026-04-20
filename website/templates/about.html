@@ -1,29 +1,57 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
+
 {% block title %}Về chúng tôi - Thuê Nhà Nhanh{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}?v=20260420a" />
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
+<div class="about-header shadow-lg">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Về chúng tôi</h1>
+    <p class="lead mt-3">Tìm hiểu thêm về hành trình và sứ mệnh của Thuê Nhà Nhanh</p>
+  </div>
+</div>
+
+<div class="container pb-5">
   <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <h1 class="mb-4">Về chúng tôi</h1>
-      <p>
-        <strong>Thuê Nhà Nhanh</strong> là nền tảng WebGIS giúp kết nối người thuê và chủ nhà một cách nhanh chóng, minh bạch và tiện lợi nhất tại TP.HCM.
-      </p>
-      <p>
-        Chúng tôi cung cấp giải pháp quản lý, tìm kiếm và đăng tin phòng trọ, nhà nguyên căn, căn hộ với bản đồ trực quan, hỗ trợ xác thực thông tin, bảo mật dữ liệu và trải nghiệm người dùng thân thiện.
-      </p>
-      <h3 class="mt-4">Sứ mệnh</h3>
-      <ul>
-        <li>Kết nối cộng đồng thuê và cho thuê nhà hiệu quả.</li>
-        <li>Đảm bảo thông tin minh bạch, chính xác.</li>
-        <li>Ứng dụng công nghệ GIS vào lĩnh vực bất động sản.</li>
-      </ul>
-      <h3 class="mt-4">Liên hệ</h3>
-      <ul>
-        <li>Địa chỉ: 43 Nguyễn Chí Thanh, Quận 5, TP.HCM</li>
-        <li>Email: admin@thuenha.com</li>
-        <li>Điện thoại: +84 123 456 789</li>
-      </ul>
+    <div class="col-lg-10">
+      
+      <div class="intro-text-box shadow-sm mb-5">
+        <p class="mb-3">
+          <strong>Thuê Nhà Nhanh</strong> là nền tảng WebGIS giúp kết nối người thuê và chủ nhà một cách nhanh chóng, minh bạch và tiện lợi nhất tại TP.HCM.
+        </p>
+        <p class="mb-0">
+          Chúng tôi cung cấp giải pháp quản lý, tìm kiếm và đăng tin phòng trọ, nhà nguyên căn, căn hộ với bản đồ trực quan, hỗ trợ xác thực thông tin, bảo mật dữ liệu và trải nghiệm người dùng thân thiện.
+        </p>
+      </div>
+
+      <div class="row g-4 about-section">
+        <div class="col-md-6">
+          <div class="about-card h-100">
+            <h3><i class="bi bi-rocket-takeoff-fill"></i> Sứ mệnh</h3>
+            <ul class="about-list">
+              <li><i class="bi bi-check-circle-fill"></i> Kết nối cộng đồng thuê và cho thuê nhà hiệu quả.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Đảm bảo thông tin minh bạch, chính xác.</li>
+              <li><i class="bi bi-check-circle-fill"></i> Ứng dụng công nghệ GIS vào lĩnh vực bất động sản.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="about-card h-100">
+            <h3><i class="bi bi-headset"></i> Liên hệ</h3>
+            <ul class="about-list contact-info">
+              <li><i class="bi bi-geo-alt-fill"></i> <span><strong>Địa chỉ:</strong> 43 Nguyễn Chí Thanh, Quận 5, TP.HCM</span></li>
+              <li><i class="bi bi-envelope-fill"></i> <span><strong>Email:</strong> admin@thuenha.com</span></li>
+              <li><i class="bi bi-telephone-fill"></i> <span><strong>Điện thoại:</strong> +84 123 456 789</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

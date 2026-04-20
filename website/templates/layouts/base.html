@@ -49,31 +49,27 @@
           </a>
 
           <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu">
-            <li class="active"><a href="{% url 'home' %}">Trang chủ</a></li>
 
-            <li class="has-children">
+            <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><a
+                href="{% url 'home' %}">Trang chủ</a></li>
+
+            <li class="has-children {% if request.resolver_match.url_name in 'category_list' %}active{% endif %}">
               <a href="#">Danh mục</a>
               <ul class="dropdown">
-                <li><a href="#">Nhà nguyên căn</a></li>
-                <li><a href="#">Căn hộ chung cư</a></li>
-                <li><a href="#">Biệt thự</a></li>
+                {% for current_val, current_label in house_categories %}
+                <li><a href="{% url 'home' %}?house_type={{ current_val }}">{{ current_label }}</a></li>
+                {% endfor %}
               </ul>
             </li>
 
-            <li>
+            <li class="{% if request.resolver_match.url_name == 'map_view' %}active{% endif %}">
               <a href="{% url 'map_view' %}">
                 <span class="icon-map-marker me-1"></span> Tìm trên bản đồ
               </a>
             </li>
 
-            <li><a href="{% url 'support' %}">Hỗ trợ</a></li>
-
-            <li class="nav-search-item">
-              <form action="{% url 'home' %}" method="GET" class="nav-search-form">
-                <span class="icon-search"></span>
-                <input type="text" name="search" placeholder="Tìm phòng..." value="{{ request.GET.search|default:'' }}">
-              </form>
-            </li>
+            <li class="{% if request.resolver_match.url_name == 'support' %}active{% endif %}"><a
+                href="{% url 'support' %}">Hỗ trợ</a></li>
 
             {% if user.is_authenticated %}
             <li>
@@ -85,68 +81,78 @@
           </ul>
 
           <div class="user-nav-group">
-            <div class="dropdown" style="display:inline-block;">
-              <a href="#" class="notification-bell dropdown-toggle" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer;position:relative;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#FFD600" stroke-width="3.2" style="stroke:#FFD600;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                {% if notification_unread_count > 0 %}
+            <div class="notification-group">
+              <div class="dropdown" style="display:inline-block;">
+                <a href="#" class="notification-bell dropdown-toggle" id="notificationDropdown"
+                  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer;position:relative;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24"
+                    stroke="#FFD600" stroke-width="3.2" style="stroke:#FFD600;">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  {% if notification_unread_count > 0 %}
                   <span class="notification-badge">{{ notification_unread_count }}</span>
-                {% endif %}
-              </a>
-              <ul class="dropdown-menu notification-dropdown-menu" aria-labelledby="notificationDropdown" style="min-width:340px;max-width:400px;">
-                {% if notification_preview %}
+                  {% endif %}
+                </a>
+                <ul class="dropdown-menu notification-dropdown-menu" aria-labelledby="notificationDropdown"
+                  style="min-width:340px;max-width:400px;">
+                  {% if notification_preview %}
                   {% for n in notification_preview %}
-                    <li class="px-3 py-2 border-bottom {% if not n.is_read %}fw-bold bg-light{% endif %}">
-                      <a href="{% url 'notification_detail' n.id %}" class="text-dark text-decoration-none d-block">
-                        {{ n.title }}
-                        <span class="small text-muted ms-2">{{ n.created_at|date:'d/m/Y H:i' }}</span>
-                        {% if not n.is_read %}<span class="badge bg-warning text-dark ms-2">Mới</span>{% endif %}
-                      </a>
-                    </li>
+                  <li class="px-3 py-2 border-bottom {% if not n.is_read %}fw-bold bg-light{% endif %}">
+                    <a href="{% url 'notification_detail' n.id %}" class="text-dark text-decoration-none d-block">
+                      {{ n.title }}
+                      <span class="small text-muted ms-2">{{ n.created_at|date:'d/m/Y H:i' }}</span>
+                      {% if not n.is_read %}<span class="badge bg-warning text-dark ms-2">Mới</span>{% endif %}
+                    </a>
+                  </li>
                   {% endfor %}
                   <li class="text-center py-2">
                     <a href="{% url 'notification_list' %}" class="text-primary fw-bold">Xem tất cả thông báo</a>
                   </li>
-                {% else %}
+                  {% else %}
                   <li class="text-center py-3 text-muted">Không có thông báo mới.</li>
-                {% endif %}
-              </ul>
+                  {% endif %}
+                </ul>
+              </div>
             </div>
-            <div class="dropdown user-dropdown" style="display:inline-block;">
-              <a href="#" class="dropdown-toggle user-avatar-wrap" aria-expanded="false" data-bs-toggle="dropdown" id="userDropdown">
-                <img src="{{ current_user_avatar_url }}" class="user-avatar-nav" alt="User">
-                <span class="user-avatar-name">{{ user.username }}</span>
-              </a>
-              <ul class="dropdown-menu">
-                {% if user.is_superuser %}
-                <li><a class="dropdown-item" href="{% url 'custom_admin_dashboard' %}">Trang quản trị</a></li>
-                {% endif %}
-                <li><a class="dropdown-item" href="{% url 'profile' %}">Hồ sơ cá nhân</a></li>
-                <li><a class="dropdown-item" href="{% url 'dashboard' %}">Quản lý tin đăng</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                  <form action="{% url 'logout' %}" method="post" class="nav-logout-form">
-                    {% csrf_token %}
-                    <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
-                  </form>
-                </li>
-              </ul>
+            <div class="avatar-group">
+              <div class="dropdown user-dropdown" style="display:inline-block;">
+                <a href="#" class="dropdown-toggle user-avatar-wrap" aria-expanded="false" data-bs-toggle="dropdown"
+                  id="userDropdown">
+                  <img src="{{ current_user_avatar_url }}" class="user-avatar-nav" alt="User">
+                  <span class="user-avatar-name">{{ user.username }}</span>
+                </a>
+                <ul class="dropdown-menu">
+                  {% if user.is_superuser %}
+                  <li><a class="dropdown-item" href="{% url 'custom_admin_dashboard' %}">Trang quản trị</a></li>
+                  {% endif %}
+                  <li><a class="dropdown-item" href="{% url 'profile' %}">Hồ sơ cá nhân</a></li>
+                  <li><a class="dropdown-item" href="{% url 'dashboard' %}">Quản lý tin đăng</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li>
+                    <form action="{% url 'logout' %}" method="post" class="nav-logout-form">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-            {% else %}
-            <li>
-              <a href="{% url 'login' %}" class="btn-post-news">
-                <span class="icon-plus-circle me-1"></span> Đăng tin
-              </a>
-            </li>
-            <li><a href="{% url 'login' %}">Đăng nhập</a></li>
-            <li><a href="{% url 'register' %}">Đăng ký</a></li>
-            {% endif %}
+          {% else %}
+          <li>
+            <a href="{% url 'login' %}" class="btn-post-news">
+              <span class="icon-plus-circle me-1"></span> Đăng tin
+            </a>
+          </li>
+          <li><a href="{% url 'login' %}">Đăng nhập</a></li>
+          <li><a href="{% url 'register' %}">Đăng ký</a></li>
+          {% endif %}
           </ul>
 
-          <a href="#"
-            class="burger light me-auto mt-1 site-menu-toggle js-menu-toggle d-inline-block d-lg-none"
+          <a href="#" class="burger light me-auto mt-1 site-menu-toggle js-menu-toggle d-inline-block d-lg-none"
             data-toggle="collapse" data-target="#main-navbar">
             <span></span>
           </a>
@@ -159,7 +165,8 @@
   {% endblock %}
 
   <!-- Bootstrap JS Bundle (dropdown, modal, v.v.) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
   {% block extra_js %}{% endblock %}
 
   <div class="site-footer">
@@ -168,10 +175,10 @@
         <div class="col-lg-4">
           <div class="widget">
             <h3>Liên hệ</h3>
-            <address>43 Nguyễn Chí Thanh, Quận 5, TP.HCM</address>
+            <address>236B Lê Văn Sỹ, Phường Tân Sơn Hòa, TP.HCM</address>
             <ul class="list-unstyled links">
-              <li><a href="tel://0123456789">+84 123 456 789</a></li>
-              <li><a href="mailto:admin@thuenha.com">admin@thuenha.com</a></li>
+              <li><a href="tel://0123456789">+84 097 195 3531</a></li>
+              <li><a href="mailto:admin@thuenha.com">tle19072005@gmail.com</a></li>
             </ul>
           </div>
         </div>
@@ -189,8 +196,8 @@
           <div class="widget">
             <h3>Mạng xã hội</h3>
             <ul class="list-unstyled social">
-              <li><a href="#"><span class="icon-instagram"></span></a></li>
-              <li><a href="#"><span class="icon-facebook"></span></a></li>
+              <li><a href="https://www.facebook.com/ngocthuan.71905"><span class="icon-instagram"></span></a></li>
+              <li><a href="https://www.facebook.com/tinh.lethanh.5832"><span class="icon-facebook"></span></a></li>
             </ul>
           </div>
         </div>
@@ -198,8 +205,8 @@
 
       <div class="row mt-5">
         <div class="col-12 text-center">
-          <p>Copyright &copy; {% now "Y" %}. All Rights Reserved. &mdash; Designed by
-            Untree.co
+          <p>Copyright &copy; {% now "Y" %}. All Rights Reserved. &mdash; Lê Ngọc Thuận - Lê Thanh Tính - Dương Minh
+            Triết
           </p>
         </div>
       </div>

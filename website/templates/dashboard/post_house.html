@@ -44,6 +44,7 @@
                         <div class="col-md-6 mb-4">
                             <label class="fw-bold mb-2 text-dark">Loại hình <span class="text-danger">*</span></label>
                             {{ form.house_type }}
+                            {% if form.house_type.errors %}<div class="text-danger small mt-1">{{ form.house_type.errors|striptags }}</div>{% endif %}
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="fw-bold mb-2 text-dark">Diện tích (m²)</label>
@@ -78,6 +79,7 @@
                                 {{ form.price }}
                                 <span class="input-group-text bg-light fw-bold text-success">VNĐ</span>
                             </div>
+                            {% if form.price.errors %}<div class="text-danger small mt-1">{{ form.price.errors|striptags }}</div>{% endif %}
                             <div class="form-check">
                                 {{ form.is_negotiable }}
                                 <label class="form-check-label fw-bold text-muted small" for="{{ form.is_negotiable.id_for_label }}">
@@ -86,11 +88,12 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-4">
-                            <label class="fw-bold mb-2 text-dark">Tiền cọc</label>
+                            <label class="fw-bold mb-2 text-dark">Tiền cọc <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 {{ form.deposit }}
                                 <span class="input-group-text bg-light">VNĐ</span>
                             </div>
+                            {% if form.deposit.errors %}<div class="text-danger small mt-1">{{ form.deposit.errors|striptags }}</div>{% endif %}
                         </div>
                     </div>
                 </div>
@@ -171,8 +174,9 @@
                     </h5>
                     <div class="row">
                         <div class="col-md-4 mb-4">
-                            <label class="fw-bold mb-2 text-dark">SĐT Liên hệ</label>
+                            <label class="fw-bold mb-2 text-dark">SĐT Liên hệ <span class="text-danger">*</span></label>
                             {{ form.owner_phone }}
+                            {% if form.owner_phone.errors %}<div class="text-danger small mt-1">{{ form.owner_phone.errors|striptags }}</div>{% endif %}
                         </div>
                         <div class="col-md-4 mb-4">
                             <label class="fw-bold mb-2 text-dark">Số người tối đa</label>
@@ -258,6 +262,7 @@
                     <div class="mb-4">
                         <label class="fw-bold mb-2 text-dark">1. Ảnh đại diện (Thumbnail) <span class="text-danger">*</span></label>
                         <input type="file" class="form-control" id="mainImageInput" name="main_image" accept="image/*">
+                        {% if form.main_image.errors %}<div class="text-danger small mt-1">{{ form.main_image.errors|striptags }}</div>{% endif %}
                         
                         <div class="mt-3 {% if not form.instance.main_image %}d-none{% endif %}" id="main-image-preview-box">
                             <img id="main-img-preview" src="{% if form.instance.main_image %}{{ form.instance.main_image.url }}{% else %}#{% endif %}" alt="Preview" class="rounded shadow-sm border main-img-preview">

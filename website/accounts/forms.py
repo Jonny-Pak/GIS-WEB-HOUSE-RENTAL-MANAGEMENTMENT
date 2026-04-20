@@ -106,6 +106,39 @@ class ResetPasswordForm(forms.Form):
     )
 
 
+class ChangePasswordRequestForm(forms.Form):
+    old_password = forms.CharField(
+        label='Mật khẩu hiện tại',
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control register-input',
+                'placeholder': 'Nhập mật khẩu hiện đang sử dụng',
+                'autocomplete': 'current-password',
+            }
+        ),
+    )
+    new_password = forms.CharField(
+        label='Mật khẩu mới',
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control register-input',
+                'placeholder': 'Nhập mật khẩu mới',
+                'autocomplete': 'new-password',
+            }
+        ),
+    )
+    confirm_new_password = forms.CharField(
+        label='Xác nhận mật khẩu mới',
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control register-input',
+                'placeholder': 'Nhập lại mật khẩu mới',
+                'autocomplete': 'new-password',
+            }
+        ),
+    )
+
+
 class EmailOrUsernameAuthenticationForm(AuthenticationForm):
     error_messages = {
         'invalid_login': 'Tên đăng nhập hoặc email hoặc mật khẩu không đúng.',

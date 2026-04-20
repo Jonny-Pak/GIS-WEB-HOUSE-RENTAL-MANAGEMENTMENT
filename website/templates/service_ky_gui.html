@@ -1,39 +1,65 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 {% block title %}Dịch vụ ký gửi nhà cho thuê - Thuê Nhà Nhanh{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/info_pages.css' %}?v=20260420a" />
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
+<div class="info-header shadow-lg">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Dịch vụ ký gửi nhà</h1>
+    <p class="lead mt-3">Tiếp cận khách hàng nhanh chóng, an toàn và chuyên nghiệp</p>
+  </div>
+</div>
+
+<div class="container pb-5">
   <div class="row justify-content-center">
-    <div class="col-lg-9">
-      <h1 class="mb-4 text-primary">Dịch vụ ký gửi nhà cho thuê</h1>
-      <p>
-        Bạn đang sở hữu nhà trống, căn hộ, phòng trọ hoặc bất động sản muốn cho thuê nhưng chưa tìm được khách phù hợp? <strong>Thuê Nhà Nhanh</strong> cung cấp dịch vụ ký gửi nhà cho thuê chuyên nghiệp, giúp bạn tiếp cận hàng nghìn khách hàng tiềm năng một cách nhanh chóng, minh bạch và hiệu quả.
-      </p>
-      <h3 class="mt-5">Lợi ích khi ký gửi nhà tại Thuê Nhà Nhanh</h3>
-      <ul>
-        <li>Đăng tin miễn phí, tiếp cận lượng lớn khách thuê thực tế.</li>
-        <li>Đội ngũ tư vấn, môi giới chuyên nghiệp hỗ trợ 24/7.</li>
-        <li>Đảm bảo thông tin minh bạch, bảo mật tuyệt đối.</li>
-        <li>Hỗ trợ chụp hình, quay video, đăng tin nổi bật.</li>
-        <li>Hỗ trợ pháp lý, hợp đồng thuê nhà rõ ràng.</li>
-      </ul>
-      <h3 class="mt-5">Quy trình ký gửi nhà cho thuê</h3>
-      <ol>
-        <li><strong>Tiếp nhận thông tin:</strong> Chủ nhà gửi thông tin bất động sản qua website, hotline hoặc trực tiếp tại văn phòng.</li>
-        <li><strong>Khảo sát & tư vấn:</strong> Đội ngũ chuyên viên khảo sát thực tế, tư vấn giá thuê phù hợp và phương án quảng bá hiệu quả.</li>
-        <li><strong>Ký hợp đồng ký gửi:</strong> Hai bên ký hợp đồng dịch vụ ký gửi nhà cho thuê.</li>
-        <li><strong>Đăng tin & tìm khách:</strong> Đăng tin trên hệ thống, quảng bá đa kênh, lọc khách thuê phù hợp.</li>
-        <li><strong>Chốt giao dịch & hỗ trợ pháp lý:</strong> Hỗ trợ thương lượng, ký hợp đồng thuê nhà, bàn giao tài sản.</li>
-      </ol>
-      <h3 class="mt-5">Liên hệ ký gửi nhà cho thuê</h3>
-      <ul>
-        <li>Hotline: <a href="tel:+84123456789">+84 123 456 789</a></li>
-        <li>Email: <a href="mailto:admin@thuenha.com">admin@thuenha.com</a></li>
-        <li>Địa chỉ: 43 Nguyễn Chí Thanh, Quận 5, TP.HCM</li>
-      </ul>
-      <div class="mt-4">
-        <a href="/" class="btn btn-primary">Về trang chủ</a>
+    <div class="col-lg-10">
+      
+      <div class="info-body">
+        <div class="info-intro shadow-sm">
+          Bạn đang sở hữu nhà trống, căn hộ, phòng trọ hoặc bất động sản muốn cho thuê nhưng chưa tìm được khách phù hợp? Nhằm tiết kiệm thời gian, công sức và hạn chế rủi ro cho bạn, <strong>Thuê Nhà Nhanh</strong> cung cấp dịch vụ ký gửi nhà cho thuê chuyên nghiệp, giúp bạn tiếp cận hàng nghìn khách hàng tiềm năng một cách nhanh chóng, minh bạch và hiệu quả nhất.
+        </div>
+
+        <div class="info-section">
+          <h3><i class="bi bi-star-fill text-warning" style="font-size: 1.6rem;"></i> Lợi ích khi ký gửi tại Thuê Nhà Nhanh</h3>
+          <ul class="info-list mt-3">
+            <li>Đăng tin hoàn toàn miễn phí, tiếp cận lượng khách thuê thực tế khổng lồ trên hệ thống mỗi ngày.</li>
+            <li>Đội ngũ chuyên viên tư vấn, môi giới chuyên nghiệp luôn sẵn sàng hỗ trợ bạn 24/7.</li>
+            <li>Cam kết bảo mật tuyệt đối thông tin cá nhân của chủ nhà và tính minh bạch của quá trình giao dịch.</li>
+            <li>Hỗ trợ chụp hình, quay video chuyên nghiệp và đẩy tin nổi bật, thu hút khách hàng.</li>
+            <li>Hỗ trợ tối đa về mặt pháp lý, cung cấp mẫu hợp đồng thuê nhà chuẩn mực, rõ ràng.</li>
+          </ul>
+        </div>
+
+        <div class="info-section mt-5">
+          <h3><i class="bi bi-clock-history text-primary" style="font-size: 1.6rem;"></i> Quy trình thực hiện</h3>
+          <ul class="info-ordered-list mt-4">
+            <li><strong>Tiếp nhận thông tin:</strong> Chủ nhà gửi thông tin chi tiết về bất động sản thông qua website, hotline, hoặc đến trực tiếp tại văn phòng.</li>
+            <li><strong>Khảo sát &amp; Tư vấn:</strong> Chuyên viên của chúng tôi sẽ đến khảo sát thực tế, đánh giá thị trường và tư vấn mức giá thuê phù hợp để dễ dàng chốt khách.</li>
+            <li><strong>Ký hợp đồng ký gửi:</strong> Thỏa thuận phương án hợp tác và hai bên tiến hành ký hợp đồng dịch vụ ký gửi nhà.</li>
+            <li><strong>Đăng tin &amp; Tìm khách:</strong> Hình ảnh nhà sẽ được xử lý chuyên nghiệp, đăng lên hệ thống, chạy chiến dịch quảng bá đa kênh và chắt lọc ra lượng khách hàng có nhu cầu thực tế phù hợp nhất.</li>
+            <li><strong>Chốt giao dịch &amp; Cung cấp hỗ trợ pháp lý:</strong> Đại diện nhà tư vấn để hai bên đi đến thống nhất, hỗ trợ ký kết hợp đồng thuê nhà tận nơi và hoàn tất bàn giao.</li>
+          </ul>
+        </div>
+
+        <div class="info-contact shadow-sm">
+          <h3>Liên hệ ký gửi ngay hôm nay</h3>
+          <ul>
+            <li><i class="bi bi-geo-alt-fill"></i> Trụ sở: 43 Nguyễn Chí Thanh, Phường 9, Quận 5, TP.HCM</li>
+            <li><i class="bi bi-envelope-check-fill"></i> Email tiếp nhận: <a href="mailto:admin@thuenha.com">admin@thuenha.com</a></li>
+            <li><i class="bi bi-telephone-outbound-fill"></i> Tổng đài CSKH: <a href="tel:+84123456789">+84 123 456 789</a></li>
+          </ul>
+        </div>
+
+        <div class="mt-5 text-center d-flex justify-content-center gap-3">
+          <a href="{% url 'home' %}" class="btn btn-outline-primary btn-lg px-4 rounded-pill shadow-sm">Trở về trang chủ</a>
+        </div>
+
       </div>
+
     </div>
   </div>
 </div>

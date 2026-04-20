@@ -32,24 +32,28 @@ def home(request):
             'label': '3 triệu đến 5 triệu',
             'min_price': 3000000,
             'max_price': 5000000,
+            'selected': price_range == '3-5',
         },
         {
             'value': '5-8',
             'label': '5 triệu đến 8 triệu',
             'min_price': 5000000,
             'max_price': 8000000,
+            'selected': price_range == '5-8',
         },
         {
             'value': '8-14',
             'label': '8 triệu đến 14 triệu',
             'min_price': 8000000,
             'max_price': 14000000,
+            'selected': price_range == '8-14',
         },
         {
             'value': '14-25',
             'label': '14 triệu đến 25 triệu',
             'min_price': 14000000,
             'max_price': 25000000,
+            'selected': price_range == '14-25',
         },
     ]
 
@@ -83,6 +87,7 @@ def home(request):
         {
             'value': value,
             'label': label,
+            'selected': house_type == value,
         }
         for value, label in House.HOUSE_TYPE_CHOICES
     ]

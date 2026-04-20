@@ -1,40 +1,76 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 {% block title %}Điều khoản sử dụng - Thuê Nhà Nhanh{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/info_pages.css' %}?v=20260420a" />
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
+<div class="info-header shadow-lg">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Điều khoản sử dụng</h1>
+    <p class="lead mt-3">Quy định và điều kiện khi sử dụng nền tảng Thuê Nhà Nhanh</p>
+  </div>
+</div>
+
+<div class="container pb-5">
   <div class="row justify-content-center">
-    <div class="col-lg-9">
-      <h1 class="mb-4 text-primary">Điều khoản sử dụng dịch vụ</h1>
-      <p>Chào mừng bạn đến với hệ thống <strong>Thuê Nhà Nhanh</strong>. Khi sử dụng website, bạn đồng ý với các điều khoản dưới đây:</p>
-      <h3 class="mt-4">1. Quy định chung</h3>
-      <ul>
-        <li>Người dùng chịu trách nhiệm về thông tin cá nhân và nội dung đăng tải.</li>
-        <li>Không đăng tin sai sự thật, vi phạm pháp luật hoặc trái đạo đức xã hội.</li>
-        <li>Không sử dụng website vào mục đích lừa đảo, phát tán mã độc, spam,...</li>
-      </ul>
-      <h3 class="mt-4">2. Quyền và nghĩa vụ của người dùng</h3>
-      <ul>
-        <li>Được đăng tin, tìm kiếm thông tin nhà trọ, căn hộ, nhà nguyên căn,...</li>
-        <li>Bảo mật thông tin tài khoản, không chia sẻ cho người khác.</li>
-        <li>Chịu trách nhiệm khi có tranh chấp phát sinh từ thông tin do mình cung cấp.</li>
-      </ul>
-      <h3 class="mt-4">3. Quyền và nghĩa vụ của Thuê Nhà Nhanh</h3>
-      <ul>
-        <li>Có quyền kiểm duyệt, chỉnh sửa, xóa các tin vi phạm mà không cần báo trước.</li>
-        <li>Bảo mật thông tin người dùng, không chia sẻ cho bên thứ ba nếu không có sự đồng ý.</li>
-        <li>Hỗ trợ giải quyết khiếu nại, tranh chấp trong phạm vi hợp lý.</li>
-      </ul>
-      <h3 class="mt-4">4. Thay đổi điều khoản</h3>
-      <p>Chúng tôi có thể cập nhật điều khoản sử dụng bất cứ lúc nào. Người dùng nên kiểm tra thường xuyên để cập nhật thông tin mới nhất.</p>
-      <h3 class="mt-4">5. Liên hệ</h3>
-      <ul>
-        <li>Email: <a href="mailto:admin@thuenha.com">admin@thuenha.com</a></li>
-        <li>Hotline: <a href="tel:+84123456789">+84 123 456 789</a></li>
-      </ul>
-      <div class="mt-4">
-        <a href="/" class="btn btn-primary">Về trang chủ</a>
+    <div class="col-lg-10">
+      
+      <div class="info-body">
+        <div class="info-intro shadow-sm">
+          Chào mừng bạn đến với hệ thống <strong>Thuê Nhà Nhanh</strong>. Khi truy cập và sử dụng website của chúng tôi, đồng nghĩa với việc bạn đã đọc, hiểu và đồng ý tuân thủ tuyệt đối với các điều khoản dưới đây.
+        </div>
+
+        <div class="info-section">
+          <h3><span class="step-number">1</span> Quy định chung</h3>
+          <ul class="info-list">
+            <li>Người dùng hoàn toàn chịu trách nhiệm trước pháp luật về mọi thông tin cá nhân và nội dung bất động sản được đăng tải trên hệ thống.</li>
+            <li>Tuyệt đối cấm hành vi đăng tin giả mạo, sai sự thật, hoặc nội dung vi phạm thuần phong mỹ tục, pháp luật Việt Nam.</li>
+            <li>Nghiêm cấm các cá nhân/tổ chức sử dụng nền tảng Thuê Nhà Nhanh vào mục đích lừa đảo chiếm đoạt tài sản, phát tán mã độc, spam hoặc tấn công hệ thống mạng.</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h3><span class="step-number">2</span> Quyền và nghĩa vụ của người dùng</h3>
+          <ul class="info-list">
+            <li>Người dùng được cấp quyền miễn phí để tìm kiếm, liên hệ cũng như đăng tải các thông tin cho thuê phòng trọ, căn hộ, nhà nguyên căn hợp lệ.</li>
+            <li>Có nghĩa vụ tự quản lý và bảo mật tuyệt đối thông tin tài khoản (tên đăng nhập, mật khẩu, mã OTP). Không được chia sẻ hoặc bán lại tài khoản cho các tổ chức/cá nhân khác.</li>
+            <li>Trực tiếp chịu trách nhiệm và tự giải quyết mọi rủi ro, tranh chấp phát sinh từ các nội dung, bài đăng do chính mình khởi tạo và chia sẻ trên web.</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h3><span class="step-number">3</span> Quyền và nghĩa vụ của Thuê Nhà Nhanh</h3>
+          <ul class="info-list">
+            <li>Ban quản trị có quyền chủ động kiểm duyệt, ẩn, chỉnh sửa hoặc xóa vĩnh viễn các tài khoản, bài đăng có dấu hiệu vi phạm điều khoản mà không cần đưa ra thông báo trước.</li>
+            <li>Chúng tôi cam kết sử dụng các biện pháp an ninh mạng tối ưu nhất để bảo vệ thông tin người dùng và tuyệt đối không chia sẻ cho bên thứ ba vì mục đích thương mại nếu không được sự cho phép.</li>
+            <li>Luôn luôn đồng hành, tiếp nhận phản hồi, và hỗ trợ cung cấp bằng chứng cho cơ quan chức năng để giải quyết khiếu nại, tranh chấp trong phạm vi pháp luật cho phép.</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h3><span class="step-number">4</span> Cập nhật và thay đổi điều khoản</h3>
+          <div class="p-3 bg-light rounded text-muted border" style="font-size: 1.05rem;">
+            Thuê Nhà Nhanh có quyền chủ động thay đổi, bổ sung Quy chế hoạt động và Điều khoản sử dụng này bất kỳ lúc nào để phù hợp với định hướng phát triển và pháp luật hiện hành. Những thay đổi mới nhất sẽ có hiệu lực ngay khi được cập nhật tại trang này. Chúng tôi khuyến khích người dùng thường xuyên kiểm tra.
+          </div>
+        </div>
+
+        <div class="info-contact shadow-sm">
+          <h3>Để được giải đáp thắc mắc</h3>
+          <ul>
+            <li><i class="bi bi-envelope-at-fill"></i> Hỗ trợ qua Email: <a href="mailto:admin@thuenha.com">admin@thuenha.com</a></li>
+            <li><i class="bi bi-telephone-inbound-fill"></i> Hotline túc trực giải quyết khiếu nại: <a href="tel:+84123456789">+84 123 456 789</a></li>
+          </ul>
+        </div>
+
+        <div class="mt-5 text-center">
+          <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">Tôi đã hiểu và trở về trang chủ</a>
+        </div>
+
       </div>
+
     </div>
   </div>
 </div>

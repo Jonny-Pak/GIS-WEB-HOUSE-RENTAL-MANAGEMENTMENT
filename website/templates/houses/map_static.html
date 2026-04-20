@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-<link rel="stylesheet" href="{% static 'css/map.css' %}" />
+<link rel="stylesheet" href="{% static 'css/map.css' %}?v=1.1" />
 {% endblock %}
 
 {% block content %}
@@ -30,7 +30,7 @@
                 </div>
                 <!-- Controls -->
                 <div class="col-12 col-md-7">
-                    <div class="d-flex flex-wrap align-items-center gap-2 justify-content-md-end">
+                    <div class="d-flex flex-wrap align-items-center gap-2 justify-content-md-start">
                         <button type="button" id="btnLocateMeOnMap" class="btn btn-outline-primary"
                             style="font-weight: 500; border-radius: 8px;">
                             <i class="bi bi-geo-alt-fill"></i> Vị trí của tôi

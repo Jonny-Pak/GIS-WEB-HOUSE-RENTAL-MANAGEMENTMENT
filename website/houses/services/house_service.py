@@ -311,6 +311,12 @@ def update_house(form, owner, original_address, request=None):
     if request is not None:
         save_house_furniture(house, request)
 
+    # Lưu ảnh phụ mới nếu landlord upload thêm khi sửa bài đăng
+    new_images = request.FILES.getlist('detail_images') if request else []
+    if new_images:
+        for image in new_images:
+            HouseImage.objects.create(house=house, image=image)
+
     return house, warning_msg
 
 
