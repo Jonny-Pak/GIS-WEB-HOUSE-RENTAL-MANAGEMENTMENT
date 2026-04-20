@@ -322,6 +322,27 @@
     drawnItems.addLayer(layer);
   }
 
+  function showBottomCard(addressText) {
+    const bottomCard = document.getElementById("mapBottomCard");
+    const addressEl = document.getElementById("bottomCardAddress");
+    if (bottomCard && addressEl) {
+      addressEl.textContent = addressText;
+      bottomCard.classList.remove("d-none");
+    }
+  }
+
+  function hideBottomCard() {
+    const bottomCard = document.getElementById("mapBottomCard");
+    if (bottomCard) {
+      bottomCard.classList.add("d-none");
+    }
+  }
+
+  const btnCloseBottomCard = document.getElementById("btnCloseBottomCard");
+  if (btnCloseBottomCard) {
+    btnCloseBottomCard.addEventListener("click", hideBottomCard);
+  }
+
   function setCustomPinAndSearch(lat, lng, radius, forceFitBounds = false) {
     const position = [lat, lng];
 
@@ -335,8 +356,9 @@
       customPinMarker.setLatLng(position);
     } else {
       customPinMarker = L.marker(position).addTo(map);
-      customPinMarker.bindPopup("<strong>Vị trí đã ghim</strong>").openPopup();
     }
+
+    showBottomCard("Đang tìm địa chỉ...");
 
     const circleLayer = L.circle(position, {
       radius: radius,
@@ -354,6 +376,44 @@
     }
 
     fetchHousesByRadius(lat, lng, radius);
+
+    // Call reverse geocoding to update address
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=vi`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.address) {
+          const ad = data.address;
+          const parts = [];
+
+          if (ad.house_number && ad.road) parts.push(ad.house_number + " " + ad.road);
+          else if (ad.road) parts.push(ad.road);
+
+          if (ad.suburb && ad.suburb.toLowerCase().includes("phường")) parts.push(ad.suburb);
+          else if (ad.quarter && ad.quarter.toLowerCase().includes("phường")) parts.push(ad.quarter);
+          else if (ad.suburb) parts.push(ad.suburb);
+          else if (ad.quarter) parts.push(ad.quarter);
+          else if (ad.neighbourhood) parts.push(ad.neighbourhood);
+
+          const uniqueParts = [...new Set(parts)];
+          let address = uniqueParts.length > 0 ? uniqueParts.join(", ") : data.display_name;
+
+          showBottomCard(address);
+          if (inputAddressSearch) {
+            inputAddressSearch.value = address;
+          }
+        } else if (data && data.display_name) {
+          showBottomCard(data.display_name);
+          if (inputAddressSearch) {
+            inputAddressSearch.value = data.display_name;
+          }
+        } else {
+          showBottomCard("Không xác định được địa chỉ.");
+        }
+      })
+      .catch(err => {
+        console.error("Reverse geocoding error:", err);
+        showBottomCard("Lỗi khi tìm địa chỉ.");
+      });
   }
 
   function fetchHousesByRadius(lat, lng, radius) {
@@ -426,6 +486,7 @@
         userLocationMarker = null;
         userAccuracyCircle = null;
       }
+      hideBottomCard();
       applyPolygonFilter();
     });
   }
@@ -558,7 +619,7 @@
             distText = (summary.totalDistance / 1000).toFixed(1) + " km";
           }
           const timeText = Math.round(summary.totalTime / 60) + " phút";
-          
+
           statusState.filter = "Đã tìm đường xong: " + distText + " (khoảng " + timeText + ").";
           renderStatus();
         }

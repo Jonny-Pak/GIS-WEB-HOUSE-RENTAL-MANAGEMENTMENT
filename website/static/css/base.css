@@ -354,8 +354,8 @@ body {
 }
 .notification-bell .notification-badge {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: -6px;
+    right: -8px;
     background: #ff3b3b;
     color: #fff;
     border-radius: 50%;

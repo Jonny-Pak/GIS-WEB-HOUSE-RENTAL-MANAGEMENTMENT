@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-<link rel="stylesheet" href="{% static 'css/map.css' %}?v=3.0" />
+<link rel="stylesheet" href="{% static 'css/map.css' %}?v=4.0" />
 {% endblock %}
 
 {% block content %}
@@ -33,13 +33,14 @@
                 <!-- Bán kính -->
                 <div class="toolbar-radius">
                     <span class="radius-label">Bán kính:</span>
-                    <input type="number" id="inputSearchRadius" class="radius-input"
-                        value="2000" min="100" max="20000" step="100">
+                    <input type="number" id="inputSearchRadius" class="radius-input" value="2000" min="100" max="20000"
+                        step="100">
                     <span class="radius-unit">m</span>
                 </div>
 
                 <!-- Tắt chỉ đường (ẩn mặc định) -->
-                <button type="button" id="btnClearMapRoute" class="btn btn-outline-danger btn-sm toolbar-btn" style="display:none;">
+                <button type="button" id="btnClearMapRoute" class="btn btn-outline-danger btn-sm toolbar-btn"
+                    style="display:none;">
                     <i class="bi bi-x-circle-fill"></i>
                 </button>
 
@@ -55,7 +56,22 @@
                 </span>
             </div>
         </div>
-        <div id="static-map" aria-label="Bản đồ nhà cho thuê" data-api-url="{% url 'api_houses' %}"></div>
+        <div class="map-wrapper" style="position: relative;">
+            <div id="static-map" aria-label="Bản đồ nhà cho thuê" data-api-url="{% url 'api_houses' %}"></div>
+            <!-- Bottom Info Card -->
+            <div id="mapBottomCard" class="map-bottom-card d-none">
+                <div class="card-content">
+                    <div class="card-icon">
+                        <i class="bi bi-geo-alt-fill text-danger"></i>
+                    </div>
+                    <div class="card-info">
+                        <h6 class="mb-1 fw-bold">Vị trí đã ghim</h6>
+                        <p id="bottomCardAddress" class="mb-0 text-muted small">Đang tìm địa chỉ...</p>
+                    </div>
+                </div>
+                <button type="button" id="btnCloseBottomCard" class="btn-close-card"><i class="bi bi-x"></i></button>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -67,5 +83,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin="anonymous"
     referrerpolicy="no-referrer"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-<script src="{% static 'Js/map_static.js' %}?v=20260409c"></script>
+<script src="{% static 'Js/map_static.js' %}?v=20260420z"></script>
 {% endblock %}

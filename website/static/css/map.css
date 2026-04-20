@@ -266,4 +266,80 @@
         width: 100%;
         border-radius: 10px;
     }
+
+    .map-bottom-card {
+        width: 90%;
+        bottom: 10px;
+    }
+}
+
+/* ========================================
+   BOTTOM INFO CARD (Google Maps Style)
+   ======================================== */
+.map-bottom-card {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    z-index: 1000;
+    min-width: 320px;
+    max-width: 500px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.map-bottom-card.d-none {
+    display: none !important;
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
+.card-icon {
+    width: 42px;
+    height: 42px;
+    background: #fdf3f3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.card-info h6 {
+    font-size: 1.05rem;
+    color: #1a202c;
+}
+
+.card-info p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #4a5568 !important;
+}
+
+.btn-close-card {
+    background: transparent;
+    border: none;
+    color: #a0aec0;
+    font-size: 1.25rem;
+    padding: 4px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close-card:hover {
+    color: #2d3748;
 }
