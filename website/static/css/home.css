@@ -488,20 +488,34 @@
     color: #fff;
 }
 
-.form-select,
-.filter-area-input {
-    min-width: 150px;
-    max-width: 200px;
-    height: 40px;
-    border-radius: 8px;
+.form-select {
+    min-width: 170px;
+    max-width: 220px;
+    height: 44px;
+    border-radius: 10px;
     border: 1.5px solid #e0e0f7;
-    font-size: 1rem;
-    margin-left: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #334155;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding-left: 12px;
 }
 
-.filter-area-input {
-    min-width: 110px;
-    max-width: 140px;
+.form-select:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(24, 20, 96, 0.08);
+    outline: none;
+}
+
+.filter-search-input {
+    width: 100%;
+    padding-right: 44px;
+    border-radius: 10px;
+    border: 1.5px solid #e0e0f7;
+    height: 44px;
+    font-size: 0.95rem;
 }
 
 .discovery-filter-actions {

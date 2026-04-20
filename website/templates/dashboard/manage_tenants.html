@@ -8,7 +8,6 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-
         {% if messages %}
         <div class="mb-4">
             {% for message in messages %}
@@ -67,85 +66,123 @@
         <div class="row g-4">
             {% for tenant in user_tenants %}
             <div class="col-md-6 col-lg-4">
-                <div class="card-custom border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
-                    <div class="card-header bg-light border-bottom-0 py-3 d-flex align-items-center gap-3">
-                        <div class="avatar-circle bg-primary text-white fs-4 fw-bold">
-                            {{ tenant.full_name|first|upper }}
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0 text-dark">{{ tenant.full_name }}</h6>
-                            <small class="text-muted"><i class="bi bi-person-vcard me-1"></i>
-                                {% if tenant.gender == 'male' %}Nam{% else %}Nữ{% endif %} • Sinh:
-                                {{tenant.dob|date:"Y"|default:"___"}}
-                            </small>
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden transition-all hover-lift">
+                    <!-- Card Header -->
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="flex-shrink-0">
+                                <div class="avatar-circle-lg bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" 
+                                     style="width: 56px; height: 56px; border-radius: 16px; font-size: 1.5rem;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <h6 class="fw-bold mb-1 text-dark text-truncate fs-5">{{ tenant.full_name }}</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-light text-muted border py-1 px-2 fw-medium" style="font-size: 11px;">
+                                        <i class="bi bi-gender-ambiguous me-1"></i>{% if tenant.gender == 'male' %}Nam{% else %}Nữ{% endif %}
+                                    </span>
+                                    <span class="badge bg-light text-muted border py-1 px-2 fw-medium" style="font-size: 11px;">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ tenant.dob|date:"Y"|default:"___" }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card-body">
-                        <div class="mb-3 pb-3 border-bottom border-dashed">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="text-muted small"><i class="bi bi-telephone-fill me-2"></i>Điện
-                                    thoại</span>
-                                <span class="fw-bold text-dark">{{ tenant.phone }}</span>
+                    <!-- Card Body -->
+                    <div class="card-body px-4 py-4">
+                        <!-- Contact Info -->
+                        <div class="bg-light rounded-3 p-3 mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="icon-box text-primary me-3 small"><i class="bi bi-telephone-fill"></i></div>
+                                <div class="flex-grow-1">
+                                    <p class="text-muted extra-small mb-0">Số điện thoại</p>
+                                    <p class="fw-bold text-dark mb-0 font-monospace" style="letter-spacing: 0.5px;">{{ tenant.phone }}</p>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="text-muted small"><i class="bi bi-person-lines-fill me-2"></i>CCCD</span>
-                                <span class="fw-bold text-dark">{{ tenant.cccd }}</span>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="icon-box text-primary me-3 small"><i class="bi bi-person-badge-fill"></i></div>
+                                <div class="flex-grow-1">
+                                    <p class="text-muted extra-small mb-0">Số CCCD / Định danh</p>
+                                    <p class="fw-bold text-dark mb-0 font-monospace" style="letter-spacing: 0.5px;">{{ tenant.cccd }}</p>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-start justify-content-between">
-                                <span class="text-muted small"><i class="bi bi-geo-alt-fill me-2"></i>Thường trú</span>
-                                <span class="fw-bold text-dark text-end small" style="max-width: 60%;">
-                                    {{tenant.address|default:"Chưa cập nhật" }}</span>
+                            <div class="d-flex align-items-start">
+                                <div class="icon-box text-primary me-3 small mt-1"><i class="bi bi-geo-alt-fill"></i></div>
+                                <div class="flex-grow-1">
+                                    <p class="text-muted extra-small mb-0">Địa chỉ thường trú</p>
+                                    <p class="fw-medium text-dark mb-0 small line-clamp-2">{{ tenant.address|default:"Chưa cập nhật" }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-0">
-                            <span class="text-muted d-block small mb-2 fw-bold">Lịch sử Thuê nhà (
-                                {{tenant.signed_contracts.count }} Hợp đồng)</span>
-                            <ul class="list-unstyled mb-0">
+                        <!-- Rental History -->
+                        <div class="history-section">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h6 class="fw-bold text-dark mb-0 small">
+                                    <i class="bi bi-clock-history me-2 text-primary"></i>Lịch sử Thuê nhà
+                                </h6>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2" style="font-size: 10px;">
+                                    {{ tenant.signed_contracts.count }} hợp đồng
+                                </span>
+                            </div>
+                            
+                            <div class="history-list d-flex flex-column gap-2">
                                 {% for contract in tenant.signed_contracts.all|slice:":2" %}
-                                <li class="small mb-1 d-flex justify-content-between align-items-center">
-                                    <span class="text-truncate d-inline-block" style="max-width: 150px;"
-                                        title="{{ contract.house.name }}">• {{ contract.house.name }}</span>
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded-2 border border-light-subtle bg-white shadow-xs">
+                                    <div class="d-flex align-items-center gap-2 min-w-0">
+                                        <div class="dot bg-primary" style="width: 6px; height: 6px; border-radius: 50%;"></div>
+                                        <span class="text-dark fw-medium text-truncate small" title="{{ contract.house.name }}">
+                                            {{ contract.house.name }}
+                                        </span>
+                                    </div>
                                     {% if contract.status == 'active' %}
-                                    <span class="badge bg-success-subtle text-success px-2 py-1"
-                                        style="font-size: 10px;">Đang thuê</span>
+                                    <span class="badge bg-success text-white px-2 py-1" style="font-size: 9px; letter-spacing: 0.3px;">ĐANG THUÊ</span>
                                     {% else %}
-                                    <span class="badge bg-secondary-subtle text-secondary px-2 py-1"
-                                        style="font-size: 10px;">Đã kết thúc</span>
+                                    <span class="badge bg-secondary text-white px-2 py-1" style="font-size: 9px; letter-spacing: 0.3px;">ĐÃ XONG</span>
                                     {% endif %}
-                                </li>
+                                </div>
                                 {% empty %}
-                                <li class="small text-muted fst-italic">Lỗi: Khách chưa có hợp đồng nào.</li>
+                                <div class="text-center py-3 bg-white rounded-2 border border-dashed">
+                                    <p class="text-muted small mb-0">Chưa có dữ liệu thuê nhà</p>
+                                </div>
                                 {% endfor %}
-
+                                
                                 {% if tenant.signed_contracts.count > 2 %}
-                                <li class="small text-primary mt-1 text-end"><a href="#" class="text-decoration-none">+
-                                        {{ tenant.signed_contracts.count|add:"-2" }} căn khác</a></li>
+                                <div class="text-center">
+                                    <a href="#" class="text-primary text-decoration-none extra-small fw-bold">+ Xem thêm {{ tenant.signed_contracts.count|add:"-2" }} căn khác</a>
+                                </div>
                                 {% endif %}
-                            </ul>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card-footer bg-white border-top-0 pt-0 pb-3 mt-n2 d-flex gap-1">
-                        <button class="btn btn-outline-primary btn-sm px-2 fw-bold" title="Gọi điện"><i
-                                class="bi bi-telephone"></i></button>
-                        <a href="{% url 'edit_tenant' tenant.id %}" class="btn btn-outline-warning btn-sm px-2 fw-bold" title="Sửa hồ sơ"><i
-                                class="bi bi-pencil-square"></i></a>
-                        {% if tenant.id_front_image or tenant.id_back_image %}
-                        <button class="btn btn-outline-info btn-sm w-100 fw-bold view-cccd" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#cccdModal"
-                                data-front="{% if tenant.id_front_image %}{{ tenant.id_front_image.url }}{% endif %}"
-                                data-back="{% if tenant.id_back_image %}{{ tenant.id_back_image.url }}{% endif %}"
-                                data-name="{{ tenant.full_name }}"
-                                title="Xem CCCD">
-                            <i class="bi bi-image me-1"></i> CCCD
-                        </button>
-                        {% else %}
-                        <button class="btn btn-outline-secondary btn-sm w-100 fw-bold disabled"><i
-                                class="bi bi-image me-1"></i> Trống</button>
-                        {% endif %}
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-light border-0 p-3 pt-0">
+                        <div class="row g-2">
+                            <div class="col-3">
+                                <a href="tel:{{ tenant.phone }}" class="btn btn-white border w-100 py-2 d-flex align-items-center justify-content-center text-primary shadow-sm" title="Gọi điện">
+                                    <i class="bi bi-telephone-outbound"></i>
+                                </a>
+                            </div>
+                            <div class="col-3">
+                                <a href="{% url 'edit_tenant' tenant.id %}" class="btn btn-white border w-100 py-2 d-flex align-items-center justify-content-center text-warning shadow-sm" title="Sửa hồ sơ">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 text-white fw-bold shadow-sm view-cccd"
+                                        style="font-size: 13px;"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#cccdModal"
+                                        data-front="{% if tenant.id_front_image %}{{ tenant.id_front_image.url }}{% endif %}"
+                                        data-back="{% if tenant.id_back_image %}{{ tenant.id_back_image.url }}{% endif %}"
+                                        data-name="{{ tenant.full_name }}">
+                                    <i class="bi bi-card-image"></i> Xem CCCD
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

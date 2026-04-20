@@ -33,13 +33,17 @@
               {% endfor %}
             </select>
             <select name="price_range" class="form-select" title="Chọn mức giá">
-              <option value="">Tất cả giá</option>
+              <option value="">Tất cả mức giá</option>
               {% for item in price_range_items %}
-              <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
+              <option value="{{ item.value }}" {% if filters.price_range == item.value %}selected{% endif %}>{{ item.label }}</option>
               {% endfor %}
             </select>
-            <input type="number" name="area" class="form-control filter-area-input" placeholder="Diện tích (m²)" min="0"
-              value="{{ filters.area|default:'' }}">
+            <select name="area_range" class="form-select" title="Chọn diện tích">
+                <option value="">Tất cả diện tích</option>
+                {% for item in area_range_items %}
+                <option value="{{ item.value }}" {% if filters.area_range == item.value %}selected{% endif %}>{{ item.label }}</option>
+                {% endfor %}
+            </select>
             <div class="discovery-filter-actions">
               <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
               <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Xóa</a>
