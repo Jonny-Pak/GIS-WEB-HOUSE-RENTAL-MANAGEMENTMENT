@@ -498,24 +498,24 @@
             ) {
               map.setView([Number(data.approximate_lat), Number(data.approximate_lng)], 14);
             }
-            geocodeStatus.textContent = data.message || "Khong the tim toa do tu dia chi.";
+            geocodeStatus.textContent = data.message || "Không thể tìm tọa độ từ địa chỉ.";
             return;
           }
 
-          let sourceMessage = "Da lay toa do tu dia chi thanh cong.";
+          let sourceMessage = "Đã lấy tọa độ từ địa chỉ thành công.";
           if (data.source === "user_location_fallback") {
-            sourceMessage = "Khong tim thay dia chi chinh xac, da dung vi tri hien tai cua ban.";
+            sourceMessage = "Không tìm thấy địa chỉ chính xác, đã dùng vị trí hiện tại của bạn.";
           } else if (data.source === "hcmc_center_fallback") {
-            sourceMessage = "Khong tim thay dia chi chinh xac, da tam dung vi tri trung tam TPHCM.";
+            sourceMessage = "Không tìm thấy địa chỉ chính xác, đã tạm dùng vị trí trung tâm TPHCM.";
           } else if (data.source === "parsed_from_input") {
-            sourceMessage = "Da doc truc tiep toa do tu noi dung ban vua nhap.";
+            sourceMessage = "Đã đọc trực tiếp tọa độ từ nội dung bạn vừa nhập.";
           } else if (data.source === "cached") {
-            sourceMessage = "Da su dung toa do da luu tru cho dia chi nay.";
+            sourceMessage = "Đã sử dụng tọa độ đã lưu trữ cho địa chỉ này.";
           }
           setCoordinate(data.lat, data.lng, sourceMessage);
         })
         .catch(function () {
-          geocodeStatus.textContent = "Co loi khi tim toa do. Vui long thu lai.";
+          geocodeStatus.textContent = "Có lỗi khi tìm tọa độ. Vui lòng thử lại.";
         });
     }
 
@@ -537,7 +537,7 @@
           map.removeLayer(marker);
           marker = null;
         }
-        geocodeStatus.textContent = "Da bo ghim thu cong.";
+        geocodeStatus.textContent = "Đã bỏ ghim thủ công.";
       });
     }
 
@@ -585,14 +585,14 @@
 
         if (!Number.isFinite(enteredArea) || enteredArea <= 0) {
           event.preventDefault();
-          showSubmitError("Dien tich khong hop le. Vui long kiem tra lai.");
+          showSubmitError("Diện tích không hợp lệ. Vui lòng kiểm tra lại.");
           return;
         }
 
         if (hasPolygon) {
           if (!Number.isFinite(estimated) || estimated <= 0) {
             event.preventDefault();
-            showSubmitError("Khong doc duoc dien tich tu polygon. Vui long ve lai polygon.");
+            showSubmitError("Không đọc được diện tích từ polygon. Vui lòng vẽ lại polygon.");
             return;
           }
 
@@ -600,7 +600,7 @@
           if (Math.abs(enteredArea - estimated) > tolerance) {
             event.preventDefault();
             showSubmitError(
-              "Dien tich nhap tay vuot nguong cho phep so voi polygon (toi da ±" +
+              "Diện tích nhập tay vượt ngưỡng cho phép so với polygon (tối đa ±" +
               tolerance.toFixed(1) +
               " m²)."
             );
@@ -611,7 +611,7 @@
 
     const existingArea = parseFloat(areaInput && areaInput.value ? areaInput.value : '');
     if (Number.isFinite(existingArea) && existingArea > 0) {
-      geocodeStatus.textContent = "Gia tri dien tich hien co: " + Math.round(existingArea) + " m². Ban co the ve polygon de cap nhat.";
+      geocodeStatus.textContent = "Giá trị diện tích hiện có: " + Math.round(existingArea) + " m². Bạn có thể vẽ polygon để cập nhật.";
     }
   }
 

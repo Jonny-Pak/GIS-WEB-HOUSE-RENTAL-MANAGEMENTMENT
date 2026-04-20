@@ -22,7 +22,7 @@
 
   <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260404e" />
-  <link rel="stylesheet" href="{% static 'css/base.css' %}?v=20260420h" />
+  <link rel="stylesheet" href="{% static 'css/base.css' %}?v=20260420p" />
 
 
   {% block extra_css %}{% endblock %}
@@ -86,7 +86,7 @@
                 href="{% url 'home' %}">Trang chủ</a></li>
 
             <li class="has-children {% if request.resolver_match.url_name in 'category_list' %}active{% endif %}">
-              <a href="#">Danh mục</a>
+              <a href="#">Danh mục <i class="bi bi-chevron-down nav-category-chevron"></i></a>
               <ul class="dropdown">
                 {% for current_val, current_label in house_categories %}
                 <li><a href="{% url 'home' %}?house_type={{ current_val }}">{{ current_label }}</a></li>
@@ -113,10 +113,10 @@
             {% if user.is_authenticated %}
             <div class="notification-group">
               <div class="dropdown" style="display:inline-block;">
-                <a href="#" class="notification-bell dropdown-toggle" id="notificationDropdown"
-                  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer;position:relative;">
+                <a href="#" class="notification-bell dropdown-toggle{% if notification_unread_count > 0 %} has-unread{% endif %}" id="notificationDropdown"
+                  data-bs-toggle="dropdown" aria-expanded="false">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24"
-                    stroke="#FFD600" stroke-width="3.2" style="stroke:#FFD600;">
+                    stroke="#FFD600" stroke-width="2.3">
                     <path stroke-linecap="round" stroke-linejoin="round"
                       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
@@ -124,23 +124,32 @@
                   <span class="notification-badge">{{ notification_unread_count }}</span>
                   {% endif %}
                 </a>
-                <ul class="dropdown-menu notification-dropdown-menu" aria-labelledby="notificationDropdown"
-                  style="min-width:340px;max-width:400px;">
+                <ul class="dropdown-menu notification-dropdown-menu" aria-labelledby="notificationDropdown">
+                  <li class="notif-dd-header">
+                    <span class="notif-dd-title"><i class="bi bi-bell-fill"></i> Thông báo</span>
+                    {% if notification_unread_count > 0 %}<span class="notif-dd-count">{{ notification_unread_count }} mới</span>{% endif %}
+                  </li>
                   {% if notification_preview %}
                   {% for n in notification_preview %}
-                  <li class="px-3 py-2 border-bottom {% if not n.is_read %}fw-bold bg-light{% endif %}">
-                    <a href="{% url 'notification_detail' n.id %}" class="text-dark text-decoration-none d-block">
-                      {{ n.title }}
-                      <span class="small text-muted ms-2">{{ n.created_at|date:'d/m/Y H:i' }}</span>
-                      {% if not n.is_read %}<span class="badge bg-warning text-dark ms-2">Mới</span>{% endif %}
+                  <li class="notif-dd-item{% if not n.is_read %} notif-dd-item--unread{% endif %}">
+                    <a href="{% url 'notification_detail' n.id %}" class="notif-dd-link">
+                      <span class="notif-dd-dot"></span>
+                      <span class="notif-dd-content">
+                        <span class="notif-dd-text">{{ n.title }}</span>
+                        <span class="notif-dd-time">{{ n.created_at|date:'d/m/Y H:i' }}</span>
+                      </span>
+                      {% if not n.is_read %}<span class="notif-dd-badge">Mới</span>{% endif %}
                     </a>
                   </li>
                   {% endfor %}
-                  <li class="text-center py-2">
-                    <a href="{% url 'notification_list' %}" class="text-primary fw-bold">Xem tất cả thông báo</a>
+                  <li class="notif-dd-footer">
+                    <a href="{% url 'notification_list' %}">Xem tất cả thông báo <i class="bi bi-arrow-right"></i></a>
                   </li>
                   {% else %}
-                  <li class="text-center py-3 text-muted">Không có thông báo mới.</li>
+                  <li class="notif-dd-empty">
+                    <i class="bi bi-bell-slash"></i>
+                    <span>Chưa có thông báo nào</span>
+                  </li>
                   {% endif %}
                 </ul>
               </div>
@@ -151,20 +160,33 @@
                   id="userDropdown">
                   <img src="{{ current_user_avatar_url }}" class="user-avatar-nav" alt="User">
                   <span class="user-avatar-name">{{ user.username }}</span>
+                  <i class="bi bi-chevron-down user-avatar-chevron"></i>
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu user-dropdown-menu" aria-labelledby="userDropdown" style="z-index:9999;">
                   {% if user.is_superuser %}
-                  <li><a class="dropdown-item" href="{% url 'custom_admin_dashboard' %}">Trang quản trị</a></li>
-                  {% endif %}
-                  <li><a class="dropdown-item" href="{% url 'profile' %}">Hồ sơ cá nhân</a></li>
-                  <li><a class="dropdown-item" href="{% url 'dashboard' %}">Quản lý tin đăng</a></li>
                   <li>
-                    <hr class="dropdown-divider">
+                    <a class="dropdown-item" href="{% url 'custom_admin_dashboard' %}">
+                      <i class="bi bi-shield-lock-fill"></i> Trang quản trị
+                    </a>
                   </li>
+                  {% endif %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'profile' %}">
+                      <i class="bi bi-person-circle"></i> Hồ sơ cá nhân
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'dashboard' %}">
+                      <i class="bi bi-house-door-fill"></i> Quản lý tin đăng
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
                   <li>
                     <form action="{% url 'logout' %}" method="post" class="nav-logout-form">
                       {% csrf_token %}
-                      <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
+                      <button type="submit" class="dropdown-item text-danger">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                      </button>
                     </form>
                   </li>
                 </ul>

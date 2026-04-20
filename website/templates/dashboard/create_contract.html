@@ -4,6 +4,39 @@
 {% block title %}Tạo mới hợp đồng đính kèm{% endblock %}
 {% block header_title %}Tạo mới Hợp Đồng{% endblock %}
 
+{% block extra_css %}
+<!-- Choices.js CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<style>
+    /* Tùy chỉnh nhẹ để hòa hợp với dashboard */
+    .choices__inner {
+        background-color: var(--bs-card-bg);
+        border-radius: 8px !important;
+        border: 1px solid #dee2e6 !important;
+        min-height: 40px !important;
+        padding: 4px 8px !important;
+    }
+    .choices__list--dropdown {
+        border-radius: 8px !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid #eee !important;
+        z-index: 1000 !important;
+    }
+    /* Sửa lỗi bị mất chữ trong ô tìm kiếm */
+    .choices__list--dropdown .choices__input {
+        width: 100% !important;
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #eee !important;
+        padding: 10px 15px !important;
+        margin-bottom: 0 !important;
+    }
+    .choices__item--selectable {
+        padding: 10px 15px !important;
+        font-size: 14px !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -21,9 +54,33 @@
             <!-- Section 1: Tenant Information -->
             <div class="card-custom mb-4 border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
-                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">
-                        <i class="bi bi-person-badge me-2"></i>1. Thông tin Khách Thuê (Người đại diện)
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h5 class="fw-bold text-primary mb-0">
+                            <i class="bi bi-person-badge me-2"></i>1. Thông tin Khách Thuê (Người đại diện)
+                        </h5>
+                        
+                        {% if existing_tenants %}
+                        <div class="d-flex align-items-center gap-2">
+                             <label class="small fw-bold text-muted text-nowrap mb-0">Tìm khách cũ:</label>
+                             <div style="min-width: 280px;">
+                                 <select id="existingTenantSelect" class="form-select">
+                                     <option value="">-- Tạo khách mới --</option>
+                                     {% for t in existing_tenants %}
+                                     <option value="{{ t.id }}" 
+                                             data-fullname="{{ t.full_name }}" 
+                                             data-phone="{{ t.phone }}"
+                                             data-cccd="{{ t.cccd }}"
+                                             data-gender="{{ t.gender }}"
+                                             data-dob="{{ t.dob|date:'Y-m-d' }}"
+                                             data-address="{{ t.address }}">
+                                         {{ t.full_name }} - {{ t.phone }}
+                                     </option>
+                                     {% endfor %}
+                                 </select>
+                             </div>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-body px-4 pb-4 pt-0">
                     <div class="row mb-3">
@@ -65,6 +122,7 @@
                                 Mặt Trước</label>
                             <input type="file" class="form-control form-control-sm" name="id_front_image"
                                 accept="image/*">
+                            <small class="text-muted d-block mt-1">Nếu chọn khách cũ, bạn có thể để trống nếu không muốn thay đổi ảnh.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="fw-bold mb-2 text-dark small"><i class="bi bi-camera me-1"></i>Ảnh thẻ CCCD
@@ -105,12 +163,12 @@
 
                     <div class="row align-items-end mb-4 bg-light rounded-3 p-3 border mx-0">
                         <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="fw-bold mb-2 text-dark">Tổng giá trị Hợp đồng (Ghi chú thêm)</label>
+                            <label class="fw-bold mb-2 text-dark">Tổng giá trị ghi trên Hợp đồng</label>
                             <div class="input-group">
                                 {{ contract_form.total_value }}
                                 <span class="input-group-text fw-bold text-success">VNĐ</span>
                             </div>
-                            <small class="text-muted d-block mt-1">Ghi chú lại tổng số tiền dự kiến nếu cần.</small>
+                            <small class="text-muted d-block mt-1">Nhập tổng số tiền thuê trong suốt thời hạn hợp đồng.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="fw-bold mb-2 text-dark">Upload bản cứng Hợp đồng (Nếu có)</label>
@@ -134,4 +192,51 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Choices.js JS -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tenantSelectEl = document.getElementById('existingTenantSelect');
+    if (tenantSelectEl) {
+        // 1. Khởi tạo Choices.js
+        const choices = new Choices(tenantSelectEl, {
+            searchEnabled: true,
+            searchPlaceholderValue: 'Tìm theo tên, SĐT...',
+            itemSelectText: 'Nhấn để chọn',
+            noResultsText: 'Không tìm thấy khách này',
+            noChoicesText: 'Danh sách trống',
+            shouldSort: false,
+        });
+
+        // 2. Lắng nghe sự kiện thay đổi qua Choices.js
+        tenantSelectEl.addEventListener('change', function(event) {
+            const selectedId = event.detail.value;
+            
+            if (!selectedId || selectedId === "") {
+                // Reset form
+                document.getElementsByName('full_name')[0].value = "";
+                document.getElementsByName('phone')[0].value = "";
+                document.getElementsByName('cccd')[0].value = "";
+                document.getElementsByName('gender')[0].value = "male";
+                document.getElementsByName('dob')[0].value = "";
+                document.getElementsByName('address')[0].value = "";
+            } else {
+                // Lấy option gốc để lấy data attributes
+                const option = Array.from(tenantSelectEl.options).find(opt => opt.value == selectedId);
+                if (option) {
+                    document.getElementsByName('full_name')[0].value = option.getAttribute('data-fullname') || "";
+                    document.getElementsByName('phone')[0].value = option.getAttribute('data-phone') || "";
+                    document.getElementsByName('cccd')[0].value = option.getAttribute('data-cccd') || "";
+                    document.getElementsByName('gender')[0].value = option.getAttribute('data-gender') || "male";
+                    document.getElementsByName('dob')[0].value = option.getAttribute('data-dob') || "";
+                    document.getElementsByName('address')[0].value = option.getAttribute('data-address') || "";
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

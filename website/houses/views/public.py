@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import redirect
 from django.shortcuts import render
 
@@ -62,7 +63,7 @@ def home(request):
     except ValueError:
         page = 1
 
-    per_page = 6
+    per_page = 12
 
     if search_query:
         houses_qs = houses_qs.filter(
@@ -70,8 +71,6 @@ def home(request):
             | Q(address__icontains=search_query)
             | Q(description__icontains=search_query)
         )
-
-
 
     selected_price_range = next(
         (item for item in price_range_items if item['value'] == price_range),
@@ -98,17 +97,17 @@ def home(request):
 
     total_available_rooms = houses_qs.count()
 
-    offset = (page - 1) * per_page
-    houses = list(houses_qs[offset:offset + per_page + 1])
-    has_more_houses = len(houses) > per_page
-    if has_more_houses:
-        houses = houses[:per_page]
-
+    paginator = Paginator(houses_qs, per_page)
+    try:
+        houses_page = paginator.page(page)
+    except PageNotAnInteger:
+        houses_page = paginator.page(1)
+    except EmptyPage:
+        houses_page = paginator.page(paginator.num_pages)
 
     context = {
-        'houses': houses,
-        'has_more_houses': has_more_houses,
-        'next_page': page + 1,
+        'page_obj': houses_page,
+        'houses': houses_page.object_list,
         'total_available_rooms': total_available_rooms,
         'price_range_items': price_range_items,
         'house_type_items': house_type_items,

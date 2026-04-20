@@ -1,10 +1,11 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load house_extras %}
 
 {% block title %}Trang chủ - Thuê Nhà Nhanh{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260418a" />
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260421a" />
 {% endblock %}
 
 {% block content %}
@@ -21,7 +22,7 @@
           <div class="discovery-filter-row">
             <div class="filter-search-wrap">
               <input type="text" name="search" class="form-control filter-search-input"
-                placeholder="Tìm phòng, địa chỉ..." value="{{ filters.search|default:'' }}">
+                placeholder="Tìm nhà, địa chỉ..." value="{{ filters.search|default:'' }}">
               <button type="submit" class="filter-search-icon-btn" aria-label="Tìm kiếm"><span
                   class="icon-search filter-search-icon"></span></button>
             </div>
@@ -60,6 +61,8 @@
           class="icon-chevron-right"></span></a> {% endcomment %}
     </div>
 
+    <!-- Bỏ nút cuộn vì chuyển sang Grid & Phân trang -->
+    {% comment %}
     <div class="district-scroll-controls rooms">
       <button type="button" class="district-scroll-btn" id="roomScrollPrev" aria-label="Cuộn trái phòng">
         <span class="icon-chevron-left"></span>
@@ -68,8 +71,9 @@
         <span class="icon-chevron-right"></span>
       </button>
     </div>
+    {% endcomment %}
 
-    <div class="room-cards-scroll" id="roomCardsScroll">
+    <div class="room-cards-grid">
       {% for house in houses %}
       <article class="room-card-item">
         <a href="{% url 'house_detail' house.id %}" class="room-card-image-link">
@@ -107,6 +111,36 @@
       </div>
       {% endfor %}
     </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-wrapper">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?{% url_replace page=page_obj.previous_page_number %}" aria-label="Previous">
+            <span class="icon-chevron-left"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item"><a class="page-link" href="?{% url_replace page=num %}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?{% url_replace page=page_obj.next_page_number %}" aria-label="Next">
+            <span class="icon-chevron-right"></span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
   </div>
 </section>
 

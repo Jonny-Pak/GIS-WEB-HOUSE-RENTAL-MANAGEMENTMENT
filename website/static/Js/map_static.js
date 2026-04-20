@@ -192,10 +192,10 @@
   function buildPopupHtml(house) {
     return (
       '<div class="map-popup-content">'
-      + "<strong>" + (house.name || "Nha cho thue") + "</strong><br>"
-      + "Gia: " + (house.price || "Lien he") + "<br>"
-      + "Trang thai: " + (house.status || "Chua cap nhat") + "<br>"
-      + '<a href="' + (house.detail_url || "#") + '" class="d-block mt-1">Xem chi tiet</a>'
+      + "<strong>" + (house.name || "Nhà cho thuê") + "</strong><br>"
+      + "Giá: " + (house.price || "Liên hệ") + "<br>"
+      + "Trạng thái: " + (house.status || "Chưa cập nhật") + "<br>"
+      + '<a href="' + (house.detail_url || "#") + '" class="d-block mt-1">Xem chi tiết</a>'
       + '<button onclick="window.routeToHouse(' + house.lat + ', ' + house.lng + ')" class="btn btn-sm btn-outline-success mt-2 w-100" style="font-weight: 500;">🚩 Chỉ đường đến đây</button>'
       + "</div>"
     );
@@ -231,7 +231,7 @@
     if (!polygonLayer) {
       renderHouses(houses, false);
       statusState.filter =
-        "Ve polygon tren ban do de loc nha theo vung. Hien dang hien thi tat ca " + houses.length + " nha.";
+        "Vẽ polygon trên bản đồ để lọc nhà theo vùng. Hiện đang hiển thị tất cả " + houses.length + " nhà.";
       renderStatus();
       return;
     }
@@ -285,12 +285,12 @@
 
   function locateCurrentUser() {
     if (!navigator.geolocation) {
-      statusState.location = "Trinh duyet khong ho tro dinh vi vi tri hien tai.";
+      statusState.location = "Trình duyệt không hỗ trợ định vị vị trí hiện tại.";
       renderStatus();
       return;
     }
 
-    statusState.location = "Dang lay vi tri hien tai...";
+    statusState.location = "Đang lấy vị trí hiện tại...";
     renderStatus();
 
     navigator.geolocation.getCurrentPosition(
@@ -301,16 +301,16 @@
 
         updateUserLocationLayer(lat, lng, accuracy);
         statusState.location =
-          "Da lay vi tri cua ban" + (Number.isFinite(accuracy) ? " (sai so ~" + Math.round(accuracy) + "m)." : ".");
+          "Đã lấy vị trí của bạn" + (Number.isFinite(accuracy) ? " (sai số ~" + Math.round(accuracy) + "m)." : ".");
         renderStatus();
       },
       function (error) {
         if (error && error.code === 1) {
-          statusState.location = "Ban da tu choi quyen vi tri. Hay cap quyen tren trinh duyet va thu lai.";
+          statusState.location = "Bạn đã từ chối quyền vị trí. Hãy cấp quyền trên trình duyệt và thử lại.";
         } else if (error && error.code === 2) {
-          statusState.location = "Khong the xac dinh vi tri hien tai. Vui long thu lai sau.";
+          statusState.location = "Không thể xác định vị trí hiện tại. Vui lòng thử lại sau.";
         } else {
-          statusState.location = "Het thoi gian lay vi tri hien tai. Vui long thu lai.";
+          statusState.location = "Hết thời gian lấy vị trí hiện tại. Vui lòng thử lại.";
         }
         renderStatus();
       },

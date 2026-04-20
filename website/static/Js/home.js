@@ -14,7 +14,6 @@
     });
   }
 
-  bindHorizontalScroll("roomCardsScroll", "roomScrollPrev", "roomScrollNext", 360);
 
   const toggleReviewsBtn = document.getElementById("toggleReviewsBtn");
   if (!toggleReviewsBtn) return;

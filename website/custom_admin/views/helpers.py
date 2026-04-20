@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
 
 def _is_admin_user(user):
     """Helper kiểm tra quyền admin."""
@@ -11,19 +12,29 @@ def _custom_admin_model_list(request, queryset, page_title, create_url, headers,
     data = queryset
     if query:
         data = row_builder['search'](data, query)
-    items = data.order_by(row_builder.get('order_by', '-id'))
+    
+    # Sắp xếp
+    items_all = data.order_by(row_builder.get('order_by', '-id'))
+    
+    # Phân trang
+    paginator = Paginator(items_all, 10) # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     rows = [
         {
             'id': item.id,
             'columns': row_builder['columns'](item),
             'extra_actions': row_builder.get('extra_actions', lambda obj: [])(item),
         }
-        for item in items
+        for item in page_obj
     ]
+    
     return render(request, 'custom_admin/list.html', {
         'page_title': page_title,
         'create_url': create_url,
-        'items': items,
+        'items': page_obj,  # Trả về page_obj để tương thích ngược nếu cần
+        'page_obj': page_obj,
         'query': query,
         'headers': headers,
         'rows': rows,

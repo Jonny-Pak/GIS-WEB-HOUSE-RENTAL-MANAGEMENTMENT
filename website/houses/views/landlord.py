@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from houses.models import House
 from houses.forms import HouseForm
@@ -66,8 +67,14 @@ def manage_post(request):
         status=status,
     )
 
+    # Phân trang: 10 tin đăng mỗi trang
+    paginator = Paginator(user_houses, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, 'dashboard/manage_post.html', {
-        'user_houses': user_houses,
+        'page_obj': page_obj,
+        'user_houses': page_obj,
         'query': query,
         'selected_status': status,
         'status_choices': status_choices,

@@ -120,6 +120,30 @@
                         </tbody>
                     </table>
                 </div>
+
+                {% if page_obj.has_other_pages %}
+                <div class="admin-pagination">
+                    <div class="pagination-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if query %}&q={{ query }}{% endif %}" class="page-link">&laquo; Đầu</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Trước</a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-link active">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" class="page-link">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Sau</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Cuối &raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
             </section>
         </div>
     </main>

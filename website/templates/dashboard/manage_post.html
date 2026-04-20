@@ -1,5 +1,6 @@
 {% extends 'layouts/dashboard_base.html' %}
 {% load static %}
+{% load house_extras %}
 
 {% block title %}Danh sách tin đăng{% endblock %}
 {% block header_title %}Quản lý Tin đăng{% endblock %}
@@ -32,10 +33,16 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3 text-end">
-                <button type="submit" class="btn btn-outline-secondary fw-bold me-2">Lọc</button>
-                <a href="{% url 'post_house' %}" class="btn btn-danger text-white fw-bold"><i class="bi bi-plus-lg"></i>
-                    Đăng tin mới</a>
+            <div class="col-md-3 text-end d-flex align-items-center justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary fw-bold">Lọc</button>
+                {% if query or selected_status %}
+                <a href="{% url 'manage_post' %}" class="btn btn-outline-secondary" title="Xóa lọc">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'post_house' %}" class="btn btn-danger text-white fw-bold">
+                    <i class="bi bi-plus-lg"></i> Đăng tin
+                </a>
             </div>
         </form>
 
@@ -138,6 +145,7 @@
             </table>
         </div>
 
+        {% include 'dashboard/includes/pagination.html' with page_obj=page_obj %}
     </div>
 </div>
 {% endblock %}

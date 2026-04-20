@@ -1,11 +1,13 @@
 {% extends 'layouts/dashboard_base.html' %}
 {% load static %}
+{% load house_extras %}
 
 {% block title %}Quản lý Hợp đồng - Chủ nhà{% endblock %}
 {% block header_title %}Quản lý Hợp đồng{% endblock %}
 
 {% block content %}
 <div class="container-fluid p-0">
+    <!-- Stat Cards Section -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
@@ -15,7 +17,7 @@
                     </div>
                     <div>
                         <h6 class="text-muted mb-1 small">Tổng hợp đồng</h6>
-                        <h4 class="fw-bold mb-0">{{ user_contracts.count }}</h4>
+                        <h4 class="fw-bold mb-0 text-dark">{{ user_contracts.count }}</h4>
                     </div>
                 </div>
             </div>
@@ -28,7 +30,7 @@
                     </div>
                     <div>
                         <h6 class="text-muted mb-1 small">Đang hiệu lực</h6>
-                        <h4 class="fw-bold mb-0">Active</h4>
+                        <h4 class="fw-bold mb-0">{{ total_active }}</h4>
                     </div>
                 </div>
             </div>
@@ -40,8 +42,8 @@
                         <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted mb-1 small">Sắp hết hạn</h6>
-                        <h4 class="fw-bold mb-0">--</h4>
+                        <h6 class="text-muted mb-1 small">Sắp hết hạn (30 ngày)</h6>
+                        <h4 class="fw-bold mb-0">{{ expiring_soon }}</h4>
                     </div>
                 </div>
             </div>
@@ -53,35 +55,54 @@
                         <i class="bi bi-cash-stack fs-4 text-info"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted mb-1 small">Dự kiến thu</h6>
-                        <h4 class="fw-bold mb-0">Phí thuê</h4>
+                        <h6 class="text-muted mb-1 small">Tổng doanh thu HĐ</h6>
+                        <h4 class="fw-bold mb-0 text-truncate" style="max-width: 150px;">{{ total_revenue|floatformat:0 }} <small>₫</small></h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Filter Bar -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" 
+                               placeholder="Tìm theo tên nhà, khách thuê hoặc số điện thoại...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-filter"></i></span>
+                        <select class="form-select border-start-0" name="status" onchange="this.form.submit()">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Đang hiệu lực</option>
+                            <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Đã hết hạn</option>
+                            <option value="terminated" {% if selected_status == 'terminated' %}selected{% endif %}>Đã chấm dứt</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold flex-grow-1">Lọc</button>
+                    {% if query or selected_status %}
+                    <a href="{% url 'manage_contracts' %}" class="btn btn-outline-secondary" title="Hủy lọc">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
-            {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h5 class="fw-bold text-dark mb-1">Danh sách Hợp đồng Của Bạn</h5>
-                            <p class="text-muted small mb-0">Quản lý và theo dõi các hợp đồng thuê nhà hiện có</p>
-                        </div>
-                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Danh sách Hợp đồng</h5>
+                    <p class="text-muted small mb-0">Quản lý và theo dõi các hồ sơ pháp lý thuê nhà.</p>
                 </div>
 
                 <div class="card-body p-0">
@@ -93,82 +114,85 @@
                                     <th class="py-3 border-0">Khách Thuê</th>
                                     <th class="py-3 border-0">Căn Nhà</th>
                                     <th class="py-3 border-0">Thời Gian</th>
-                                    <th class="py-3 border-0">Tổng Giá Trị</th>
+                                    <th class="py-3 border-0">Giá Trị</th>
                                     <th class="py-3 border-0">Trạng Thái</th>
                                     <th class="py-3 border-0 text-end pe-4">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody class="border-top-0">
-                                {% for contract in user_contracts %}
+                            <tbody>
+                                {% for contract in page_obj %}
                                 <tr>
-                                    <td class="ps-4">
-                                        <span class="badge bg-light text-dark border fw-medium">#{{ contract.id }}</span>
-                                    </td>
+                                    <td class="ps-4 text-muted small">#{{ contract.id }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center me-2 fw-bold" 
-                                                    style="width: 32px; height: 32px; background-color: #e7e6fa; color: #181460;">
+                                            <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center me-2 fw-bold bg-primary text-white" style="width: 32px; height: 32px; font-size: 13px;">
                                                 {{ contract.renter.full_name|first|upper }}
                                             </div>
                                             <div>
-                                                <div class="fw-bold text-dark">{{ contract.renter.full_name }}</div>
-                                                <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ contract.renter.phone }}</small>
+                                                <div class="fw-bold text-dark small-14">{{ contract.renter.full_name }}</div>
+                                                <div class="text-muted extra-small"><i class="bi bi-telephone me-1"></i>{{ contract.renter.phone }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{% url 'house_detail' contract.house.id %}" target="_blank" 
-                                                         class="fw-bold text-teal text-decoration-none d-block mb-0" style="color: #181460;">
+                                        <a href="{% url 'house_detail' contract.house.id %}" target="_blank" class="fw-bold text-primary text-decoration-none">
                                             {{ contract.house.name }}
                                         </a>
-                                        <small class="text-muted text-truncate d-inline-block" style="max-width: 180px;">
-                                            <i class="bi bi-geo-alt me-1"></i>{{ contract.house.address }}
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex flex-column small">
-                                            <span>Bắt đầu: <b class="text-dark">{{ contract.start_date|date:"d/m/Y" }}</b></span>
-                                            <span>Kết thúc: <b class="text-danger">{{ contract.end_date|date:"d/m/Y" }}</b></span>
+                                        <div class="text-muted extra-small text-truncate" style="max-width: 180px;">
+                                            {{ contract.house.address }}
                                         </div>
                                     </td>
                                     <td>
-                                        {% if contract.total_value %}
-                                        <span class="fw-bold text-dark">{{ contract.total_value|floatformat:0 }} ₫</span>
-                                        {% else %}
-                                        <span class="text-muted small fst-italic">N/A</span>
-                                        {% endif %}
+                                        <div class="extra-small">
+                                            <div>Bắt đầu: <span class="text-dark fw-medium">{{ contract.start_date|date:"d/m/Y" }}</span></div>
+                                            <div>Kết thúc: <span class="text-danger fw-medium">{{ contract.end_date|date:"d/m/Y" }}</span></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark">{{ contract.total_value|floatformat:0 }}₫</span>
                                     </td>
                                     <td>
                                         {% if contract.status == 'active' %}
-                                        <span class="text-success fw-medium"><i class="bi bi-circle-fill me-1 small"></i>Đang hiệu lực</span>
+                                        <span class="badge bg-success-subtle text-success fw-medium px-2 py-1">Đang hiệu lực</span>
                                         {% elif contract.status == 'expired' %}
-                                        <span class="text-secondary fw-medium"><i class="bi bi-circle-fill me-1 small"></i>Đã hết hạn</span>
+                                        <span class="badge bg-secondary-subtle text-secondary fw-medium px-2 py-1">Đã hết hạn</span>
                                         {% elif contract.status == 'terminated' %}
-                                        <span class="text-danger fw-medium"><i class="bi bi-circle-fill me-1 small"></i>Đã chấm dứt</span>
+                                        <span class="badge bg-danger-subtle text-danger fw-medium px-2 py-1">Đã chấm dứt</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-end pe-4">
-                                        <div class="btn-group shadow-sm rounded bg-white border">
+                                        <div class="btn-group shadow-none">
                                             {% if contract.contract_document %}
-                                            <a href="{{ contract.contract_document.url }}" target="_blank" class="btn btn-sm text-info border-0" title="Xem hợp đồng">
-                                                <i class="bi bi-paperclip"></i>
+                                            <a href="{{ contract.contract_document.url }}" target="_blank" class="btn btn-sm text-info" title="Xem hợp đồng">
+                                                <i class="bi bi-paperclip fs-5"></i>
                                             </a>
                                             {% endif %}
-                                            <a href="#" class="btn btn-sm text-primary border-0" title="Sửa"><i class="bi bi-pencil-square"></i></a>
+                                            <a href="{% url 'edit_contract' contract.id %}" class="btn btn-sm text-primary" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil-square fs-5"></i>
+                                            </a>
+                                            {% if contract.status == 'active' %}
+                                            <a href="{% url 'terminate_contract' contract.id %}" class="btn btn-sm text-danger" title="Chấm dứt sớm"
+                                               onclick="return confirm('Xác nhận chấm dứt hợp đồng sớm?')">
+                                                <i class="bi bi-x-circle fs-5"></i>
+                                            </a>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="7" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1 d-block mb-3 text-light"></i>
-                                        Bạn chưa có hợp đồng nào.
+                                    <td colspan="7" class="text-center py-5 text-muted fst-italic">
+                                        Không tìm thấy hợp đồng nào khớp với bộ lọc.
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                </div>
+                
+                <div class="card-footer bg-white border-top-0 py-3">
+                    {% include 'dashboard/includes/pagination.html' with page_obj=page_obj %}
                 </div>
             </div>
         </div>
