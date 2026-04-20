@@ -1,3 +1,6 @@
+/* ========================================
+   MAP PAGE - Base
+   ======================================== */
 .map-page {
     min-height: calc(100vh - 240px);
     padding: 120px 0 60px;
@@ -7,100 +10,222 @@
         linear-gradient(140deg, #f4f8f2, #eef4ea 50%, #e7f0e8);
 }
 
-.map-title {
-    margin-bottom: 8px;
-    color: #1e3d32;
-}
-
-.map-subtitle {
-    margin-bottom: 20px;
-    color: #496457;
-}
-
-/* --- Improved alignment for map filter bar and controls --- */
+/* ========================================
+   MAP TOOLBAR - Container
+   ======================================== */
 .map-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(239, 248, 242, 0.96));
-    border: 1px solid rgba(30, 61, 50, 0.14);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7f2 100%);
+    border: 1px solid rgba(30, 61, 50, 0.12);
     border-radius: 16px;
-    box-shadow: 0 12px 24px rgba(31, 61, 49, 0.1);
-    backdrop-filter: blur(6px);
-    padding: 18px 20px 12px 20px;
+    box-shadow: 0 4px 20px rgba(31, 61, 49, 0.08);
+    padding: 14px 20px;
     margin-bottom: 18px;
 }
 
-.map-toolbar .d-flex {
+/* ========================================
+   MAP TOOLBAR - Single Row
+   ======================================== */
+.map-toolbar-row {
+    display: flex;
+    flex-direction: row;    /* horizontal */
+    flex-wrap: nowrap;      /* never wrap to next line */
+    align-items: center;
+    gap: 10px;
     width: 100%;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: flex-end;
 }
 
-.map-filter-status {
-    color: #214a3b;
-    font-size: 13px;
+/* ========================================
+   SEARCH BOX
+   ======================================== */
+.toolbar-search {
+    display: flex;
+    flex: 1 1 auto;         /* take all available space */
+    min-width: 0;
+    align-items: center;
+    background: #ffffff;
+    border: 1.5px solid #d1dce5;
+    border-radius: 10px;
+    height: 42px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toolbar-search:focus-within {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.toolbar-search-icon {
+    padding: 0 12px;
+    color: #9fb3c0;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.toolbar-search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    color: #2d3748;
+    padding: 0;
+    height: 100%;
+    background: transparent;
+}
+
+.toolbar-search-input::placeholder {
+    color: #b0bec5;
+}
+
+.toolbar-search .btn-primary {
+    flex-shrink: 0;
+    border-radius: 0 8px 8px 0;
+    height: 100%;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 8px 12px;
-    background: rgba(53, 117, 94, 0.1);
+    padding: 0 18px;
+    letter-spacing: 0.3px;
+}
+
+/* ========================================
+   TOOLBAR BUTTONS (Vị trí & Xóa ghim)
+   ======================================== */
+.toolbar-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 42px;
+    padding: 0 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+#btnLocateMeOnMap.toolbar-btn {
+    color: #1a5fb4;
+    background: rgba(26, 95, 180, 0.08);
+    border: 1.5px solid rgba(26, 95, 180, 0.3);
+}
+
+#btnLocateMeOnMap.toolbar-btn:hover {
+    background: #1a5fb4;
+    color: #fff;
+    border-color: #1a5fb4;
+    box-shadow: 0 4px 14px rgba(26, 95, 180, 0.3);
+    transform: translateY(-1px);
+}
+
+#btnClearMapPolygon.toolbar-btn {
+    color: #4a5568;
+    background: rgba(74, 85, 104, 0.07);
+    border: 1.5px solid rgba(74, 85, 104, 0.25);
+}
+
+#btnClearMapPolygon.toolbar-btn:hover {
+    background: #4a5568;
+    color: #fff;
+    border-color: #4a5568;
+    box-shadow: 0 4px 14px rgba(74, 85, 104, 0.25);
+    transform: translateY(-1px);
+}
+
+#btnClearMapRoute.toolbar-btn {
+    color: #c0392b;
+    background: rgba(192, 57, 43, 0.07);
+    border: 1.5px solid rgba(192, 57, 43, 0.25);
+}
+
+/* ========================================
+   RADIUS CONTROL
+   ======================================== */
+.toolbar-radius {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 42px;
+    padding: 0 12px;
+    background: rgba(248, 250, 252, 1);
+    border: 1.5px solid #d1dce5;
+    border-radius: 10px;
+    transition: border-color 0.2s ease;
+}
+
+.toolbar-radius:focus-within {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.10);
+}
+
+.radius-label {
+    font-size: 0.78rem;
+    color: #78909c;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.radius-input {
+    width: 40px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1a202c;
+    padding: 0;
+    outline: none;
+    -moz-appearance: textfield;
+}
+
+.radius-input::-webkit-inner-spin-button,
+.radius-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.radius-unit {
+    font-size: 0.78rem;
+    color: #78909c;
+    font-weight: 600;
+}
+
+/* ========================================
+   STATUS BAR
+   ======================================== */
+.map-filter-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #2d6a4f;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 7px 16px;
+    background: rgba(53, 117, 94, 0.08);
     border: 1px solid rgba(53, 117, 94, 0.18);
     border-radius: 999px;
-    display: inline-block;
-    margin-left: 0;
-    margin-right: auto;
-    text-align: left;
-    padding-left: 18px;
-    padding-right: 18px;
 }
 
-#btnLocateMeOnMap,
-#btnClearMapPolygon {
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-weight: 700;
-    letter-spacing: 0.1px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-#btnLocateMeOnMap {
-    color: #0b4f8a;
-    border-color: rgba(11, 79, 138, 0.35);
-    background: rgba(78, 149, 221, 0.12);
-}
-
-#btnLocateMeOnMap:hover {
-    color: #ffffff;
-    border-color: #0b4f8a;
-    background: #0b4f8a;
-    box-shadow: 0 8px 18px rgba(11, 79, 138, 0.28);
-    transform: translateY(-1px);
-}
-
-#btnClearMapPolygon {
-    color: #5f635f;
-    border-color: rgba(95, 99, 95, 0.35);
-    background: rgba(95, 99, 95, 0.08);
-}
-
-#btnClearMapPolygon:hover {
-    color: #ffffff;
-    border-color: #5f635f;
-    background: #5f635f;
-    box-shadow: 0 8px 18px rgba(50, 53, 50, 0.22);
-    transform: translateY(-1px);
-}
-
+/* ========================================
+   MAP CANVAS
+   ======================================== */
 #static-map {
     height: 70vh;
     min-height: 420px;
-    border-radius: 18px;
-    box-shadow: 0 22px 55px rgba(31, 61, 49, 0.18);
-    border: 1px solid rgba(30, 61, 50, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(31, 61, 49, 0.15);
+    border: 1px solid rgba(30, 61, 50, 0.10);
     overflow: hidden;
 }
 
+/* ========================================
+   LEAFLET OVERRIDES
+   ======================================== */
 .leaflet-popup-content {
     font-family: "Work Sans", sans-serif;
 }
@@ -114,182 +239,31 @@
     min-width: 200px;
 }
 
-.map-note {
-    margin-top: 14px;
-    color: #4f6b5f;
-    font-size: 14px;
-}
-
-/* --- Force map-toolbar children to align in a single row and fix input group width --- */
-.map-toolbar .row.g-3.align-items-center {
-    width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    gap: 16px;
-}
-
-.map-toolbar .col-12.col-md-5,
-.map-toolbar .col-12.col-md-7 {
-    flex: 1 1 0;
-    display: flex;
-    align-items: center;
-    padding: 0;
-}
-
-.map-toolbar .col-12.col-md-5 {
-    max-width: 420px;
-    min-width: 320px;
-}
-
-.map-toolbar .col-12.col-md-7 {
-    justify-content: flex-start;
-    gap: 12px;
-}
-
-.map-toolbar .input-group {
-    width: 100%;
-}
-
-.map-toolbar .d-flex.flex-wrap.align-items-center.gap-2.justify-content-md-start {
-    flex-wrap: nowrap;
-    gap: 12px;
-    width: 100%;
-}
-
-/* Thu nhỏ vùng bán kính trong map-toolbar */
-.map-toolbar .d-flex .border.bg-light.px-3.py-1.shadow-sm {
-    padding: 4px 12px !important;
-    min-width: unset;
-    max-width: unset;
-    font-size: 0.98rem;
-    border-radius: 8px;
-    gap: 4px;
-}
-
-.map-toolbar #inputSearchRadius {
-    width: 54px !important;
-    min-width: unset;
-    max-width: unset;
-    font-size: 1rem;
-    padding: 2px;
-    text-align: center;
-    -moz-appearance: textfield;
-    /* Hide spinner Firefox */
-}
-
-/* Hide spinner Chrome/Safari/Edge */
-.map-toolbar #inputSearchRadius::-webkit-inner-spin-button,
-.map-toolbar #inputSearchRadius::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.map-toolbar .d-flex .text-muted.small {
-    font-size: 0.97em;
-    padding-right: 2px;
-}
-
-.map-toolbar .d-flex .fw-bold {
-    font-size: 0.97em;
-    padding-left: 2px;
-}
-
+/* ========================================
+   RESPONSIVE
+   ======================================== */
 @media (max-width: 768px) {
     .map-page {
-        padding-top: 110px;
+        padding-top: 100px;
     }
 
     #static-map {
-        min-height: 360px;
-        height: 62vh;
+        min-height: 340px;
+        height: 60vh;
         border-radius: 12px;
     }
 
-    .map-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 10px;
-        padding: 12px 8px 8px 8px;
+    /* On small screens: search takes full row, buttons wrap below */
+    .map-toolbar-row {
+        flex-wrap: wrap;
     }
 
-    .map-toolbar .d-flex {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    #btnLocateMeOnMap,
-    #btnClearMapPolygon {
-        flex: 1 1 auto;
-        text-align: center;
-        width: 100%;
-        margin-bottom: 6px;
+    .toolbar-search {
+        flex: 1 1 100%;
     }
 
     .map-filter-status {
         width: 100%;
-        border-radius: 12px;
-        margin-top: 8px;
-        margin-left: 0;
-        margin-right: 0;
-        text-align: left;
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-}
-
-@media (max-width: 900px) {
-    .map-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 12px 8px 8px 8px;
-    }
-
-    .map-toolbar .d-flex {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    #btnLocateMeOnMap,
-    #btnClearMapPolygon {
-        width: 100%;
-        margin-bottom: 6px;
-    }
-
-    .map-filter-status {
-        width: 100%;
-        border-radius: 12px;
-        margin-top: 8px;
-        margin-left: 0;
-        margin-right: 0;
-        text-align: left;
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .map-toolbar .mt-3.pt-3.border-top.text-muted.small.d-flex.align-items-center {
-        justify-content: flex-start !important;
-        text-align: left;
-    }
-}
-
-@media (max-width: 1100px) {
-    .map-toolbar .row.g-3.align-items-center {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .map-toolbar .col-12.col-md-5,
-    .map-toolbar .col-12.col-md-7 {
-        min-width: 220px;
-        max-width: 100%;
-    }
-
-    .map-toolbar .d-flex.flex-wrap.align-items-center.gap-2.justify-content-md-end {
-        flex-wrap: wrap;
-        gap: 8px;
+        border-radius: 10px;
     }
 }
