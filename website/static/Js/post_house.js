@@ -121,8 +121,13 @@
     const initialLng = parseFloat(String(lngVal).replace(',', '.'));
     const hasInitialCoords = Number.isFinite(initialLat) && Number.isFinite(initialLng);
 
-    // Vô hiệu hóa cảm ứng của Leaflet trên desktop để sửa lỗi double-click trên Chrome khi vẽ
-    if (window.navigator.userAgent.indexOf('Chrome') > -1 && navigator.maxTouchPoints > 0) {
+    // detect mobile
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isChromium = window.navigator.userAgent.indexOf('Chrome') > -1 || window.navigator.userAgent.indexOf('Edg') > -1;
+
+    // Chỉ vô hiệu hóa cảm ứng Leaflet trên Desktop Chrome/Edge có màn hình cảm ứng để sửa lỗi double-click.
+    // Trên thiết bị di động thực sự (Mobile), chúng ta PHẢI giữ L.Browser.touch = true để vẽ được.
+    if (!isMobileDevice && isChromium && navigator.maxTouchPoints > 0) {
       L.Browser.touch = false;
     }
 

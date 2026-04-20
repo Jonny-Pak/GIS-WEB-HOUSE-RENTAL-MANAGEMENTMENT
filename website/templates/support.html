@@ -1,104 +1,145 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 
-{% block title %}Hỗ trợ - Thuê Nhà Nhanh{% endblock %}
+{% block title %}Trung tâm hỗ trợ - Thuê Nhà Nhanh{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/support.css' %}?v=20260406a" />
+<link rel="stylesheet" href="{% static 'css/support.css' %}?v=20260420b" />
 {% endblock %}
 
 {% block content %}
 <section class="section support-page">
   <div class="container">
-    <div class="support-hero text-center mb-5">
-      <h1 class="heading text-primary mb-3">Trung tâm hỗ trợ</h1>
-      <p class="text-muted mb-0">Gửi yêu cầu cho đội ngũ kỹ thuật. Chúng tôi sẽ phản hồi trong thời gian sớm nhất.</p>
+
+    <!-- Hero -->
+    <div class="support-hero text-center">
+      <div class="hero-badge">
+        <i class="bi bi-headset"></i> Hỗ trợ khách hàng
+      </div>
+      <h1>Trung tâm <span>hỗ trợ</span></h1>
+      <p>Gửi yêu cầu cho đội ngũ kỹ thuật. Chúng tôi cam kết phản hồi trong thời gian sớm nhất.</p>
     </div>
 
+    <!-- Alert messages -->
     {% if messages %}
     <div class="mb-4">
       {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }} shadow-sm" role="alert">
-        {{ message }}
+      <div class="alert support-alert alert-{{ message.tags|default:'info' }}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
       </div>
       {% endfor %}
     </div>
     {% endif %}
 
+    <!-- Cards row -->
     <div class="row g-4 align-items-stretch">
+
+      <!-- Contact info card -->
       <div class="col-lg-5">
-        <article class="support-card h-100">
-          <h2 class="h4 mb-3">Thông tin liên hệ</h2>
-          <p class="text-muted">Bạn có thể liên hệ trực tiếp theo các kênh bên dưới nếu cần hỗ trợ gấp.</p>
+        <article class="support-card">
+          <h2><i class="bi bi-telephone-fill me-2" style="color:#675aff;"></i>Thông tin liên hệ</h2>
+          <p>Bạn có thể liên hệ trực tiếp theo các kênh dưới đây nếu cần hỗ trợ gấp.</p>
 
           <div class="support-contact-list">
             <div class="support-contact-item">
-              <span class="icon-phone"></span>
-              <div>
+              <div class="support-contact-icon">
+                <i class="bi bi-telephone-fill"></i>
+              </div>
+              <div class="item-text">
                 <strong>Hotline</strong>
-                <p class="mb-0">{{ support_hotline }}</p>
+                <p>{{ support_hotline }}</p>
               </div>
             </div>
+
             <div class="support-contact-item">
-              <span class="icon-envelope"></span>
-              <div>
+              <div class="support-contact-icon">
+                <i class="bi bi-envelope-fill"></i>
+              </div>
+              <div class="item-text">
                 <strong>Email hỗ trợ</strong>
-                <p class="mb-0">{{ support_email }}</p>
+                <p>{{ support_email }}</p>
               </div>
             </div>
+
             <div class="support-contact-item">
-              <span class="icon-clock-o"></span>
-              <div>
+              <div class="support-contact-icon">
+                <i class="bi bi-clock-fill"></i>
+              </div>
+              <div class="item-text">
                 <strong>Giờ phản hồi</strong>
-                <p class="mb-0">08:00 - 22:00 (Thứ 2 đến Chủ nhật)</p>
+                <p>08:00 – 22:00 (Thứ 2 → Chủ nhật)</p>
+              </div>
+            </div>
+
+            <div class="support-contact-item">
+              <div class="support-contact-icon">
+                <i class="bi bi-geo-alt-fill"></i>
+              </div>
+              <div class="item-text">
+                <strong>Địa chỉ</strong>
+                <p>236B Lê Văn Sỹ, P. Tân Sơn Hòa, TP.HCM</p>
               </div>
             </div>
           </div>
         </article>
       </div>
 
+      <!-- Support form card -->
       <div class="col-lg-7">
-        <article class="support-card h-100">
-          <h2 class="h4 mb-3">Gửi yêu cầu hỗ trợ</h2>
+        <article class="support-card">
+          <h2><i class="bi bi-send-fill me-2" style="color:#675aff;"></i>Gửi yêu cầu hỗ trợ</h2>
+          <p>Điền đầy đủ thông tin bên dưới, chúng tôi sẽ liên hệ lại với bạn sớm nhất có thể.</p>
+
           <form method="post" novalidate>
             {% csrf_token %}
 
             <div class="mb-3">
-              <label class="form-label" for="{{ support_form.full_name.id_for_label }}">Họ và tên</label>
+              <label class="form-label" for="{{ support_form.full_name.id_for_label }}">
+                <i class="bi bi-person me-1"></i>Họ và tên
+              </label>
               {{ support_form.full_name }}
               {% if support_form.full_name.errors %}
-              <div class="text-danger small mt-1">{{ support_form.full_name.errors|striptags }}</div>
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ support_form.full_name.errors|striptags }}</div>
               {% endif %}
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="{{ support_form.contact_email.id_for_label }}">Email liên hệ</label>
+              <label class="form-label" for="{{ support_form.contact_email.id_for_label }}">
+                <i class="bi bi-envelope me-1"></i>Email liên hệ
+              </label>
               {{ support_form.contact_email }}
               {% if support_form.contact_email.errors %}
-              <div class="text-danger small mt-1">{{ support_form.contact_email.errors|striptags }}</div>
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ support_form.contact_email.errors|striptags }}</div>
               {% endif %}
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="{{ support_form.subject.id_for_label }}">Tiêu đề</label>
+              <label class="form-label" for="{{ support_form.subject.id_for_label }}">
+                <i class="bi bi-tag me-1"></i>Tiêu đề
+              </label>
               {{ support_form.subject }}
               {% if support_form.subject.errors %}
-              <div class="text-danger small mt-1">{{ support_form.subject.errors|striptags }}</div>
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ support_form.subject.errors|striptags }}</div>
               {% endif %}
             </div>
 
-            <div class="mb-3">
-              <label class="form-label" for="{{ support_form.message.id_for_label }}">Nội dung</label>
+            <div class="mb-4">
+              <label class="form-label" for="{{ support_form.message.id_for_label }}">
+                <i class="bi bi-chat-text me-1"></i>Nội dung
+              </label>
               {{ support_form.message }}
               {% if support_form.message.errors %}
-              <div class="text-danger small mt-1">{{ support_form.message.errors|striptags }}</div>
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ support_form.message.errors|striptags }}</div>
               {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary px-4">Gửi yêu cầu</button>
+            <button type="submit" class="btn-support-submit">
+              <i class="bi bi-send"></i> Gửi yêu cầu
+            </button>
           </form>
         </article>
       </div>
+
     </div>
   </div>
 </section>
