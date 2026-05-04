@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.http import HttpResponse
+import openpyxl
 from contracts.models import Tenant, Contract
 from houses.models import House
 from contracts.forms import TenantForm, ContractForm
@@ -171,3 +173,100 @@ def terminate_contract(request, contract_id):
         messages.success(request, 'Đã chấm dứt hợp đồng thành công.')
         
     return redirect('manage_contracts')
+
+
+@login_required(login_url='login')
+def export_contracts_xlsx(request):
+    from django.db.models import Q
+    
+    query = request.GET.get('q', '').strip()
+    status = request.GET.get('status', '').strip()
+    
+    user_contracts = Contract.objects.filter(house__owner=request.user).select_related('house', 'renter')
+    
+    if query:
+        user_contracts = user_contracts.filter(
+            Q(house__name__icontains=query) | 
+            Q(renter__full_name__icontains=query) | 
+            Q(renter__phone__icontains=query)
+        )
+    
+    if status:
+        user_contracts = user_contracts.filter(status=status)
+    
+    user_contracts = user_contracts.order_by('-created_at')
+
+    # Create workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Danh sách Hợp đồng"
+    
+    # Headers
+    headers = ['Mã HĐ', 'Căn Nhà', 'Khách Thuê', 'SĐT Khách', 'Ngày Bắt Đầu', 'Ngày Kết Thúc', 'Tổng Giá Trị (VNĐ)', 'Trạng Thái']
+    ws.append(headers)
+    
+    # Data
+    for contract in user_contracts:
+        status_display = dict(Contract.STATUS_CHOICES).get(contract.status, contract.status)
+        ws.append([
+            contract.id,
+            contract.house.name if contract.house else "N/A",
+            contract.renter.full_name if contract.renter else "N/A",
+            contract.renter.phone if contract.renter else "N/A",
+            contract.start_date.strftime('%d/%m/%Y'),
+            contract.end_date.strftime('%d/%m/%Y'),
+            float(contract.total_value),
+            status_display
+        ])
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="danh_sach_hop_dong.xlsx"'
+    wb.save(response)
+    
+    return response
+
+
+@login_required(login_url='login')
+def export_tenants_xlsx(request):
+    from django.db.models import Q
+    
+    query = request.GET.get('q', '').strip()
+    
+    user_tenants = Tenant.objects.filter(created_by=request.user).prefetch_related('signed_contracts')
+    
+    if query:
+        user_tenants = user_tenants.filter(
+            Q(full_name__icontains=query) | 
+            Q(phone__icontains=query) | 
+            Q(cccd__icontains=query)
+        )
+        
+    user_tenants = user_tenants.order_by('-created_at')
+
+    # Create workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Danh sách Khách thuê"
+    
+    # Headers
+    headers = ['Họ Tên', 'Giới Tính', 'Ngày Sinh', 'Số Điện Thoại', 'Số CCCD', 'Địa Chỉ Thường Trú', 'Số HĐ Đã Ký']
+    ws.append(headers)
+    
+    # Data
+    for tenant in user_tenants:
+        gender_display = dict(Tenant.GENDER_CHOICES).get(tenant.gender, tenant.gender)
+        ws.append([
+            tenant.full_name,
+            gender_display,
+            tenant.dob.strftime('%d/%m/%Y') if tenant.dob else "",
+            tenant.phone,
+            tenant.cccd,
+            tenant.address or "",
+            tenant.signed_contracts.count()
+        ])
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="danh_sach_khach_thue.xlsx"'
+    wb.save(response)
+    
+    return response

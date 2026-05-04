@@ -13,8 +13,8 @@ class Tenant(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Quản lý bởi Chủ nhà")
     
     full_name = models.CharField(max_length=100, verbose_name="Họ tên khách thuê")
-    phone = models.CharField(max_length=15, verbose_name="Số điện thoại")
-    cccd = models.CharField(max_length=20, verbose_name="CCCD")
+    phone = models.CharField(max_length=15, verbose_name="Số điện thoại", unique=True)
+    cccd = models.CharField(max_length=20, verbose_name="CCCD", unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, verbose_name="Giới tính")
     dob = models.DateField(null=True, blank=True, verbose_name="Ngày sinh")
     address = models.TextField(null=True, blank=True, verbose_name="Nơi thường trú")

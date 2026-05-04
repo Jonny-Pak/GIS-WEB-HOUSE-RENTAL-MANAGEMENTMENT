@@ -5,8 +5,8 @@ from django.contrib import messages
 from django.db.models import Count, Q
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth import get_user_model
 
 from houses.forms import SupportRequestForm
 from houses.models import House
@@ -118,9 +118,32 @@ def house_detail_view(request, house_id):
     })
 
 
+def landlord_posts_view(request, user_id):
+    User = get_user_model()
+    landlord = get_object_or_404(User, id=user_id)
+    houses_qs = House.objects.filter(owner=landlord, status='available').order_by('-created_at')
+    
+    paginator = Paginator(houses_qs, 12)
+    page = request.GET.get('page')
+    try:
+        houses_page = paginator.page(page)
+    except (PageNotAnInteger, EmptyPage):
+        houses_page = paginator.page(1)
+        
+    return render(request, 'houses/landlord_posts.html', {
+        'landlord': landlord,
+        'houses': houses_page,
+        'page_obj': houses_page,
+    })
+
+
 def map_view(request):
     map_houses = get_map_houses()
-    return render(request, 'houses/map_static.html', {'map_houses': map_houses})
+    focused_house_id = request.GET.get('house_id')
+    return render(request, 'houses/map_static.html', {
+        'map_houses': map_houses,
+        'focused_house_id': focused_house_id
+    })
 
 
 def support_view(request):

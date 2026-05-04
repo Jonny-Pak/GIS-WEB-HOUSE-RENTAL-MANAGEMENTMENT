@@ -8,10 +8,10 @@
     top: 0 !important;
     width: 300px !important;
     height: 100vh !important;
-    background: rgba(24, 20, 96, 0.95) !important;
+    background: #181460 !important; /* Fully opaque background to hide header background */
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px) !important;
-    z-index: 9999 !important;
+    z-index: 10000 !important; /* Higher than any header */
     display: flex !important;
     flex-direction: column !important;
     box-shadow: 10px 0 40px rgba(0, 0, 0, 0.4) !important;
@@ -36,10 +36,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5) !important;
+    background: rgba(0, 0, 0, 0.6) !important;
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;
-    z-index: 9998 !important;
+    z-index: 9999 !important;
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s ease;
@@ -53,33 +53,44 @@
 .site-mobile-menu-header {
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-end !important;
-    padding: 20px 24px !important;
+    justify-content: space-between !important; /* Space between logo and close button */
+    padding: 16px 24px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.mobile-menu-logo {
+    display: flex !important;
+    align-items: center !important;
 }
 
 .site-mobile-menu-close {
-    width: 40px !important;
-    height: 40px !important;
+    width: 42px !important;
+    height: 42px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.1) !important;
     color: #fff !important;
-    font-size: 24px !important;
+    font-size: 20px !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    position: relative !important;
+    top: 3px;
+    float: none !important;
 }
 
 .site-mobile-menu-close:hover {
     background: rgba(255, 255, 255, 0.2) !important;
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
+    color: #ffd600 !important;
 }
 
 .site-mobile-menu-body {
     flex: 1 !important;
-    padding: 20px 0 !important;
+    padding: 10px 0 !important;
     overflow-y: auto !important;
 }
 
@@ -93,21 +104,24 @@
     position: relative;
     display: flex !important;
     align-items: center !important;
-    padding: 16px 28px !important;
+    padding: 18px 28px !important;
     color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 16px !important;
+    font-size: 17px !important;
     font-weight: 500 !important;
     text-decoration: none !important;
     transition: all 0.3s ease !important;
-    border-left: 4px solid transparent;
+    border-left: 3px solid transparent;
+    border-radius: 0 12px 12px 0;
+    margin-right: 12px;
 }
 
 .site-nav-wrap>li>a:hover,
 .site-nav-wrap>li.active>a {
     color: #ffd600 !important;
-    background: rgba(255, 214, 0, 0.08) !important;
+    background: rgba(255, 214, 0, 0.12) !important;
     border-left-color: #ffd600;
     padding-left: 36px !important;
+    border-radius: 0 12px 12px 0;
 }
 
 /* Dropdown */
@@ -381,7 +395,6 @@ body {
     border: none;
     display: flex;
     align-items: center;
-    margin-left: 18px;
 }
 
 .site-menu>li.active>a,
@@ -542,8 +555,8 @@ body {
     font-weight: bold;
     border-radius: var(--menu-radius);
     padding: 12px 28px !important;
-    margin-left: 12px;
-    min-width: 140px;
+    margin-left: 0;
+    min-width: 130px;
     font-size: 16px;
     display: inline-flex;
     align-items: center;
@@ -590,7 +603,10 @@ body {
     box-shadow: 0 2px 8px rgba(255, 214, 0, 0.10) !important;
     border: 1.5px solid #ffd600 !important;
     transition: box-shadow 0.18s, border 0.18s, background 0.18s;
-    margin-left: 18px;
+    font-weight: 600;
+    color: #181460;
+    font-size: 15px;
+    margin-left: 0;
 }
 
 .user-avatar-name {
@@ -610,27 +626,10 @@ body {
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid #ffd600;
-    margin-right: 8px;
     background: #fff;
 }
 
-.user-avatar-wrap {
-    display: flex;
-    align-items: center;
-    background: #fffbe6;
-    border-radius: 24px;
-    padding: 2px 16px 2px 2px;
-    box-shadow: 0 2px 8px rgba(255, 214, 0, 0.10);
-    font-weight: 600;
-    color: #181460;
-    font-size: 15px;
-    border: 1.5px solid #ffd600;
-}
 
-.user-avatar-name {
-    margin-left: 2px;
-    margin-right: 2px;
-}
 
 /* Giảm size chuông cho cân đối */
 /* === NOTIFICATION BELL - Premium === */
@@ -792,6 +791,11 @@ body {
     animation: user-drop-in 0.22s ease both;
 }
 
+.notification-dropdown-menu .notif-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 /* Header */
 .notif-dd-header {
     display: flex;
@@ -944,8 +948,8 @@ body {
 .user-nav-group {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-left: 24px;
+    gap: 20px;
+    margin-left: 28px;
     flex-direction: row;
 }
 

@@ -22,7 +22,7 @@ class Notification(models.Model):
 # Hồ sơ cá nhân
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=10, blank=True)
+    phone = models.CharField(max_length=10, blank=True, null=True, unique=True)
     avatar = models.ImageField(upload_to='avatars/', default='avatars/avatar.jpg')
 
     def __str__(self):

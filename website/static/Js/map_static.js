@@ -68,7 +68,7 @@
   }
 
   // detect mobile
-  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && /iPad|Macintosh/i.test(navigator.userAgent));
   const isChromium = window.navigator.userAgent.indexOf('Chrome') > -1 || window.navigator.userAgent.indexOf('Edg') > -1;
 
   // Chỉ vô hiệu hóa cảm ứng Leaflet trên Desktop Chrome/Edge có màn hình cảm ứng để sửa lỗi double-click.
@@ -77,9 +77,17 @@
     L.Browser.touch = false;
   }
 
+  // Hotfix cho Leaflet.Draw trên mobile: Ép sự kiện chạm (touch) thành đặt đỉnh (vertex) cho Polygon/Polyline
+  if (typeof L.Draw !== 'undefined' && L.Browser.touch && isMobileDevice) {
+    L.Draw.Polyline.prototype._onTouch = function (e) {
+      this._onClick(e);
+    };
+  }
+
   const map = L.map("static-map", {
     zoomControl: true,
     scrollWheelZoom: true,
+    tap: false, // Tắt trình xử lý tap nội bộ của Leaflet để ưu tiên click tự nhiên trên mọi thiết bị
   }).setView([10.7769, 106.7009], 12);
 
   let baseLayer = null;
@@ -116,25 +124,28 @@
 
   const mapElement = document.getElementById("static-map");
   const apiUrl = mapElement ? mapElement.dataset.apiUrl : '/api/v1/houses/';
+  const focusId = mapElement ? mapElement.dataset.focusId : null;
 
   const housesDataNode = document.getElementById("houses-data");
   const rawHouses = JSON.parse((housesDataNode && housesDataNode.textContent) || "[]");
-  let houses = rawHouses
+  const allHouses = rawHouses
     .map(normalizeMapHouse)
     .filter(function (house) {
       return house && house.lat != null && house.lng != null;
     });
+  let houses = [...allHouses];
 
   const markerGroup = L.featureGroup().addTo(map);
   const drawnItems = new L.FeatureGroup().addTo(map);
 
-  // Code _onTouch removed because it broke the Finish button.
   const btnClearPolygon = document.getElementById("btnClearMapPolygon");
   const btnLocateMeOnMap = document.getElementById("btnLocateMeOnMap");
   const inputSearchRadius = document.getElementById("inputSearchRadius");
+  const switchRadiusFilter = document.getElementById("switchRadiusFilter");
   const btnSearchAddress = document.getElementById("btnSearchAddress");
   const inputAddressSearch = document.getElementById("inputAddressSearch");
   const mapFilterStatus = document.getElementById("mapFilterStatus");
+  const btnToggleRadiusFromCard = document.getElementById("btnToggleRadiusFromCard");
   let userLocationMarker = null;
   let userAccuracyCircle = null;
   let customPinMarker = null;
@@ -205,7 +216,7 @@
     markerGroup.clearLayers();
 
     houseList.forEach(function (house) {
-      const marker = L.marker([house.lat, house.lng]);
+      const marker = L.marker([house.lat, house.lng], { houseId: house.id });
       marker.bindPopup(buildPopupHtml(house));
       marker.addTo(markerGroup);
     });
@@ -348,10 +359,90 @@
     btnCloseBottomCard.addEventListener("click", hideBottomCard);
   }
 
+  function applyRadiusFilter() {
+    const isFilterActive = switchRadiusFilter && switchRadiusFilter.checked;
+    const radius = parseFloat(inputSearchRadius.value) || 2000;
+
+    let center = null;
+    if (customPinMarker) center = customPinMarker.getLatLng();
+    else if (userLocationMarker) center = userLocationMarker.getLatLng();
+
+    if (isFilterActive && center) {
+      // Create/Update the circle layer representing the radius
+      const circleLayer = L.circle(center, {
+        radius: radius,
+        color: "#0d6efd",
+        weight: 3,
+        fillColor: "#0d6efd",
+        fillOpacity: 0.15,
+      });
+      replacePolygonLayer(circleLayer);
+
+      const filtered = allHouses.filter(house => {
+        const houseLatLng = L.latLng(house.lat, house.lng);
+        return map.distance(center, houseLatLng) <= radius;
+      });
+
+      renderHouses(filtered, false);
+      statusState.filter = `Đang lọc: Tìm thấy ${filtered.length}/${allHouses.length} nhà trong bán kính ${Math.round(radius)}m.`;
+      
+      // Update Bottom Card Button
+      if (btnToggleRadiusFromCard) {
+        btnToggleRadiusFromCard.innerHTML = '<i class="fas fa-times-circle"></i> <span>Tắt lọc bán kính</span>';
+        btnToggleRadiusFromCard.classList.add("active");
+      }
+    } else {
+      renderHouses(allHouses, false);
+      
+      // Remove the circle/polygon layer if we are not filtering
+      if (!isFilterActive) {
+        drawnItems.clearLayers();
+      }
+
+      if (isFilterActive && !center) {
+        statusState.filter = "Vui lòng ghim vị trí hoặc bật 'Vị trí của tôi' để bắt đầu lọc.";
+      } else {
+        statusState.filter = "Chế độ xem toàn bộ: Đang hiển thị " + allHouses.length + " nhà.";
+      }
+
+      // Update Bottom Card Button
+      if (btnToggleRadiusFromCard) {
+        btnToggleRadiusFromCard.innerHTML = '<i class="fas fa-search"></i> <span>Tìm trọ quanh đây</span>';
+        btnToggleRadiusFromCard.classList.remove("active");
+      }
+    }
+    renderStatus();
+  }
+
+  if (switchRadiusFilter) {
+    switchRadiusFilter.addEventListener("change", function() {
+      if (this.checked) {
+        // Show notification/alert when enabled
+        statusState.filter = "Đã bật chế độ lọc bán kính.";
+        // Automatically try to find center if none exists
+        if (!customPinMarker && !userLocationMarker) {
+           locateCurrentUser();
+        }
+      } else {
+        statusState.filter = "Đã tắt lọc bán kính. Hiện tất cả.";
+      }
+      applyRadiusFilter();
+    });
+  }
+
+  if (btnToggleRadiusFromCard) {
+    btnToggleRadiusFromCard.addEventListener("click", function() {
+      if (switchRadiusFilter) {
+        switchRadiusFilter.checked = !switchRadiusFilter.checked;
+        // Trigger the change event manually
+        switchRadiusFilter.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+
   function setCustomPinAndSearch(lat, lng, radius, forceFitBounds = false) {
     const position = [lat, lng];
 
-    // Clear user location when custom pin is dropped
     if (userLocationMarker) map.removeLayer(userLocationMarker);
     if (userAccuracyCircle) map.removeLayer(userAccuracyCircle);
     userLocationMarker = null;
@@ -363,24 +454,13 @@
       customPinMarker = L.marker(position).addTo(map);
     }
 
-    showBottomCard("Đang tìm địa chỉ...");
-
-    const circleLayer = L.circle(position, {
-      radius: radius,
-      color: "#0d6efd",
-      weight: 3,
-      fillColor: "#0d6efd",
-      fillOpacity: 0.15,
-    });
-    replacePolygonLayer(circleLayer);
-
     if (forceFitBounds) {
-      map.fitBounds(circleLayer.getBounds(), { padding: [24, 24] });
+      map.setView(position, 16);
     } else {
       map.panTo(position);
     }
 
-    fetchHousesByRadius(lat, lng, radius);
+    showBottomCard("Đang tìm địa chỉ...");
 
     // Call reverse geocoding to update address
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=vi`)
@@ -419,26 +499,8 @@
         console.error("Reverse geocoding error:", err);
         showBottomCard("Lỗi khi tìm địa chỉ.");
       });
-  }
 
-  function fetchHousesByRadius(lat, lng, radius) {
-    statusState.filter = "Đang tải dữ liệu...";
-    renderStatus();
-
-    fetch(`${apiUrl}?lat=${lat}&lng=${lng}&radius=${radius / 1000}`)
-      .then(response => response.json())
-      .then(data => {
-        houses = data.map(normalizeMapHouse).filter(h => h != null);
-        // Do not force fit bounds to houses! The circle/pan logic handles zoom.
-        renderHouses(houses, false);
-        statusState.filter = `Tìm thấy ${houses.length} nhà trong bán kính ${Math.round(radius)}m`;
-        renderStatus();
-      })
-      .catch(error => {
-        statusState.filter = "Lỗi khi tải dữ liệu từ máy chủ.";
-        renderStatus();
-        console.error("API error:", error);
-      });
+    applyRadiusFilter();
   }
 
   map.on(L.Draw.Event.CREATED, function (event) {
@@ -449,7 +511,9 @@
     } else if (event.layerType === "circle") {
       const center = event.layer.getLatLng();
       const radius = event.layer.getRadius();
-      fetchHousesByRadius(center.lat, center.lng, radius);
+      // Update radius input to match drawn circle
+      if (inputSearchRadius) inputSearchRadius.value = Math.round(radius);
+      applyRadiusFilter();
     }
   });
 
@@ -504,20 +568,12 @@
       }
       locateCurrentUser();
 
-      // Attempt search immediately assuming successful locate after a small delay
+      // Trigger radius filter after location found
       setTimeout(() => {
         if (userLocationMarker) {
-          const radius = parseFloat(inputSearchRadius.value) || 2000;
-          const lat = userLocationMarker.getLatLng().lat;
-          const lng = userLocationMarker.getLatLng().lng;
-
-          const circleLayer = L.circle([lat, lng], {
-            radius: radius, color: "#0d6efd", weight: 3, fillColor: "#0d6efd", fillOpacity: 0.15
-          });
-          replacePolygonLayer(circleLayer);
-          fetchHousesByRadius(lat, lng, radius);
+          applyRadiusFilter();
         }
-      }, 3000); // 3 sec is generally enough but it's a rough fallback
+      }, 3500);
     });
   }
 
@@ -661,7 +717,17 @@
     });
   }
 
-  renderHouses(houses, true);
-  statusState.filter = "Nhấn vào bản đồ để ghim vị trí hoặc tìm kiếm địa chỉ. Bán kính mặc định là " + inputSearchRadius.value + "m.";
+  renderHouses(allHouses, !focusId); // Do not fit bounds if focusing
+
+  if (focusId) {
+    markerGroup.eachLayer(function (layer) {
+      if (layer instanceof L.Marker && layer.options.houseId && layer.options.houseId.toString() === focusId.toString()) {
+        map.setView(layer.getLatLng(), 17);
+        layer.openPopup();
+      }
+    });
+  }
+
+  statusState.filter = "Nhấn vào bản đồ để ghim vị trí hoặc nhấn nút 'Lọc bán kính' để tìm quanh đây.";
   renderStatus();
 })();

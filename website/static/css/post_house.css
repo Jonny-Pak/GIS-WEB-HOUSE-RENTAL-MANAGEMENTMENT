@@ -41,3 +41,33 @@
     border-style: dashed !important;
     border-color: #ccc !important;
 }
+
+/* Mobile Map Controls Optimization */
+@media (max-width: 768px) {
+    .leaflet-draw-toolbar a {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        background-size: 300px 30px !important;
+    }
+    
+    .leaflet-bar a {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+    }
+    
+    .leaflet-draw-actions {
+        left: 42px !important;
+    }
+    
+    .leaflet-draw-actions li {
+        height: 36px !important;
+    }
+    
+    .leaflet-draw-actions a {
+        line-height: 36px !important;
+        height: 36px !important;
+        padding: 0 10px !important;
+    }
+}

@@ -179,7 +179,7 @@
 
   baseLayer.addTo(map);
 
-  const houseName = escapeHtml(mapElement.dataset.name || "Nha cho thue");
+  const houseName = escapeHtml(mapElement.dataset.name || "Nhà cho thuê");
   const houseAddress = escapeHtml(mapElement.dataset.address || "");
 
   const marker = L.marker([lat, lng]).addTo(map);

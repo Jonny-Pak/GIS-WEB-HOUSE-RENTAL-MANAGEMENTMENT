@@ -137,6 +137,18 @@ class HouseForm(forms.ModelForm):
             self.add_error('area', 'Vui lòng nhập diện tích.')
             return cleaned_data
 
+        # Kiểm tra trùng lặp (Tên + Địa chỉ)
+        name = cleaned_data.get('name')
+        address = cleaned_data.get('address')
+        if name and address:
+            duplicate_query = House.objects.filter(name__iexact=name, address__iexact=address)
+            if self.instance.pk:
+                duplicate_query = duplicate_query.exclude(pk=self.instance.pk)
+            
+            if duplicate_query.exists():
+                self.add_error('name', 'Tin đăng có tên và địa chỉ này đã tồn tại trong hệ thống.')
+                self.add_error('address', 'Vui lòng kiểm tra lại địa chỉ hoặc tên nhà để tránh trùng lặp.')
+
         tolerance = max(5.0, estimated_area * self.AREA_TOLERANCE_RATIO)
         difference = abs(float(area) - estimated_area)
         if difference > tolerance:

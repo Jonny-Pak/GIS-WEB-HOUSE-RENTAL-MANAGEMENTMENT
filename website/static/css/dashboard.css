@@ -389,4 +389,326 @@ body {
     }
 }
 
+/* Unified Dashboard Filters */
+.dashboard-filter-card {
+    border: none;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(24, 20, 96, 0.05) !important;
+    background: white;
+    margin-bottom: 24px;
+}
 
+.filter-search-group {
+    box-shadow: 0 2px 6px rgba(24, 20, 96, 0.03);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.filter-search-group .input-group-text {
+    background: white;
+    border-right: none;
+    color: #9da1bc;
+    padding-left: 16px;
+}
+
+.filter-search-group .form-control {
+    border-left: none;
+    border-right: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 14px;
+}
+
+.filter-search-group .btn-search {
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: 700;
+}
+
+.btn-clear-filter {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #6c757d;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-clear-filter:hover {
+    background: #e9ecef;
+    color: #dc3545;
+    border-color: #dee2e6;
+}
+
+/* Utilities used in dashboard */
+.extra-small {
+    font-size: 11px;
+}
+
+.small-14 {
+    font-size: 14px;
+}
+
+.font-monospace {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.shadow-xs {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(24, 20, 96, 0.12) !important;
+}
+
+/* Tenant Card Specifics */
+.history-scroll-container {
+    max-height: 145px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Custom Scrollbar for Dashboard Elements */
+.history-scroll-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.history-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.history-scroll-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.history-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+.avatar-circle-lg {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover .avatar-circle-lg {
+    transform: scale(1.05);
+}
+
+
+
+
+/* === CUSTOM PAGINATION (Match Homepage Style) === */
+.pagination {
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.pagination .page-item .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 10px !important;
+    background: #fff;
+    border: 1.5px solid #e0e0f7 !important;
+    color: var(--primary-red) !important;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(24, 20, 96, 0.04) !important;
+}
+
+.pagination .page-item .page-link:hover {
+    background: #f0f0ff;
+    border-color: var(--primary-red) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 20, 96, 0.1) !important;
+    color: var(--primary-red) !important;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary-red) !important;
+    border-color: var(--primary-red) !important;
+    color: #ffd600 !important; /* Yellow theme from home */
+    box-shadow: 0 4px 12px rgba(24, 20, 96, 0.2) !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    background: #f8f9fa;
+    border-color: #e9ecef !important;
+    color: #adb5bd !important;
+    opacity: 0.6;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Adjust for icons in pagination */
+.pagination .page-link i,
+.pagination .page-link span[class^="icon-"] {
+    font-size: 14px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Standard Action Buttons in Tables */
+.btn-action {
+    width: 35px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    background-color: #f8f9fa;
+    color: #495057;
+    text-decoration: none;
+    padding: 0;
+}
+
+.btn-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    color: white;
+}
+
+.btn-action-edit {
+    color: #181460;
+    background-color: rgba(24, 20, 96, 0.08);
+}
+
+.btn-action-edit:hover {
+    background-color: #181460;
+}
+
+.btn-action-delete, .btn-action-terminate {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.08);
+}
+
+.btn-action-delete:hover, .btn-action-terminate:hover {
+    background-color: #ef4444;
+}
+
+.btn-action-view {
+    color: #06b6d4;
+    background-color: rgba(6, 182, 212, 0.08);
+}
+
+.btn-action-view:hover {
+    background-color: #06b6d4;
+}
+
+.btn-action-success {
+    background-color: rgba(16, 185, 129, 0.08);
+    color: #10b981;
+    width: auto;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.btn-action-success:hover {
+    background-color: #10b981;
+    color: white;
+}
+
+
+/* Custom Pills Styling for Filters (e.g. Notifications) */
+.custom-pills .nav-link {
+    border-left: none !important; /* Xóa vệt vàng kế thừa từ sidebar */
+    color: #6c757d;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1.5px solid transparent !important;
+}
+
+.custom-pills .nav-link.active {
+    background-color: var(--primary-red) !important; /* Xanh Navy (#181460) */
+    color: #ffb347 !important; /* Vàng chủ đạo (#ffb347) */
+    border-left: none !important;
+    box-shadow: 0 4px 10px rgba(24, 20, 96, 0.15);
+}
+
+.custom-pills .nav-link:not(.active):hover {
+    background-color: #f1f2f6;
+    color: var(--primary-red);
+    border-color: #e0e0f7 !important;
+}
+
+/* --- PROFILE DROPDOWN STYLES --- */
+.user-profile:hover .avatar-circle {
+    border-color: #ffb347 !important;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu {
+    animation: fadeInDown 0.3s ease;
+    box-shadow: 0 10px 30px rgba(24, 20, 96, 0.15) !important;
+    border: none;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dropdown-item:hover {
+    background-color: #fff1f1 !important;
+}
+
+.avatar-circle {
+    transition: all 0.3s ease;
+}
+
+/* --- FIXING PROFILE DROPDOWN BEHAVIOR --- */
+.user-profile.dropdown {
+    position: relative !important;
+    user-select: none;
+}
+
+.user-profile.dropdown [role='button'] {
+    outline: none !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease;
+}
+
+.user-profile.dropdown [role='button']:active {
+    transform: scale(0.98);
+}
+
+.dropdown-menu-end[style] {
+    right: 0 !important;
+    left: auto !important;
+}
+
+.user-profile .dropdown-menu {
+    border-radius: 12px;
+    border: 1px solid rgba(24, 20, 96, 0.08);
+    margin-top: 10px !important; /* Tạo một khoảng cách nhỏ hợp lý */
+    animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

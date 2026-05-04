@@ -121,18 +121,29 @@
     const initialLng = parseFloat(String(lngVal).replace(',', '.'));
     const hasInitialCoords = Number.isFinite(initialLat) && Number.isFinite(initialLng);
 
-    // detect mobile
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // detection
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && /iPad|Macintosh/i.test(navigator.userAgent));
     const isChromium = window.navigator.userAgent.indexOf('Chrome') > -1 || window.navigator.userAgent.indexOf('Edg') > -1;
 
-    // Chỉ vô hiệu hóa cảm ứng Leaflet trên Desktop Chrome/Edge có màn hình cảm ứng để sửa lỗi double-click.
-    // Trên thiết bị di động thực sự (Mobile), chúng ta PHẢI giữ L.Browser.touch = true để vẽ được.
+    // Chi vo hieu hoa cam ung Leaflet tren Desktop Chrome/Edge co man hinh cam ung de sua loi double-click.
+    // Tren thiet bi di dong thuc su (Mobile), chung ta PHẢI giu L.Browser.touch = true de ve duoc.
     if (!isMobileDevice && isChromium && navigator.maxTouchPoints > 0) {
       L.Browser.touch = false;
     }
 
+    // Fix error drawing on mobile for Leaflet Draw
+    if (typeof L.Draw !== 'undefined' && L.Browser.touch && isMobileDevice) {
+      // Re-map touchstart to vertex placement specifically for mobile
+      // This is a safer version than the one that "broke" the finish button
+      L.Draw.Polyline.prototype._onTouch = function (e) {
+        this._onClick(e);
+      };
+    }
+
     let latestUserLocation = null;
-    const map = L.map(mapElement).setView(
+    const map = L.map(mapElement, {
+        tap: false, // Disable Leaflet's internal tap handler to let native clicks work better on all devices
+    }).setView(
       hasInitialCoords ? [initialLat, initialLng] : [defaultLat, defaultLng],
       hasInitialCoords ? 16 : 12
     );

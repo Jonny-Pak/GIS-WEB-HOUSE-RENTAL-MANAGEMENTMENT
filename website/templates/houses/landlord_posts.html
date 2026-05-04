@@ -1,0 +1,136 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Tin đăng của {{ landlord.username }} - Thuê Nhà Nhanh{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260421e" />
+<style>
+    .landlord-profile-header {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #181460 0%, #2d278a 100%);
+        color: #fff;
+        margin-top: 100px; /* Offset for fixed navbar */
+        border-radius: 0 0 40px 40px;
+        box-shadow: 0 10px 30px rgba(24, 20, 96, 0.15);
+        text-align: center;
+    }
+    .landlord-avatar-large {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 4px solid #ffd600;
+        object-fit: cover;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .landlord-name {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #ffd600;
+    }
+    .landlord-stats {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    .posts-section {
+        padding: 60px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="landlord-profile-header">
+    <div class="container">
+        {% if landlord.profile.avatar %}
+            <img src="{{ landlord.profile.avatar.url }}" class="landlord-avatar-large" alt="{{ landlord.username }}">
+        {% else %}
+            <img src="{% static 'images/person_1-min.jpg' %}" class="landlord-avatar-large" alt="{{ landlord.username }}">
+        {% endif %}
+        <h1 class="landlord-name">{{ landlord.username }}</h1>
+        <div class="landlord-stats">
+            <span class="icon-home me-2"></span> Đang có <strong>{{ page_obj.paginator.count }}</strong> tin đăng đang trống
+        </div>
+    </div>
+</section>
+
+<section class="section posts-section">
+    <div class="container">
+        <div class="room-cards-grid">
+            {% for house in houses %}
+            <article class="room-card-item">
+                <a href="{% url 'house_detail' house.id %}" class="room-card-image-link">
+                    {% if house.main_image %}
+                    <img src="{{ house.main_image.url }}" alt="{{ house.name }}" class="room-card-image">
+                    {% else %}
+                    {% with first_image=house.images.all|first %}
+                    {% if first_image %}
+                    <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="room-card-image">
+                    {% else %}
+                    <img src="{% static 'images/img_1.jpg' %}" alt="{{ house.name }}" class="room-card-image">
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+
+                <div class="room-card-body">
+                    <span class="room-vacancy-badge">Còn trống</span>
+                    <h3 class="room-card-title">{{ house.name }}</h3>
+                    <p class="room-card-address">• {{ house.address }}</p>
+                    <p class="room-card-meta">
+                        <span class="room-price-highlight">{{ house.price|floatformat:0 }} VNĐ</span>
+                    </p>
+
+                    <div class="room-card-actions">
+                        <a href="{% url 'map_view' %}?house_id={{ house.id }}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+                        <a href="{% url 'house_detail' house.id %}" class="btn btn-primary btn-sm px-3">Chi tiết</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="w-100 text-center py-5 bg-white rounded border">
+                <h4 class="text-muted">Chủ nhà này chưa có tin đăng nào khác</h4>
+                <p class="text-muted mb-0">Hãy quay lại sau nhé!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination-wrapper">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                <span class="icon-chevron-left"></span>
+              </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                <span class="icon-chevron-right"></span>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <a href="{% url 'home' %}" class="btn btn-outline-primary px-5 py-3 rounded-pill fw-bold">
+                <span class="icon-arrow-left me-2"></span> Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -182,40 +182,47 @@
                 <h2 class="font-weight-bold text-primary heading">Tin đăng khác của {{ house.owner.username }}</h2>
             </div>
         </div>
-        <div class="row">
+        <div class="room-cards-grid">
             {% for other_house in other_houses %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="property-item shadow-sm border rounded">
-                    <a href="{% url 'house_detail' other_house.id %}" class="img">
-                        {% if other_house.main_image %}
-                        <img src="{{ other_house.main_image.url }}" alt="Image" class="img-fluid rounded-top">
-                        {% else %}
-                        {% with other_first_image=other_house.images.all|first %}
-                        {% if other_first_image %}
-                        <img src="{{ other_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
-                        {% else %}
-                        <img src="{% static 'images/img_1.jpg' %}" alt="Image" class="img-fluid rounded-top">
-                        {% endif %}
-                        {% endwith %}
-                        {% endif %}
-                    </a>
-                    <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>{{ other_house.price|floatformat:0 }}
-                                VNĐ</span></div>
-                        <h5 class="mb-2"><a href="{% url 'house_detail' other_house.id %}" class="text-black">{{
-                                other_house.name }}</a></h5>
-                        <span class="city d-block mb-3 text-muted small"><span class="icon-map-marker me-1"></span>{{
-                            other_house.address }}</span>
-                        <a href="{% url 'house_detail' other_house.id %}"
-                            class="btn btn-primary btn-sm px-3 text-white">Chi tiết</a>
+            <article class="room-card-item">
+                <a href="{% url 'house_detail' other_house.id %}" class="room-card-image-link">
+                    {% if other_house.main_image %}
+                    <img src="{{ other_house.main_image.url }}" alt="{{ other_house.name }}" class="room-card-image">
+                    {% else %}
+                    {% with other_first_image=other_house.images.all|first %}
+                    {% if other_first_image %}
+                    <img src="{{ other_first_image.image.url }}" alt="{{ other_house.name }}" class="room-card-image">
+                    {% else %}
+                    <img src="{% static 'images/img_1.jpg' %}" alt="{{ other_house.name }}" class="room-card-image">
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+                <div class="room-card-body">
+                    <span class="room-vacancy-badge">Còn trống</span>
+                    <h3 class="room-card-title">{{ other_house.name }}</h3>
+                    <p class="room-card-address">• {{ other_house.address }}</p>
+                    <p class="room-card-meta">
+                        <span class="room-price-highlight">Giá: {{ other_house.price|floatformat:0 }} VNĐ</span>
+                    </p>
+                    <div class="room-card-actions">
+                        <a href="{% url 'map_view' %}?house_id={{ other_house.id }}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+                        <a href="{% url 'house_detail' other_house.id %}" class="btn btn-primary btn-sm px-3">Chi tiết</a>
                     </div>
                 </div>
-            </div>
+            </article>
             {% empty %}
             <div class="col-12">
                 <p class="text-muted">Chủ nhà hiện chưa có tin đăng nào khác.</p>
             </div>
             {% endfor %}
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{% url 'landlord_posts' house.owner.id %}" class="btn btn-primary px-4 py-2 rounded shadow-sm text-white">
+                    Xem thêm tin của chủ nhà này <span class="icon-arrow-right ms-2"></span>
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -228,34 +235,35 @@
                 <p class="text-muted">Những căn nhà tương tự có thể bạn sẽ thích</p>
             </div>
         </div>
-        <div class="row">
+        <div class="room-cards-grid">
             {% for related in related_houses %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="property-item bg-white shadow-sm border rounded">
-                    <a href="{% url 'house_detail' related.id %}" class="img">
-                        {% if related.main_image %}
-                        <img src="{{ related.main_image.url }}" alt="Image" class="img-fluid rounded-top">
-                        {% else %}
-                        {% with related_first_image=related.images.all|first %}
-                        {% if related_first_image %}
-                        <img src="{{ related_first_image.image.url }}" alt="Image" class="img-fluid rounded-top">
-                        {% else %}
-                        <img src="{% static 'images/img_4.jpg' %}" alt="Image" class="img-fluid rounded-top">
-                        {% endif %}
-                        {% endwith %}
-                        {% endif %}
-                    </a>
-                    <div class="p-3">
-                        <div class="price mb-2 text-primary fw-bold"><span>{{ related.price|floatformat:0 }} VNĐ</span>
-                        </div>
-                        <h5 class="mb-2"><a href="{% url 'house_detail' related.id %}" class="text-black">{{
-                                related.name }}</a></h5>
-                        <span class="city d-block mb-3 text-muted small">{{ related.address }}</span>
-                        <a href="{% url 'house_detail' related.id %}" class="btn btn-outline-primary btn-sm">Xem chi
-                            tiết</a>
+            <article class="room-card-item">
+                <a href="{% url 'house_detail' related.id %}" class="room-card-image-link">
+                    {% if related.main_image %}
+                    <img src="{{ related.main_image.url }}" alt="{{ related.name }}" class="room-card-image">
+                    {% else %}
+                    {% with related_first_image=related.images.all|first %}
+                    {% if related_first_image %}
+                    <img src="{{ related_first_image.image.url }}" alt="{{ related.name }}" class="room-card-image">
+                    {% else %}
+                    <img src="{% static 'images/img_4.jpg' %}" alt="{{ related.name }}" class="room-card-image">
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+                <div class="room-card-body">
+                    <span class="room-vacancy-badge">Gợi ý</span>
+                    <h3 class="room-card-title">{{ related.name }}</h3>
+                    <p class="room-card-address">• {{ related.address }}</p>
+                    <p class="room-card-meta">
+                        <span class="room-price-highlight">{{ related.price|floatformat:0 }} VNĐ</span>
+                    </p>
+                    <div class="room-card-actions">
+                        <a href="{% url 'map_view' %}?house_id={{ related.id }}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+                        <a href="{% url 'house_detail' related.id %}" class="btn btn-primary btn-sm px-3">Chi tiết</a>
                     </div>
                 </div>
-            </div>
+            </article>
             {% empty %}
             <div class="col-12 text-center">
                 <p class="text-muted">Hiện chưa tìm thấy nhà tương tự trong khu vực này.</p>

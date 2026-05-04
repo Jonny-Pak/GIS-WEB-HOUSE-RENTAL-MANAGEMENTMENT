@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
   <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260404e" />
   <link rel="stylesheet" href="{% static 'css/base.css' %}?v=20260420p" />
+  <link rel="stylesheet" href="{% static 'css/components.css' %}?v=20260421a" />
 
 
   {% block extra_css %}{% endblock %}
@@ -32,14 +33,17 @@
 
   <div class="site-mobile-menu site-navbar-target">
     <div class="site-mobile-menu-header">
+      <div class="mobile-menu-logo">
+        <img src="{% static 'images/logo_web.png' %}" alt="Logo" class="logo-img" style="max-height: 40px; width: auto;">
+      </div>
       <div class="site-mobile-menu-close js-menu-toggle" style="cursor:pointer;">
-        <span>&times;</span>
+        <i class="bi bi-x-lg"></i>
       </div>
     </div>
     <div class="site-mobile-menu-body">
       <ul class="site-nav-wrap">
         <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-          <a href="{% url 'home' %}">Trang chủ</a>
+          <a href="{% url 'home' %}"><span class="icon-home me-1"></span> Trang chủ</a>
         </li>
         <li class="has-children {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
           <a href="#">Danh mục</a>
@@ -55,7 +59,7 @@
           </a>
         </li>
         <li class="{% if request.resolver_match.url_name == 'support' %}active{% endif %}">
-          <a href="{% url 'support' %}">Hỗ trợ</a>
+          <a href="{% url 'support' %}"><span class="icon-question-circle me-1"></span> Hỗ trợ</a>
         </li>
         <li>
           <a href="{% url 'post_house' %}" class="btn-post-news">
@@ -129,28 +133,30 @@
                     <span class="notif-dd-title"><i class="bi bi-bell-fill"></i> Thông báo</span>
                     {% if notification_unread_count > 0 %}<span class="notif-dd-count">{{ notification_unread_count }} mới</span>{% endif %}
                   </li>
-                  {% if notification_preview %}
-                  {% for n in notification_preview %}
-                  <li class="notif-dd-item{% if not n.is_read %} notif-dd-item--unread{% endif %}">
-                    <a href="{% url 'notification_detail' n.id %}" class="notif-dd-link">
-                      <span class="notif-dd-dot"></span>
-                      <span class="notif-dd-content">
-                        <span class="notif-dd-text">{{ n.title }}</span>
-                        <span class="notif-dd-time">{{ n.created_at|date:'d/m/Y H:i' }}</span>
-                      </span>
-                      {% if not n.is_read %}<span class="notif-dd-badge">Mới</span>{% endif %}
-                    </a>
-                  </li>
-                  {% endfor %}
+                  <div class="notif-list-container">
+                    {% if notification_preview %}
+                    {% for n in notification_preview %}
+                    <li class="notif-dd-item{% if not n.is_read %} notif-dd-item--unread{% endif %}">
+                      <a href="{% url 'notification_detail' n.id %}" class="notif-dd-link">
+                        <span class="notif-dd-dot"></span>
+                        <span class="notif-dd-content">
+                          <span class="notif-dd-text">{{ n.title }}</span>
+                          <span class="notif-dd-time">{{ n.created_at|date:'d/m/Y H:i' }}</span>
+                        </span>
+                        {% if not n.is_read %}<span class="notif-dd-badge">Mới</span>{% endif %}
+                      </a>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="notif-dd-empty">
+                      <i class="bi bi-bell-slash"></i>
+                      <span>Chưa có thông báo nào</span>
+                    </li>
+                    {% endif %}
+                  </div>
                   <li class="notif-dd-footer">
                     <a href="{% url 'notification_list' %}">Xem tất cả thông báo <i class="bi bi-arrow-right"></i></a>
                   </li>
-                  {% else %}
-                  <li class="notif-dd-empty">
-                    <i class="bi bi-bell-slash"></i>
-                    <span>Chưa có thông báo nào</span>
-                  </li>
-                  {% endif %}
                 </ul>
               </div>
             </div>

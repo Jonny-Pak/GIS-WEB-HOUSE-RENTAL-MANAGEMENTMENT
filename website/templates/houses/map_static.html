@@ -38,6 +38,15 @@
                     <span class="radius-unit">m</span>
                 </div>
 
+                <!-- Nút gạt lọc -->
+                <div class="toolbar-switch">
+                    <label class="switch-container">
+                        <input type="checkbox" id="switchRadiusFilter">
+                        <span class="switch-slider"></span>
+                    </label>
+                    <span class="switch-label">Lọc bán kính</span>
+                </div>
+
                 <!-- Tắt chỉ đường (ẩn mặc định) -->
                 <button type="button" id="btnClearMapRoute" class="btn btn-outline-danger btn-sm toolbar-btn"
                     style="display:none;">
@@ -57,7 +66,7 @@
             </div>
         </div>
         <div class="map-wrapper" style="position: relative;">
-            <div id="static-map" aria-label="Bản đồ nhà cho thuê" data-api-url="{% url 'api_houses' %}"></div>
+            <div id="static-map" aria-label="Bản đồ nhà cho thuê" data-api-url="{% url 'api_houses' %}" data-focus-id="{{ focused_house_id|default:'' }}"></div>
             <!-- Bottom Info Card -->
             <div id="mapBottomCard" class="map-bottom-card d-none">
                 <div class="card-content">
@@ -66,7 +75,13 @@
                     </div>
                     <div class="card-info">
                         <h6 class="mb-1 fw-bold">Vị trí đã ghim</h6>
-                        <p id="bottomCardAddress" class="mb-0 text-muted small">Đang tìm địa chỉ...</p>
+                        <p id="bottomCardAddress" class="mb-2 text-muted small">Đang lấy địa chỉ...</p>
+                        <div id="cardActionArea">
+                            <button type="button" id="btnToggleRadiusFromCard" class="btn-card-action">
+                                <i class="bi bi-search"></i>
+                                <span>Tìm trọ quanh đây</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <button type="button" id="btnCloseBottomCard" class="btn-close-card"><i class="bi bi-x"></i></button>
@@ -83,5 +98,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin="anonymous"
     referrerpolicy="no-referrer"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-<script src="{% static 'Js/map_static.js' %}?v=20260420z"></script>
+<script src="{% static 'Js/map_static.js' %}?v=20260421smart_toggle_fix"></script>
 {% endblock %}

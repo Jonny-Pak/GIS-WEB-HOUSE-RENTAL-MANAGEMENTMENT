@@ -402,11 +402,11 @@ def get_house_detail(house_id):
     )
     related_houses = House.objects.filter(
         status='available',
-    ).exclude(id=house_id)[:3]
+    ).exclude(id=house_id)[:4]
     other_houses = House.objects.filter(
         status='available',
         owner=house.owner,
-    ).exclude(id=house_id).order_by('-created_at')[:6]
+    ).exclude(id=house_id).order_by('-created_at')[:4]
     return house, related_houses, other_houses
 
 
@@ -424,6 +424,7 @@ def get_map_houses():
     ).order_by('-created_at')
 
     return [{
+        'id': house.id,
         'name': house.name,
         'price': f"{house.price:,} VNĐ/tháng" if house.price else 'Thỏa thuận',
         'status': house.get_status_display(),
