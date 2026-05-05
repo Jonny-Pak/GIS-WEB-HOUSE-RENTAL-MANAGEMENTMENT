@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}?v=20260406b">
+</head>
+
+<body class="admin-page">
+    <header class="admin-topbar">
+        <div class="admin-topbar-title">
+            <h1>
+                <a href="{% url 'home' %}" aria-label="Về trang chủ" class="admin-brand-link">
+                    <img src="{% static 'images/logo_web.png' %}" alt="Thuê Nhà Nhanh" class="admin-brand-logo">
+                </a>
+            </h1>
+            <p>{{ page_title }} - Quản trị hệ thống</p>
+        </div>
+        <div class="admin-topbar-actions">
+            <a href="{% url 'custom_admin_dashboard' %}" class="outline-btn">Dashboard</a>
+            <a href="{% url 'custom_admin_logout' %}" class="primary-btn">Đăng xuất</a>
+        </div>
+    </header>
+
+    <nav class="admin-nav">
+        <div class="admin-main-inner admin-nav-inner">
+            <a href="{% url 'custom_admin_dashboard' %}"
+                class="admin-nav-link {% if request.path == '/custom-admin/' %}active{% endif %}">Tổng quan</a>
+            <a href="{% url 'custom_admin_users' %}"
+                class="admin-nav-link {% if '/custom-admin/users/' in request.path %}active{% endif %}">User</a>
+            <a href="{% url 'custom_admin_houses' %}"
+                class="admin-nav-link {% if '/custom-admin/houses/' in request.path %}active{% endif %}">Nhà</a>
+            <a href="{% url 'custom_admin_tenants' %}"
+                class="admin-nav-link {% if '/custom-admin/tenants/' in request.path %}active{% endif %}">Khách thuê</a>
+            <a href="{% url 'custom_admin_contracts' %}"
+                class="admin-nav-link {% if '/custom-admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
+            <a href="{% url 'custom_admin_furnitures' %}"
+                class="admin-nav-link {% if '/custom-admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
+        </div>
+    </nav>
+
+    <main class="admin-main">
+        <div class="admin-main-inner">
+            {% if messages %}
+            <section class="admin-messages">
+                {% for message in messages %}
+                <div class="admin-message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <section class="admin-list-toolbar">
+                <form method="get" class="admin-search-form">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Tìm kiếm...">
+                    <button type="submit" class="secondary-btn">Tìm</button>
+                </form>
+                {% if create_url %}
+                <a href="{% url create_url %}" class="primary-btn">+ Tạo mới</a>
+                {% endif %}
+            </section>
+
+            <section class="panel-card">
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                {% for head in headers %}
+                                <th>{{ head }}</th>
+                                {% endfor %}
+                                {% if edit_url_name or delete_url_name %}
+                                <th>Hành động</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                            <tr>
+                                {% for col in row.columns %}
+                                <td>
+                                    {% if col and col|stringformat:"s"|slice:":7" == "/media/" or col and col|stringformat:"s"|slice:":8" == "/static/" %}
+                                        <img src="{{ col }}" alt="img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    {% else %}
+                                        {{ col }}
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                                {% if edit_url_name or delete_url_name %}
+                                <td>
+                                    <div class="actions-cell">
+                                    {% for action in row.extra_actions %}
+                                    <form method="post" action="{% url action.url_name row.id %}"
+                                            {% if action.confirm %}data-confirm-submit="{{ action.confirm }}"{% endif %}>
+                                        {% csrf_token %}
+                                        <button type="submit" class="mini-btn {{ action.class_name|default:'' }}">
+                                            {{ action.label }}</button>
+                                    </form>
+                                    {% endfor %}
+                                    {% if edit_url_name %}
+                                    <a href="{% url edit_url_name row.id %}" class="mini-btn">Sửa</a>
+                                    {% endif %}
+                                    {% if delete_url_name %}
+                                    <form method="post" action="{% url delete_url_name row.id %}"
+                                        data-confirm-submit="Xác nhận xóa dữ liệu này?">
+                                        {% csrf_token %}
+                                        <button type="submit" class="mini-btn danger-btn">Xóa</button>
+                                    </form>
+                                    {% endif %}
+                                    </div>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="{{ headers|length|add:'1' }}" class="empty-cell">Không có dữ liệu.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <div class="admin-pagination">
+                    <div class="pagination-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if query %}&q={{ query }}{% endif %}" class="page-link">&laquo; Đầu</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Trước</a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-link active">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" class="page-link">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Sau</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Cuối &raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+<script src="{% static 'Js/form_helpers.js' %}?v=20260406e"></script>
+</body>
+
+</html>

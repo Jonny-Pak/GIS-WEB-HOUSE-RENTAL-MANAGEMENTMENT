@@ -1,0 +1,178 @@
+/* components.css - Reusable UI Components */
+
+/* --- ROOM CARD COMPONENT --- */
+.room-card-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(24, 20, 96, 0.10);
+    border: 1.5px solid #f2f2f7;
+    background: #fff;
+    overflow: hidden;
+    transition: box-shadow 0.18s, transform 0.18s;
+    margin-bottom: 0;
+}
+
+.room-card-item:hover {
+    box-shadow: 0 8px 32px rgba(24, 20, 96, 0.18);
+    transform: translateY(-4px) scale(1.025);
+    border-color: #e0e0f7;
+}
+
+.room-card-image-link {
+    display: block;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: #f7f7fa;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+.room-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+    transition: transform 0.18s;
+}
+
+.room-card-item:hover .room-card-image {
+    transform: scale(1.06);
+}
+
+.room-card-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 18px 18px 14px 18px;
+    background: #fff;
+}
+
+.room-vacancy-badge {
+    display: inline-block;
+    background: #ffe6b0;
+    color: #b97a00;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 3px 12px;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+    width: fit-content;
+}
+
+.room-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #181460;
+    margin-bottom: 2px;
+    margin-top: 0;
+    line-height: 1.25;
+    min-height: 1.25em;
+    max-height: 2.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.room-card-address {
+    color: #5a5a7a;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-height: 2.8em;
+    white-space: normal;
+}
+
+.room-price-highlight {
+    color: #181818;
+    background: #ffd600;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.10);
+    margin-right: 4px;
+    display: inline-block;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.room-card-actions {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+    padding-top: 8px;
+}
+
+.room-card-actions .room-action-link {
+    color: #6c63ff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.18s;
+}
+
+.room-card-actions .room-action-link:hover {
+    color: #181460;
+    text-decoration: underline;
+}
+
+.room-card-actions .btn {
+    background: #181460;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border: none;
+    transition: all 0.18s;
+}
+
+.room-card-actions .btn:hover {
+    background: #2d278a;
+    transform: scale(1.05);
+}
+
+/* --- GRID LAYOUT --- */
+.room-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1200px) {
+    .room-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .room-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .room-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,188 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load house_extras %}
+
+{% block title %}Trang chủ - Thuê Nhà Nhanh{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}?v=20260421a" />
+{% endblock %}
+
+{% block content %}
+<section class="home-discovery">
+  <div class="container">
+    <div class="discovery-grid">
+      <div class="discovery-intro">
+        <h2>Tìm nhà nhanh chóng</h2>
+        <p>Thuê nhà dễ dàng</p>
+      </div>
+
+      <div class="discovery-filter-controls">
+        <form class="discovery-filter-form" method="get">
+          <div class="discovery-filter-row">
+            <div class="filter-search-wrap">
+              <input type="text" name="search" class="form-control filter-search-input"
+                placeholder="Tìm nhà, địa chỉ..." value="{{ filters.search|default:'' }}">
+              <button type="submit" class="filter-search-icon-btn" aria-label="Tìm kiếm"><span
+                  class="icon-search filter-search-icon"></span></button>
+            </div>
+            <select name="house_type" class="form-select" title="Chọn loại nhà">
+              <option value="">Tất cả loại nhà</option>
+              {% for item in house_type_items %}
+              <option value="{{ item.value }}" {% if item.selected %}selected{% endif %}>{{ item.label }}</option>
+              {% endfor %}
+            </select>
+            <select name="price_range" class="form-select" title="Chọn mức giá">
+              <option value="">Tất cả mức giá</option>
+              {% for item in price_range_items %}
+              <option value="{{ item.value }}" {% if filters.price_range == item.value %}selected{% endif %}>{{ item.label }}</option>
+              {% endfor %}
+            </select>
+            <select name="area_range" class="form-select" title="Chọn diện tích">
+                <option value="">Tất cả diện tích</option>
+                {% for item in area_range_items %}
+                <option value="{{ item.value }}" {% if filters.area_range == item.value %}selected{% endif %}>{{ item.label }}</option>
+                {% endfor %}
+            </select>
+            <div class="discovery-filter-actions">
+              <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+              <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Xóa</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section rooms-section">
+  <div class="container">
+    <div class="rooms-section-head">
+      <h2 class="heading text-primary mb-0">Đang có <span>{{ total_available_rooms }}</span> phòng đang trống</h2>
+      {% comment %} <a href="{% url 'home' %}" class="rooms-see-all">Xem tất cả <span
+          class="icon-chevron-right"></span></a> {% endcomment %}
+    </div>
+
+    <!-- Bỏ nút cuộn vì chuyển sang Grid & Phân trang -->
+    {% comment %}
+    <div class="district-scroll-controls rooms">
+      <button type="button" class="district-scroll-btn" id="roomScrollPrev" aria-label="Cuộn trái phòng">
+        <span class="icon-chevron-left"></span>
+      </button>
+      <button type="button" class="district-scroll-btn" id="roomScrollNext" aria-label="Cuộn phải phòng">
+        <span class="icon-chevron-right"></span>
+      </button>
+    </div>
+    {% endcomment %}
+
+    <div class="room-cards-grid">
+      {% for house in houses %}
+      <article class="room-card-item">
+        <a href="{% url 'house_detail' house.id %}" class="room-card-image-link">
+          {% if house.main_image %}
+          <img src="{{ house.main_image.url }}" alt="{{ house.name }}" class="room-card-image">
+          {% else %}
+          {% with first_image=house.images.all|first %}
+          {% if first_image %}
+          <img src="{{ first_image.image.url }}" alt="{{ house.name }}" class="room-card-image">
+          {% else %}
+          <img src="{% static 'images/img_1.jpg' %}" alt="{{ house.name }}" class="room-card-image">
+          {% endif %}
+          {% endwith %}
+          {% endif %}
+        </a>
+
+        <div class="room-card-body">
+          <span class="room-vacancy-badge">Còn trống</span>
+          <h3 class="room-card-title">{{ house.name }}</h3>
+          <p class="room-card-address">• {{ house.address }}, Diện tích {{ house.area }} m²</p>
+          <p class="room-card-meta">
+            <span class="room-price-highlight">Giá thuê: {{ house.price|floatformat:0 }} VNĐ</span>
+          </p>
+
+          <div class="room-card-actions">
+            <a href="{% url 'map_view' %}?house_id={{ house.id }}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+            <a href="{% url 'house_detail' house.id %}" class="btn btn-primary btn-sm px-3">Xem chi tiết</a>
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <div class="w-100 text-center py-5 bg-white rounded border">
+        <h4 class="text-muted">Không có phòng phù hợp</h4>
+        <p class="text-muted mb-0">Bạn hãy thử tìm với từ khóa khác.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-wrapper">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?{% url_replace page=page_obj.previous_page_number %}" aria-label="Previous">
+            <span class="icon-chevron-left"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item"><a class="page-link" href="?{% url_replace page=num %}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?{% url_replace page=page_obj.next_page_number %}" aria-label="Next">
+            <span class="icon-chevron-right"></span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Tiện ích chung section -->
+<section class="utilities-section">
+  <div class="utilities-box">
+    <div class="utility-main-title">
+      <h3>Tiện ích chung</h3>
+    </div>
+    <div class="utility-items-wrap">
+      <div class="utility-item">
+        <i class="bi bi-person-video3"></i>
+        <span>Nhân viên<br>trực 24/7</span>
+      </div>
+      <div class="utility-item">
+        <i class="bi bi-fingerprint"></i>
+        <span>Khoá cổng<br>vân tay</span>
+      </div>
+      <div class="utility-item">
+        <i class="bi bi-camera-video"></i>
+        <span>Camera an<br>ninh</span>
+      </div>
+      <div class="utility-item">
+        <i class="bi bi-wifi"></i>
+        <span>Wifi tốc độ<br>cao</span>
+      </div>
+      <div class="utility-item">
+        <i class="bi bi-tools"></i>
+        <span>Sửa chữa<br>nhanh</span>
+      </div>
+      <div class="utility-item">
+        <i class="bi bi-bucket-fill"></i>
+        <span>Vệ sinh<br>hàng ngày</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script src="{% static 'Js/home.js' %}?v=20260405a"></script>
+{% endblock %}

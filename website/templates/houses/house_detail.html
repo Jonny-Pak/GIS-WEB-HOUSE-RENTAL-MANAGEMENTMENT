@@ -1,0 +1,280 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết - {{ house.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="{% static 'css/house_detail.css' %}?v=20260404n" />
+{% endblock %}
+
+{% block content %}
+
+<div class="section">
+    <div class="container">
+        <div class="row justify-content-between house-detail-row">
+
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="house-breadcrumb mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ > </a></li>
+                        <li class="breadcrumb-item active" aria-current="page"> {{ house.name }}</li>
+                    </ol>
+                </nav>
+
+                <div class="img-property-main mb-4">
+                    <div class="house-main-view">
+                        <button type="button" class="house-main-nav" id="houseMainPrev" aria-label="Ảnh trước">
+                            <span class="icon-chevron-left"></span>
+                        </button>
+                        {% if house.main_image %}
+                        <img src="{{ house.main_image.url }}" alt="{{ house.name }}"
+                            class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        {% else %}
+                        {% with first_image=house.images.all|first %}
+                        {% if first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ house.name }}"
+                            class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        {% else %}
+                        <img src="{% static 'images/img_3.jpg' %}" alt="Default Image"
+                            class="img-fluid rounded w-100 house-main-image" id="houseMainImage">
+                        {% endif %}
+                        {% endwith %}
+                        {% endif %}
+                        <button type="button" class="house-main-nav" id="houseMainNext" aria-label="Ảnh kế tiếp">
+                            <span class="icon-chevron-right"></span>
+                        </button>
+                        <div class="house-main-overlay">
+                            <h1 class="house-main-title mb-0">{{ house.name }}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="house-gallery-wrap mb-5">
+
+                    <div class="house-gallery-strip" id="houseGalleryStrip" aria-label="Ảnh phụ của căn nhà">
+                        {% for img in house.images.all %}
+                        <button type="button" class="house-gallery-item" data-src="{{ img.image.url }}"
+                            data-alt="Gallery Image {{ forloop.counter }}">
+                            <img src="{{ img.image.url }}" alt="Gallery Image {{ forloop.counter }}"
+                                class="house-gallery-image">
+                        </button>
+                        {% empty %}
+                        <div class="w-100">
+                            <p class="text-muted fst-italic small mb-0">Chưa có ảnh thư viện cho căn nhà này.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+                <h2 class="heading text-primary">Thông tin chi tiết</h2>
+                <p class="text-black-50"><span class="icon-map-marker me-1"></span> {{ house.address }}</p>
+
+                <div class="row mt-4 mb-4">
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <span class="flaticon-house-1 me-2 text-primary display-6"></span>
+                            <div>
+                                <span class="d-block fw-bold">Diện tích</span>
+                                <span class="text-black-50">{{ house.area }} m²</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <span class="flaticon-building me-2 text-primary display-6"></span>
+                            <div>
+                                <span class="d-block fw-bold">Loại hình</span>
+                                <span class="text-black-50">{{ house.get_house_type_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <span class="icon-users me-2 text-primary display-6"></span>
+                            <div>
+                                <span class="d-block fw-bold">Số người tối đa</span>
+                                <span class="text-black-50">{% if house.max_people %}{{ house.max_people }} người{% else %}Không giới hạn{% endif %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <h3 class="heading text-primary mt-4">Mô tả</h3>
+                <p>{{ house.description|linebreaks }}</p>
+
+                <h3 class="heading text-primary mt-4">Nội thất (Đã trang bị)</h3>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <ul class="list-unstyled mb-0">
+                                {% for item in house.furniture_items.all %}
+                                <li class="mb-2"><span class="icon-check text-success me-2"></span> {{ item.furniture.name }} (x{{ item.quantity }})</li>
+                                {% empty %}
+                                <li class="text-muted">Chưa cập nhật thông tin nội thất.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="heading text-primary mt-5">Vị trí trên bản đồ</h3>
+                {% load l10n %}
+                <div id="house-location-map" class="house-map-wrapper shadow-sm"
+                    data-lat="{{ house.lat|unlocalize|default_if_none:'' }}"
+                    data-lng="{{ house.lng|unlocalize|default_if_none:'' }}" data-name="{{ house.name|escape }}"
+                    data-address="{{ house.address|escape }}"></div>
+                <div id="house-location-fallback" class="house-map-fallback mt-3 p-3 rounded border bg-light d-none">
+                    <span class="icon-map-marker text-danger me-2"></span>
+                    Chưa có tọa độ chính xác cho căn nhà này.
+                </div>
+                <small class="d-block mt-2 text-muted">Lat: {{ house.lat|default:"N/A" }} | Long:
+                    {{house.lng|default:"N/A" }}</small>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="bg-white widget border rounded p-4 mb-5 shadow-sm sticky-top house-price-widget">
+                    <h3 class="h4 text-black widget-title mb-3">Giá thuê</h3>
+                    <div class="price mb-3">
+                        <span class="text-primary h2 fw-bold">{{ house.price|floatformat:0 }} VNĐ</span><span
+                            class="text-muted">/tháng</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-warning text-dark px-3 py-2">Cọc: {{ house.deposit|floatformat:0 }}
+                            VNĐ</span>
+                    </div>
+                    <button type="button" id="copyOwnerPhoneBtn" data-phone="{{ house.owner_phone }}"
+                        class="btn btn-primary w-100 py-3 fw-bold shadow-sm text-white">
+                        <span class="icon-phone me-2"></span> {{ house.owner_phone }}
+                    </button>
+                </div>
+
+                <div class="bg-white widget border rounded p-4 shadow-sm mt-5">
+                    <h3 class="h4 text-black widget-title mb-3">Người đăng tin</h3>
+                    <div class="d-flex align-items-center mb-4">
+                        {% if house.owner.profile.avatar %}
+                        <img src="{{ house.owner.profile.avatar.url }}" alt="Owner"
+                            class="img-fluid rounded-circle me-3 owner-avatar">
+                        {% else %}
+                        <img src="{% static 'images/person_1-min.jpg' %}" alt="Owner"
+                            class="img-fluid rounded-circle me-3 owner-avatar">
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0 text-black fw-bold">{{ house.owner.username }}</h5>
+                            <span class="text-muted small">Chủ sở hữu</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small fst-italic">"Liên hệ trực tiếp với chủ nhà để trao đổi và xem phòng nhanh
+                        nhất."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section pt-0">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h2 class="font-weight-bold text-primary heading">Tin đăng khác của {{ house.owner.username }}</h2>
+            </div>
+        </div>
+        <div class="room-cards-grid">
+            {% for other_house in other_houses %}
+            <article class="room-card-item">
+                <a href="{% url 'house_detail' other_house.id %}" class="room-card-image-link">
+                    {% if other_house.main_image %}
+                    <img src="{{ other_house.main_image.url }}" alt="{{ other_house.name }}" class="room-card-image">
+                    {% else %}
+                    {% with other_first_image=other_house.images.all|first %}
+                    {% if other_first_image %}
+                    <img src="{{ other_first_image.image.url }}" alt="{{ other_house.name }}" class="room-card-image">
+                    {% else %}
+                    <img src="{% static 'images/img_1.jpg' %}" alt="{{ other_house.name }}" class="room-card-image">
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+                <div class="room-card-body">
+                    <span class="room-vacancy-badge">Còn trống</span>
+                    <h3 class="room-card-title">{{ other_house.name }}</h3>
+                    <p class="room-card-address">• {{ other_house.address }}</p>
+                    <p class="room-card-meta">
+                        <span class="room-price-highlight">Giá: {{ other_house.price|floatformat:0 }} VNĐ</span>
+                    </p>
+                    <div class="room-card-actions">
+                        <a href="{% url 'map_view' %}?house_id={{ other_house.id }}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+                        <a href="{% url 'house_detail' other_house.id %}" class="btn btn-primary btn-sm px-3">Chi tiết</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted">Chủ nhà hiện chưa có tin đăng nào khác.</p>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{% url 'landlord_posts' house.owner.id %}" class="btn btn-primary px-4 py-2 rounded shadow-sm text-white">
+                    Xem thêm tin của chủ nhà này <span class="icon-arrow-right ms-2"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section bg-light py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <h2 class="font-weight-bold text-primary heading">Có thể bạn quan tâm</h2>
+                <p class="text-muted">Những căn nhà tương tự có thể bạn sẽ thích</p>
+            </div>
+        </div>
+        <div class="room-cards-grid">
+            {% for related in related_houses %}
+            <article class="room-card-item">
+                <a href="{% url 'house_detail' related.id %}" class="room-card-image-link">
+                    {% if related.main_image %}
+                    <img src="{{ related.main_image.url }}" alt="{{ related.name }}" class="room-card-image">
+                    {% else %}
+                    {% with related_first_image=related.images.all|first %}
+                    {% if related_first_image %}
+                    <img src="{{ related_first_image.image.url }}" alt="{{ related.name }}" class="room-card-image">
+                    {% else %}
+                    <img src="{% static 'images/img_4.jpg' %}" alt="{{ related.name }}" class="room-card-image">
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+                <div class="room-card-body">
+                    <span class="room-vacancy-badge">Gợi ý</span>
+                    <h3 class="room-card-title">{{ related.name }}</h3>
+                    <p class="room-card-address">• {{ related.address }}</p>
+                    <p class="room-card-meta">
+                        <span class="room-price-highlight">{{ related.price|floatformat:0 }} VNĐ</span>
+                    </p>
+                    <div class="room-card-actions">
+                        <a href="{% url 'map_view' %}?house_id={{ related.id }}" class="room-action-link"><span class="icon-map-marker"></span> Bản đồ</a>
+                        <a href="{% url 'house_detail' related.id %}" class="btn btn-primary btn-sm px-3">Chi tiết</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Hiện chưa tìm thấy nhà tương tự trong khu vực này.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{% static 'Js/house_detail.js' %}?v=20260419x"></script>
+
+{% endblock %}

@@ -1,0 +1,263 @@
+{% extends 'layouts/dashboard_base.html' %}
+{% load static %}
+{% load house_extras %}
+
+{% block title %}Danh sách tin đăng{% endblock %}
+{% block header_title %}Quản lý Tin đăng{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/manage_post.css' %}?v=20260406e" />
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'Js/form_helpers.js' %}?v=20260406e"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <!-- Filter Card -->
+    <div class="card dashboard-filter-card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-3">
+        <form method="get" class="row align-items-center g-3">
+          <div class="col-md-5">
+            <div class="input-group filter-search-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                class="form-control"
+                placeholder="Tìm theo tiêu đề tin..."
+              />
+              <button type="submit" class="btn btn-primary btn-search">
+                Tìm
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="input-group shadow-xs rounded-3 overflow-hidden">
+              <span class="input-group-text bg-white border-end-0"
+                ><i class="bi bi-funnel text-muted small"></i
+              ></span>
+              <select
+                class="form-select border-start-0 py-2 fs-14"
+                name="status"
+                onchange="this.form.submit()"
+              >
+                <option
+                  value=""
+                  {%
+                  if
+                  not
+                  selected_status
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Tất cả trạng thái
+                </option>
+                {% for value, label, is_selected in status_choices %}
+                <option
+                  value="{{ value }}"
+                  {%
+                  if
+                  is_selected
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ label }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div
+            class="col-md-3 text-end d-flex align-items-center justify-content-end gap-2"
+          >
+            {% if query or selected_status %}
+            <a
+              href="{% url 'manage_post' %}"
+              class="btn btn-clear-filter rounded-3 p-2 shadow-xs"
+              title="Xóa lọc"
+            >
+              <i class="bi bi-x-lg"></i>
+            </a>
+            {% endif %}
+            <a
+              href="{% url 'post_house' %}"
+              class="btn btn-danger text-white fw-bold px-3 py-2 rounded-3 shadow-sm flex-grow-1"
+            >
+              <i class="bi bi-plus-lg me-1"></i> Đăng tin
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if query or selected_status %}
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+      <div class="small fw-bold text-muted">
+        Hiển thị kết quả:
+        <span class="text-primary italic">"{{ query|default:'Tất cả' }}"</span>
+        {% if selected_status %}
+          {% for val, lab, sel in status_choices %}
+            {% if val == selected_status %}
+              <span class="badge bg-light text-dark border ms-2">Trạng thái: {{ lab }}</span>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </div>
+      <span
+        class="badge bg-white text-primary border border-primary-subtle rounded-pill px-3 py-2 shadow-xs"
+      >
+        <i class="bi bi-info-circle me-1"></i>Tìm thấy: {{
+        page_obj.paginator.count }} tin
+      </span>
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table align-middle table-hover">
+            <thead class="bg-light">
+              <tr class="text-muted small text-uppercase">
+                <th class="manage-post-image-head">Hình ảnh</th>
+                <th>Tiêu đề tin</th>
+                <th>Giá & Diện tích</th>
+                <th>Trạng thái</th>
+                <th class="text-end">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for house in user_houses %}
+              <tr>
+                <td>
+                  {% if house.main_image %}
+                  <img
+                    src="{{ house.main_image.url }}"
+                    class="rounded manage-post-thumbnail"
+                    width="80"
+                    height="60"
+                  />
+                  {% else %}
+                  <div
+                    class="bg-secondary rounded manage-post-thumbnail-placeholder"
+                  ></div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="fw-bold text-dark">{{ house.name }}</div>
+                  <small class="text-muted">Mã tin: #{{ house.id }}</small
+                  ><br />
+                  <small class="text-muted"
+                    ><i class="bi bi-calendar"></i>
+                    {{house.created_at|date:"d/m/Y"}}</small
+                  >
+                  <br />
+                  {% if house.lat and house.lng %}
+                  <small class="text-success">
+                    <i class="bi bi-geo-alt"></i>
+                    {{ house.lat|floatformat:6 }}, {{ house.lng|floatformat:6 }}
+                  </small>
+                  {% else %}
+                  <small class="text-muted">
+                    <i class="bi bi-geo-alt"></i> Chưa có tọa độ
+                  </small>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="text-danger fw-bold">
+                    {% if house.price %}{{ house.price|floatformat:0 }} VNĐ
+                    {% else %}Thỏa thuận{% endif %}
+                  </div>
+                  <small>{{ house.area }} m²</small>
+                </td>
+                <td>
+                  {% if house.status == 'no_coordinates' %}
+                  <span
+                    class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 rounded-pill"
+                    >Chưa có tọa độ</span
+                  >
+                  {% elif house.status == 'available' %}
+                  <span
+                    class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill"
+                    >Còn trống</span
+                  >
+                  {% elif house.status == 'pending' %}
+                  <span
+                    class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill"
+                    >Chờ duyệt</span
+                  >
+                  {% elif house.status == 'rented' %}
+                  <span
+                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill"
+                    >Đã cho thuê</span
+                  >
+                  {% elif house.status == 'hidden' %}
+                  <span
+                    class="badge bg-dark-subtle text-dark border border-dark-subtle px-3 py-2 rounded-pill"
+                    >Đã ẩn</span
+                  >
+                  {% else %}
+                  <span
+                    class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill"
+                    >Bị từ chối</span
+                  >
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-2">
+                    {% if house.status == 'available' %}
+                    <a
+                      href="{% url 'create_contract' house.id %}"
+                      class="btn-action btn-action-success"
+                      title="Tạo hợp đồng cho căn nhà này"
+                    >
+                      <i class="bi bi-file-earmark-plus me-1"></i>Tạo Hợp Đồng
+                    </a>
+                    {% endif %}
+                    <a
+                      href="{% url 'edit_house' house.id %}"
+                      class="btn-action btn-action-edit"
+                      title="Sửa tin"
+                    >
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <form
+                      method="post"
+                      action="{% url 'delete_house' house.id %}"
+                      class="d-inline"
+                      data-confirm-submit="Bạn có chắc muốn xóa tin này?"
+                    >
+                      {% csrf_token %}
+                      <button
+                        type="submit"
+                        class="btn-action btn-action-delete"
+                        title="Xóa tin"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">
+                  Bạn chưa đăng tin nào.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% include 'dashboard/includes/pagination.html' with page_obj=page_obj %}
+      </div>
+    </div>
+    {% endblock %}
+  </div>
+</div>

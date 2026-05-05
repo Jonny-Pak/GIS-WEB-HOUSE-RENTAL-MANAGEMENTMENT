@@ -1,143 +1,351 @@
-# 🏠 LT-GIS: Hệ thống Quản lý Đăng tin Phòng trọ (WebGIS)
+# LT-GIS: Hệ thống Quản lý Đăng tin Phòng trọ (WebGIS)
+
 Dự án ứng dụng công nghệ WebGIS trong việc quản lý, tìm kiếm và đăng tin phòng trọ trên địa bàn TP.HCM.
 
 ---
 
-## 📂 Cấu trúc thư mục dự án
+## Cấu trúc thư mục
 
 ```text
 GIS-WEB-HOUSE-RENTAL-MANAGEMENTMENT/
-├── media/               # Nơi chứa các ảnh do người dùng upload (nhà trọ, hình ảnh phòng...)
-├── website/             # Thư mục gốc chứa source code backend
-│   ├── quanly/          # App chính (Chứa Models, Views, Templates, Static files)
-│   ├── website/         # Thư mục cấu hình trung tâm (settings.py, urls.py)
-│   └── manage.py        # File để thực thi các lệnh của Django
-├── .gitignore           # File cấu hình chặn Git
-├── requirements.txt     # Danh sách các thư viện cần cài đặt để chạy dự án
-└── README.md            # Tài liệu hướng dẫn bạn đang đọc
+├── docker-compose.yml          # Cấu hình Docker Compose (web + PostgreSQL)
+├── Dockerfile                  # Build image cho Django app
+├── requirements.txt            # Danh sách thư viện Python
+├── media/                      # Thư mục chứa file upload (ảnh nhà, CCCD, hợp đồng...)
+├── README.md
+│
+└── website/                    # ── Django Project Root ──
+    ├── manage.py               # Entry point (DJANGO_SETTINGS_MODULE = config.settings)
+    │
+    ├── config/                 # Cấu hình trung tâm của project
+    │   ├── settings.py         #   Cài đặt Django (DB, apps, middleware...)
+    │   ├── urls.py             #   Bảng định tuyến gốc — phân luồng URL tới từng app
+    │   ├── wsgi.py             #   WSGI entry point (cho deploy production)
+    │   └── asgi.py             #   ASGI entry point (cho deploy async)
+    │
+    ├── accounts/               # App: Tài khoản & Xác thực
+    │   ├── models.py           #   Profile (1-1 với User)
+    │   ├── views/              #   [Thư mục] Đăng ký, xem hồ sơ (auth.py, profile.py)
+    │   ├── urls/               #   [Thư mục] /auth/login, /auth/register, /auth/profile
+    │   └── admin.py            #   Đăng ký ProfileAdmin
+    │
+    ├── houses/                 # App: Quản lý Nhà cho thuê (Core Domain)
+    │   ├── models.py           #   House, Furniture, HouseImage
+    │   ├── views/              #   [Thư mục] Gồm public.py (khách vãng lai) và landlord.py (chủ nhà)
+    │   ├── urls/               #   [Thư mục] Bảng định tuyến được chia theo user type
+    │   ├── forms.py            #   HouseForm (form đăng tin)
+    │   ├── admin.py            #   HouseAdmin + custom filter/actions (duyệt, từ chối)
+    │   ├── services/           #   Tầng Business Logic (tách khỏi views)
+    │   │   ├── house_service.py    # Tìm kiếm bán kính (Haversine), tìm kiếm vùng vẽ (Shapely)
+    │   │   └── geocoding.py        # Chuyển địa chỉ → tọa độ (Nominatim API)
+    │   └── api/                #   REST API (DRF) cho bản đồ
+    │       ├── views.py        #     API tìm nhà theo bán kính, theo polygon vẽ
+    │       ├── serializers.py  #     HouseSerializer (chuyển đổi Model → JSON)
+    │       └── urls.py         #     /api/v1/houses/, /api/v1/polygon-search/
+    │
+    ├── contracts/              # App: Quản lý Hợp đồng & Khách thuê
+    │   ├── models.py           #   Tenant (khách thuê), Contract (hợp đồng)
+    │   ├── views/              #   [Thư mục] Chứa landlord.py xử lý hợp đồng, khách thuê
+    │   ├── urls/               #   [Thư mục] Định tuyến tạo/xem hợp đồng
+    │   ├── forms.py            #   TenantForm, ContractForm
+    │   └── admin.py            #   TenantAdmin, ContractAdmin
+    │
+    ├── custom_admin/           # App: Trang Quản trị Tùy chỉnh (thay thế Django Admin)
+    │   ├── views/              #   [Thư mục] Tách nhỏ 400 dòng thành: auth, users, houses, contracts, furnitures
+    │   ├── urls/               #   [Thư mục] Tách nhỏ các route theo từng phân hệ
+    │   └── forms.py            #   AdminUserCreateForm, AdminHouseForm, AdminFurnitureForm
+    │
+    ├── templates/              # Templates tập trung (HTML — xử lý phía server)
+    │   ├── layouts/            #   Base templates dùng chung (base.html, dashboard_base.html)
+    │   ├── home.html           #   Trang chủ
+    │   ├── accounts/           #   Templates cho accounts (login, register, profile)
+    │   ├── houses/             #   Templates cho houses (chi tiết nhà, bản đồ)
+    │   ├── dashboard/          #   Templates cho dashboard người dùng
+    │   └── custom_admin/       #   Templates cho trang quản trị
+    │
+    └── static/                 # Tài nguyên tĩnh (CSS, JS, Fonts, Images — gửi thẳng xuống trình duyệt)
+        ├── css/
+        ├── fonts/
+        └── images/
 ```
 
 ---
 
-## 🚀 Hướng dẫn cài đặt và chạy dự án (Dành cho nhà phát triển)
+## Giải thích kiến trúc: Tại sao cấu trúc như thế này?
 
+### 1. Tại sao tách ra nhiều App thay vì để một chỗ?
 
-Vui lòng làm theo trình tự các bước dưới đây để đảm bảo dự án chạy ổn định trên máy của bạn.
+Django khuyến khích mỗi app chỉ đảm nhận **một nhóm nghiệp vụ** (Single Responsibility). Nếu để tất cả model, view, form vào một app duy nhất, khi project phát triển sẽ:
 
-### Bước 1: Clone dự án và thiết lập môi trường ảo
+- File `views.py` phình lên hàng nghìn dòng, rất khó tìm code
+- Nhiều người cùng sửa một file → xung đột Git liên tục
+- Không thể hiểu nhanh phạm vi ảnh hưởng khi thay đổi code
+
+Cách chia hiện tại:
+
+| App | Nghiệp vụ | Lý do tách riêng |
+|-----|-----------|-------------------|
+| `accounts` | Đăng nhập, đăng ký, hồ sơ | Auth là tính năng độc lập, hầu như không thay đổi khi phát triển thêm |
+| `houses` | Nhà cho thuê, bản đồ, API | Core domain — phần lớn logic nghiệp vụ nằm ở đây |
+| `contracts` | Hợp đồng, khách thuê | Có model riêng (Tenant, Contract), flow nghiệp vụ riêng (tạo HĐ → đổi trạng thái nhà) |
+| `custom_admin` | Trang quản trị | Admin có giao diện, quyền, flow hoàn toàn khác với user thường |
+
+### 2. Tại sao `config/` thay vì dùng tên project mặc định?
+
+Khi chạy `django-admin startproject`, Django tạo folder cùng tên project (ví dụ: `GIS_WEB_HOUSE_RENTAL_MANAGEMENTMENT/settings.py`). Tên quá dài, khó gõ mỗi lần import.
+
+Đổi thành `config/` giúp:
+- Ngắn gọn, dễ nhớ: `config.settings`, `config.urls`
+- Convention phổ biến trong cộng đồng Django
+- Thể hiện rõ mục đích: đây là folder **cấu hình**, không chứa logic nghiệp vụ
+
+### 3. Kiến trúc Enterprise MVC (Có thêm tầng Service)
+
+Tại sao không đẩy thẳng toàn bộ nghiệp vụ (lưu Form, kiểm tra tọa độ, gán trạng thái, v.v) vào file `views.py` như truyền thống mà lại sinh ra thư mục `services/`?
+
+Câu trả lời nằm ở khái niệm thiết kế phần mềm cốt lõi: **Actor-Driven (Hướng Tác nhân) vs Domain-Driven (Hướng Thực thể)**.
+
+- **Thư mục Views là "Người Gác Cửa" (Actor-Driven):** Nó bắt buộc phải chia theo vai trò người dùng (`public.py`, `landlord.py`, `custom_admin`). Nhiệm vụ của View chỉ là Nhận Yêu Cầu (Request) -> Nhờ vả ai đó làm -> Báo kết quả (Response). View tuyệt đối KHÔNG chứa các câu lệnh `if/else` để lưu dữ liệu phức tạp. Điều này giúp ngăn chặn tình trạng "Fat Controller" (Bộ điều khiển béo phì).
+- **Thư mục Services là "Bếp Trưởng" (Domain-Driven):** Nó chia theo các thực thể CSDL cốt lõi (`house_service.py`, `contract_service.py`). Nó không quan tâm ai là người gọi nó (Chủ nhà gọi, hay Admin gọi, hay Thằng lập trình viên test code gọi). Nhiệm vụ của nó là thực thi chính xác thuật toán cốt lõi.
+
+**Lợi ích khổng lồ:**
+Nếu sau này hệ thống viết thêm API cho Mobile App, thì cái `api/views.py` chỉ việc gọi lại nguyên xi hàm `HouseService.process_coordinate_status()`. Điểm 10 cho khả năng tái sử dụng (DRY - Don't Repeat Yourself)! Cả hệ thống Web HTML và Mobile App sẽ xài chung logic mà không lo bị lệch pha.
+
+### 4. Tại sao API nằm trong `houses/api/` thay vì app riêng hay nhét vào thư mục `views/`?
+
+API bản chất là **một cách phục vụ dữ liệu** (trả JSON thay vì HTML). Nó không phải một domain nghiệp vụ riêng, nhưng nó lại cần một hệ sinh thái riêng biệt.
+
+```text
+houses/
+├── views/        → Dành trọn vẹn cho giao diện Web (Render HTML, dùng Forms)
+├── api/          → Thế giới thu nhỏ của API (JSON, dùng Serializers)
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+└── services/     → Chứa logic nghiệp vụ dùng chung cho cả 2 bên (Ví dụ: Geocoding)
+```
+
+**Tại sao KHÔNG tách `api` thành app riêng?**
+- Nếu tạo app `api`, nó sẽ phải import model `House` từ `houses` → phụ thuộc chéo nặng nề.
+- Nếu sau này `contracts` cũng cần API → lại phải nhét vào app `api` đó? Rất nhanh chóng app `api` sẽ biến thành một "Bãi rác" chứa API của toàn hệ thống mà không có ranh giới nghiệp vụ (Domain boundary) rõ ràng.
+
+**Tại sao KHÔNG nhét API vào thư mục `views/`? (Dù bản chất nó vẫn là View)**
+Đúng là API View vẫn kế thừa từ View của Django. Thế nhưng, nếu bạn tạo file `houses/views/api.py` thì sẽ cực kỳ lấn cấn khi giải quyết câu hỏi: **Vậy file `serializers.py` và đường dẫn tĩnh `/api/v1/` vứt ở đâu?**
+- Nếu ném `serializers.py` ra ngoài rễ thư mục `houses/`, nó sẽ lạc quẻ vì code Web không hề dùng tới nó.
+- Việc tạo hẳn một phân hệ `api/` giúp "gói ghém" trọng vẹn hệ sinh thái của DRF (gồm URLs, Views, Serializers) vào chung một chỗ. Không giẫm đạp lên code Web HTML, và cực kỳ dễ gỡ bỏ (Plug & Play) nếu sau này dự án không cần API nữa.
+
+### 5. Tại sao Templates tập trung (`templates/`) thay vì mỗi app một folder?
+
+Django hỗ trợ cả hai cách:
+- **Cách 1**: `templates/` tập trung ở ngoài rễ dự án.
+- **Cách 2**: Để tản mác trong từng app (`accounts/templates/accounts/`, `houses/templates/houses/`...)
+
+**Dự án quyết định chọn Cách 1 vì:**
+Khác với Backend (mạnh ai nấy lo), bộ mặt Frontend là một khối dính liền. Nếu chia nhỏ template vào từng app, Kỹ sư Frontend sẽ phải đào bới 10 thư mục Python chỉ để sửa giao diện. Gom chung lại giúp:
+- Quản lý tập trung các layout dùng chung (`base.html`, `dashboard_base.html`).
+- Frontend Dev chỉ cần làm việc trong đúng 2 gốc là `templates/` và `static/`.
+- Dễ dàng Ghi đè (Override) giao diện của các thư viện bên thứ 3 (như `allauth`).
+
+**Hỏi thêm: Tại sao file Bản đồ (`map_static.html`) lại nằm trong `templates/houses/` mà không tách ra thư mục `maps/` riêng?**
+Bởi vì ở giai đoạn hiện tại, bản đồ sinh ra với mục đích duy nhất là **Hiển thị Vị trí Nhà trọ**. Nó đóng vai trò là một "Giao diện trực quan" của bảng dữ liệu `House`. Do đó, đặt nó ở `houses/` là chuẩn xác theo Domain-Driven Design. (Trừ khi sau này Bản đồ thăng cấp thành "Siêu bản đồ" hiển thị cả Trạm xe buýt, Quy hoạch thành phố... thì lúc đó mới xứng đáng tách ra thư mục `maps/` độc lập).
+
+### 6. Tại sao `static/` và `templates/` ngang hàng, không lồng nhau?
+
+Hai loại tài nguyên này phục vụ mục đích hoàn toàn khác:
+
+| | `templates/` | `static/` |
+|---|---|---|
+| **Xử lý bởi** | Django template engine (server) | Trình duyệt tải trực tiếp (client) |
+| **Nội dung** | HTML với biến, if/for, extends | CSS, JS, hình ảnh, fonts |
+| **Khi deploy** | Django render ra HTML rồi gửi | Nginx/CDN phục vụ trực tiếp, không qua Django |
+
+Để ngang hàng là **chuẩn Django convention**, tách rõ trách nhiệm server vs client.
+
+### 7. Tại sao `media/` nằm ngoài `website/`?
+
+`media/` chứa file do người dùng upload (ảnh nhà, CCCD, hợp đồng...). Đặt ngoài `website/` vì:
+- **Không thuộc source code** — không nên commit vào Git
+- **Khi deploy**, media thường lưu trên storage riêng (S3, CDN)
+- Docker volume mount riêng, không ảnh hưởng khi rebuild container
+
+### 8. Tại sao tách `custom_admin` thay vì gộp logic quản trị vào từng App con?
+
+Một lựa chọn kiến trúc khác là phân bổ logic quản trị vào từng app riêng lẻ (ví dụ: `houses/admin_views.py`). Dù cách này đảm bảo tính đóng gói tốt (Domain-Driven Design), dự án vẫn quyết định gom tất cả giao diện quản trị vào một App trung tâm `custom_admin` vì 3 lý do cốt lõi:
+
+- **Tính liên thông dữ liệu (Cross-Domain)**: Trang Dashboard thường cần vẽ biểu đồ và thống kê chéo nhiều bảng dữ liệu. Ví dụ: *Biểu đồ tỉ lệ Hợp đồng (`contracts`) thực tế theo từng khu vực Nhà trọ (`houses`)*. Đặt logic đa chiều này ở `custom_admin` đảm bảo tính trung lập, tránh việc một app phải gánh trách nhiệm của app khác.
+- **Thống nhất Giao diện (Layout & Assets)**: Hệ thống quản trị nội bộ sử dụng một bộ khung Layout riêng rất phức tạp (Sidebar điều hướng chung, Chart.js, DataTables). Một app trung tâm giúp gom gọn toàn bộ cấu hình Template và CSS/JS thay vì bắt các app con chia nhau xử lý.
+- **Màng lọc bảo mật (Security Choke Point)**: Mọi đường dẫn quản trị đều quy về một mạch máu duy nhất (ví dụ `/custom-admin/...`). Cấu trúc này giúp lập trình viên có thể đặt bức tường lửa chặn người dùng ngay từ URL tổng thông qua Route Grouping hoặc Middleware cực kỳ an toàn; triệt tiêu hoàn toàn rủi ro bị "lọt lưới" bảo mật do quên cấu hình phân quyền như khi code rải rác từng app.
+
+### 9. Tại sao lại "đập" file `views.py` và `urls.py` thành các thư mục `views/` và `urls/`?
+
+Dự án áp dụng mô hình **Directory-based Views & URLs** cho TẤT CẢ các apps (kể cả app nhỏ như `accounts` hay app khổng lồ như `custom_admin`). Thay vì chỉ có 1 file `views.py` chứa tất cả, chúng ta tạo ra thư mục `views/` và tách nhỏ code thành `auth.py`, `public.py`, `landlord.py`... 
+
+Quyết định kiến trúc này nhằm giải quyết 3 bài toán:
+
+- **Tính nhất quán tuyệt đối (Absolute Uniformity)**: Bất kể dev nhảy vào app nào, họ cũng thấy cùng một format. Không có chuyện "app nhỏ thì 1 file, app to thì 1 thư mục". Sự đồng bộ này giảm thiểu triệt để chi phí "chuyển đổi luồng suy nghĩ" (context-switching cost) khi làm việc.
+- **Code tự giải thích (Self-Documenting Code)**: Dev mới nhìn vào thư mục `houses/views/` là biết ngay app này phục vụ 2 đối tượng `public` và `landlord` mà không cần đọc bất kỳ dòng code logic nào. Tên file đã nói lên tất cả.
+- **Tuân thủ xuất sắc MVC & SOLID**: MVC quy định "View (Controller trong Django)" có nhiệm vụ điều phối. Nhưng nếu bạn nhét 50 chức năng chọc Database khác nhau vào cùng 1 file, bạn đang vi phạm nguyên tắc S (Single Responsibility) trong SOLID. Việc chia thư mục giúp các "Nhạc trưởng" chỉ huy đúng sân khấu của mình (Auth quản lý đăng nhập, Landlord quản lý đăng bài), vừa chuẩn MVC, vừa sạch sẽ theo SOLID. Cuối cùng, ở file root `config/urls.py`, chúng ta điều hướng tập trung trực tiếp vào các file route con này, giúp bức tranh luồng đi của dự án hiện ra vô cùng minh bạch.
+
+---
+
+## Luồng Xử lý Dữ liệu Chuyên sâu (Data Flow với Service Layer)
+
+Để hình dung hệ thống chạy như thế nào với kiến trúc MVC + Service, hãy xem xét luồng giao dịch **"Tạo Hợp đồng thuê nhà"** (Create Contract):
+
+```mermaid
+sequenceDiagram
+    participant User as Khách (Browser)
+    participant Route as URL Router (config/urls)
+    participant View as View (Lễ tân)
+    participant Service as ContractService (Bếp trưởng)
+    participant House as HouseService
+    participant DB as Database (Model)
+
+    User->>Route: Nộp Form Tạo Hợp đồng (/create-contract/)
+    Route->>View: Phân luồng tới contracts/views/landlord.py
+    Note over View: Kiểm tra Form (is_valid)<br/>-> Ngăn chặn dữ liệu rác
+    View->>Service: Bàn giao Dữ liệu sạc cho Service (create_contract_workflow)
+    Note over Service: Mở Cổng Giao Dịch (Database Transaction)
+    Service->>DB: 1. Lưu thông tin Khách (Tenant)
+    Service->>DB: 2. Lưu thông tin Hợp Đồng (Contract)
+    Service->>House: 3. Nhờ HouseService cập nhật nhà
+    House->>DB: Đổi House status = 'rented'
+    Note over Service: Đóng Giao Dịch (Thành công trọn vẹn 3 bước)
+    Service-->>View: Trả về đối tượng Contract & Tenant
+    View-->>User: Ép tạo Flash Message "Thành công" và Redirect trang
+```
+
+**Diễn giải theo ẩn dụ Nhà Hàng:**
+1. Khách hàng nộp Order List cho Gác cửa.
+2. Bộ định tuyến (URL) thấy khách mặc đồ Landlord bèn chỉ đường tới Lễ tân khu vực Chủ nhà (`contracts/views/landlord.py`).
+3. Lễ tân (View) dòm lướt qua cái Order thấy Form hợp lệ (is_valid), bèn chạy vào trong bếp tìm Bếp Trưởng Hợp Đồng (`contract_service.py`). Lễ tân KHÔNG BAO GIỜ tự tay xào nấu dữ liệu.
+4. Bếp Trưởng (Service) kích hoạt `atomic transaction` (Đảm bảo nấu xong món ăn trọn vẹn, nếu giữa tiến trình cúp điện thì đổ bỏ hết làm lại từ đầu chứ không bưng ra món ăn sống).
+5. Bếp Trưởng lưu Khách Thuê -> Lưu Hợp Đồng -> Rồi hô gào qua khu bếp kế bên nhờ lão Bếp Trưởng Nhà (`house_service.py`) đổi cái biển báo của Căn nhà đó thành "Đã thuê". (Đây là lý do tại sao các Service gọi nhau, tính đóng gói cực cao).
+6. Nấu xong xuôi, Bếp báo cho Lễ tân. Lễ tân bưng đồ ăn (Flash Message) ra tươi cười với Khách và lật menu sang trang mới (Redirect).
+
+---
+
+## Yêu cầu
+
+1. Python 3.11+.
+2. Git.
+3. (Tùy chọn) PostgreSQL nếu muốn chạy với DB thật.
+
+## Cài đặt và chạy nhanh (Local)
+
+### 1. Clone source
+
 ```bash
-# Clone dự án về máy
-git clone <đường-dẫn-repo-của-bạn>
+git clone <repo-url>
 cd GIS-WEB-HOUSE-RENTAL-MANAGEMENTMENT
+```
 
-# Tạo môi trường ảo (Tùy chọn nhưng RẤT KHUYẾN KHÍCH)
+### 2. Tạo môi trường ảo và cài thư viện
+
+```bash
 python -m venv .venv
-
-# Kích hoạt môi trường ảo:
-# - Trên Windows:
 .venv\Scripts\activate
-# - Trên MacOS/Linux:
-source .venv/bin/activate
-```
-
-### Bước 2: Cài đặt thư viện
-(Đảm bảo bạn đã kích hoạt môi trường ảo ở Bước 1)
-```bash
-# Cài đặt toàn bộ thư viện cần thiết (Django, psycopg2,...)
 pip install -r requirements.txt
 ```
 
-### Bước 3: Cấu hình Cơ sở dữ liệu (PostgreSQL)
-1. Hãy chắc chắn rằng bạn đã cài đặt và bật phần mềm **PostgreSQL** trên máy tính phần mềm pgAdmin/DBeaver.
-2. Mở file `website/website/settings.py`.
-3. Tìm đến phần `DATABASES` và cập nhật lại thông số khớp với database Postgres của bạn:
-   - `NAME`: Tên database bạn đã tạo.
-   - `USER`: Tên đăng nhập postgresql (mặc định: postgres)
-   - `PASSWORD`: Mật khẩu postgresql của bạn.
+### 3. Tạo file `.env`
 
-### Bước 4: Khởi tạo Database
 ```bash
-# Di chuyển vào thư mục chứa file manage.py
-cd website
-
-# Tạo các bảng trong database
-python manage.py makemigrations
-python manage.py migrate
+copy .env.example .env
 ```
 
-### Bước 5: Tạo tài khoản Admin (Quản trị viên)
-```bash
-python manage.py createsuperuser
-```
-*(Nhập username, email và password theo ý muốn)*
+Để chạy nhanh không cần PostgreSQL, chỉnh trong `.env`:
 
-### Bước 6: Chạy Server
-```bash
-python manage.py runserver
+```env
+DB_BACKEND=sqlite3
 ```
 
-### 🌐 Truy cập: 
-- Trang web chính: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)  
-- Trang quản trị Admin: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
-
----
-
-## 🔄 Hướng dẫn cập nhật Code mới (Khi trong nhóm có người đẩy code lên)
-
-Nếu máy của bạn đã clone dự án từ trước, bạn không cần phải làm lại từ Bước 1. Khi có người trong nhóm đẩy (push) code mới lên GitHub, bạn chỉ cần làm các bước sau để cập nhật máy của mình:
-
-### Mở Terminal tại gốc dự án (nơi có file manage.py) và gõ:
+### 4. Migrate và tạo tài khoản admin
 
 ```bash
-# 1. Kéo code mới nhất từ nhánh dev trên GitHub về máy
-git pull origin dev
-
-# 2. Bật môi trường ảo (Nếu chưa bật)
-.venv\Scripts\activate   # (Windows)
-
-# 3. Cài đặt thêm thư viện mới (Phòng trường hợp bạn khác vừa cài thêm module mới vào requirements.txt)
-pip install -r requirements.txt
-
-# 4. Cập nhật Database (Phòng trường hợp bạn khác vừa thay đổi bảng Models)
-python manage.py migrate
-
-# 5. Chạy lại server bình thường
-python manage.py runserver
+python website/manage.py migrate
+python website/manage.py createsuperuser
 ```
 
----
+### 5. Chạy server
 
-## 🔀 Quy trình làm việc nhóm với Git (Branching Workflow)
-
-Để tránh đụng độ code (conflict) và mất dữ liệu, **TUYỆT ĐỐI KHÔNG CODE TRỰC TIẾP TRÊN NHÁNH `dev`**. Vui lòng tuân thủ quy trình sau khi làm tính năng mới:
-
-### Bước 1: Cập nhật nhánh gốc (dev)
 ```bash
+python website/manage.py runserver
+```
+
+## Truy cập nhanh
+
+| Trang | URL |
+|-------|-----|
+| Trang chủ | http://127.0.0.1:8000/ |
+| Bản đồ | http://127.0.0.1:8000/map/ |
+| Django Admin | http://127.0.0.1:8000/admin/ |
+| Custom Admin | http://127.0.0.1:8000/custom-admin/ |
+| API tìm nhà theo bán kính | http://127.0.0.1:8000/api/v1/houses/?lat=10.78&lng=106.70&radius=5 |
+| API tìm nhà theo polygon | http://127.0.0.1:8000/api/v1/houses/polygon-search/ |
+
+## Chạy với PostgreSQL (tùy chọn)
+
+Nếu muốn dùng PostgreSQL local, giữ `DB_BACKEND=postgresql` và cấu hình thêm trong `.env`:
+
+```env
+DB_NAME=quanlythuenha
+DB_USER=postgres
+DB_PASSWORD=123456
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+## Lệnh hay dùng
+
+```bash
+# Tạo migration mới
+python website/manage.py makemigrations
+
+# Chạy toàn bộ migration
+python website/manage.py migrate
+
+# Chạy test
+pytest
+
+# Format code
+black website
+
+# Sort import
+isort website
+
+# Lint
+flake8 website
+```
+
+## Lưu ý dữ liệu khi làm nhóm
+
+Data DB không nằm trong Git. Để chia sẻ dữ liệu giữa các máy, có thể dùng fixture:
+
+```bash
+# Xuất dữ liệu
+python website/manage.py dumpdata --indent 2 > seed_data.json
+
+# Nhập dữ liệu
+python website/manage.py loaddata seed_data.json
+```
+
+## Quy trình làm việc nhóm với Git
+
+Không code trực tiếp trên nhánh `dev`.
+
+```bash
+# Cập nhật dev
 git checkout dev
 git pull origin dev
-```
 
-### Bước 2: Tạo nhánh riêng của bạn từ nhánh dev
-```bash
-# Đặt tên nhánh theo tính năng (VD: feature/login, feature/them-hoa-don...)
-git checkout -b feature/ten-tinh-nang-cua-ban
-```
+# Tạo nhánh tính năng
+git checkout -b feature/ten-tinh-nang
 
-### Bước 3: Code, Commit và Push lên nhánh riêng
-```bash
-# Sau khi bạn hoàn thành code trên nhánh của riêng mình
+# Làm việc và đẩy code
 git add .
-git commit -m "feat: mô tả ngắn gọn bạn vừa làm gì"
-
-# Lần đầu tiên push nhánh mới lên GitHub, sử dụng lệnh này:
-git push -u origin feature/ten-tinh-nang-cua-ban
-
-# Các lần push sau trên cùng nhánh đó chỉ cần:
-git push
+git commit -m "feat: mô tả ngắn gọn"
+git push -u origin feature/ten-tinh-nang
 ```
 
-### Bước 4: Tạo Pull Request (PR)
-- Lên trang GitHub của dự án.
-- Bấm vào nút **Compare & pull request** ở nhánh bạn vừa push.
-- Xác nhận gộp nhánh `feature/ten-tinh-nang-cua-ban` vào nhánh `dev`.
-- Nhờ Leader hoặc đồng đội Review Code và nhấn nút **Merge**.
+Tạo Pull Request để merge vào `dev` sau khi được review.

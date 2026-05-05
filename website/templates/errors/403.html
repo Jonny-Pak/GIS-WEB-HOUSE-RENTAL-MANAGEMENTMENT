@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}403 - Không có quyền truy cập{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/error_pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="error-page-wrap">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="error-card">
+          <h1 class="error-code">403</h1>
+          <h2 class="error-title">Bạn không có quyền truy cập trang này</h2>
+          <p class="error-subtitle">Tài khoản hiện tại không đủ quyền để thực hiện hành động này. Hãy đăng nhập tài khoản khác nếu cần.</p>
+          <div class="error-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary error-btn-primary">Quay về trang chủ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

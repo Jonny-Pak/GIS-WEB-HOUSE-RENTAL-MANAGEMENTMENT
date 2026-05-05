@@ -1,0 +1,503 @@
+/* Đẩy bộ lọc xuống dưới header (cao hơn để không bị che) */
+.home-discovery,
+.discovery-grid {
+    margin-top: 180px !important;
+}
+
+/* home.css - CSS dành riêng cho trang chủ (home.html) */
+
+/* Tiện ích chung box */
+.utilities-section {
+    margin: 60px auto 48px auto;
+    max-width: 1200px;
+    padding: 0 15px;
+}
+
+.utilities-box {
+    background: #181460;
+    border-radius: 12px;
+    padding: 35px 32px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    box-shadow: 0 10px 30px rgba(24, 20, 96, 0.15);
+}
+
+.utility-main-title h3 {
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    white-space: nowrap;
+    min-width: 180px;
+}
+
+.utility-items-wrap {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.utilities-box .utility-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.utilities-box .utility-item i {
+    font-size: 2.2rem;
+    color: #ffd600;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.utilities-box .utility-item:hover i {
+    transform: translateY(-5px) scale(1.1);
+}
+
+.utilities-box .utility-item span {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.4;
+}
+
+/* Card phòng trọ: Đã chuyển sang components.css */
+
+/* Section heading */
+.rooms-section-head h2 {
+    color: var(--brand-primary);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.rooms-section-head .rooms-see-all {
+    color: #181460;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.18s;
+}
+
+.rooms-section-head .rooms-see-all:hover {
+    color: #6c63ff;
+    text-decoration: underline;
+}
+
+/* Responsive card grid using CSS Grid */
+.room-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+}
+
+@media (max-width: 1200px) {
+    .room-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .room-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .room-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Pagination premium style */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 8px;
+    align-items: center;
+}
+
+.pagination .page-item {
+    display: block;
+}
+
+.pagination .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1.5px solid #e0e0f7;
+    color: var(--brand-primary);
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(24, 20, 96, 0.04);
+}
+
+.pagination .page-link:hover {
+    background: #f0f0ff;
+    border-color: var(--brand-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 20, 96, 0.1);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #ffd600;
+    box-shadow: 0 4px 16px rgba(24, 20, 96, 0.2);
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    border-radius: 12px;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 992px) {
+    .utilities-box {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        padding: 35px 32px;
+    }
+
+    .utility-main-title {
+        text-align: center;
+    }
+
+    .utility-main-title h3 {
+        min-width: auto;
+    }
+
+    .utility-items-wrap {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .utility-items-wrap {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .utility-main-title h3 {
+        font-size: 1.4rem;
+    }
+}
+
+/* Badge phòng trống màu cam nhạt */
+.room-vacancy-badge {
+    background: #ffe6b0;
+    color: #b97a00;
+}
+
+/* Giá thuê nổi bật */
+.room-price-highlight {
+    color: #181818;
+    background: #ffd600;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.10);
+    margin-right: 4px;
+    display: inline-block;
+}
+
+.room-area-highlight {
+    color: #1976d2;
+    background: #e3f2fd;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 1.01rem;
+    margin-right: 4px;
+    display: inline-block;
+}
+
+.room-people-highlight {
+    color: #6c63ff;
+    background: #f3f0ff;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 1.01rem;
+    display: inline-block;
+}
+
+/* --- END HOME PAGE CUSTOM STYLE --- */
+
+/* Bộ lọc trang chủ */
+.discovery-filter-controls {
+    margin: 0 0 32px 0;
+}
+
+.discovery-filter-form {
+    width: 100%;
+}
+
+.discovery-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 18px 16px 18px;
+    box-shadow: 0 2px 12px rgba(24, 20, 96, 0.06);
+    margin-bottom: 0;
+    position: relative;
+}
+
+.filter-search-wrap {
+    position: relative;
+    flex: 1.5 1 0;
+    display: flex;
+    align-items: center;
+}
+
+.filter-search-input {
+    width: 100%;
+    padding-right: 44px;
+    border-radius: 8px;
+    border: 1.5px solid #e0e0f7;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.btn-search {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    z-index: 2;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background 0.18s;
+    background: var(--brand-primary);
+    color: #fff;
+}
+
+.btn-search:hover {
+    background: #ffd600;
+    color: #181460;
+}
+
+.btn-search:focus,
+.btn-search:active {
+    background: var(--brand-primary);
+    color: #fff;
+}
+
+.form-select {
+    min-width: 170px;
+    max-width: 220px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1.5px solid #e0e0f7;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #334155;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding-left: 12px;
+}
+
+.form-select:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(24, 20, 96, 0.08);
+    outline: none;
+}
+
+.filter-search-input {
+    width: 100%;
+    padding-right: 44px;
+    border-radius: 10px;
+    border: 1.5px solid #e0e0f7;
+    height: 44px;
+    font-size: 0.95rem;
+}
+
+.discovery-filter-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.discovery-filter-actions .btn,
+.discovery-filter-actions a.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: none;
+    padding: 0 18px;
+    line-height: 1.2;
+}
+
+.discovery-filter-actions a {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0 12px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.discovery-filter-actions a.btn-outline-secondary {
+    border: 1.5px solid #181460;
+    color: #181460;
+    background: #fff;
+    transition: background 0.18s, color 0.18s;
+}
+
+.discovery-filter-actions a.btn-outline-secondary:hover {
+    background: #181460;
+    color: #ffd600;
+}
+
+.filter-search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.25rem;
+    color: var(--brand-primary);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.filter-search-icon-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.18s;
+}
+
+.filter-search-icon-btn:hover,
+.filter-search-icon-btn:focus {
+    background: #f7f7fa;
+}
+
+@media (max-width: 900px) {
+    .discovery-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px 8px;
+    }
+
+    .discovery-filter-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+}
+
+/* Cuộn trái/phải phòng */
+.district-scroll-controls.rooms {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.district-scroll-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1.5px solid #e0e0f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    color: var(--brand-primary);
+    box-shadow: 0 2px 8px rgba(24, 20, 96, 0.08);
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    outline: none;
+    margin: 0;
+    padding: 0;
+}
+
+.district-scroll-btn:hover,
+.district-scroll-btn:focus {
+    background: #ffd600;
+    color: #181460;
+    box-shadow: 0 4px 16px rgba(255, 214, 0, 0.18);
+    border-color: #ffd600;
+}
+
+.district-scroll-btn:active {
+    background: #f7f7fa;
+    color: var(--brand-primary);
+}
+
+.district-scroll-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f7f7fa;
+    color: #bdbdbd;
+    border-color: #e0e0f7;
+    box-shadow: none;
+}

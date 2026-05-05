@@ -1,0 +1,129 @@
+/* website/quanly/static/css/login.css */
+
+/* Màu chủ đạo */
+:root {
+    --primary-color: #181460;
+    --primary-hover: #232183;
+    --text-color: #000000;
+    --muted-color: #6f7383;
+}
+
+.login-section {
+    background-color: #f8f9fa;
+    padding: 120px 0 80px 0;
+}
+
+.login-section .login-heading {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-card {
+    border-radius: 20px;
+    background: #ffffff;
+    padding: 2.5rem 2rem;
+    border: none;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important; /* shadow-lg */
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.custom-input {
+    border-radius: 10px;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    width: 100%;
+}
+
+.custom-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(24, 20, 96, 0.25);
+}
+
+.btn-custom-login {
+    border-radius: 30px;
+    background-color: var(--primary-color);
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: #fff;
+    width: 100%;
+    padding: 1rem;
+}
+
+.btn-custom-login:hover {
+    background-color: #120f49;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(24, 20, 96, 0.3);
+}
+
+/* Đường gạch ngang "Hoặc" */
+.separator-wrapper {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.separator-text {
+    background: white;
+    padding: 0 10px;
+    color: var(--muted-color);
+    position: relative;
+    z-index: 1;
+}
+
+.separator-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border: none;
+    border-top: 1px solid #ddd;
+    z-index: 0;
+}
+
+.login-section .link-register {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.login-section .link-register:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.login-card p,
+.login-card small,
+.login-card .text-muted {
+    color: var(--muted-color) !important;
+}
+
+.login-card a.link-register,
+.login-card p .link-register {
+    color: var(--primary-color) !important;
+}
+
+.login-section .login-heading,
+.login-section a.link-register,
+.login-section a.link-register:visited {
+    color: var(--primary-color) !important;
+}
+
+.login-card a.link-register:hover,
+.login-card p .link-register:hover,
+.login-section a.link-register:focus,
+.login-section a.link-register:active {
+    color: var(--primary-hover) !important;
+}
+

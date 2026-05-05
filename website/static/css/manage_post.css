@@ -1,0 +1,12 @@
+.manage-post-image-head {
+    width: 100px;
+}
+
+.manage-post-thumbnail {
+    object-fit: cover;
+}
+
+.manage-post-thumbnail-placeholder {
+    width: 80px;
+    height: 60px;
+}
