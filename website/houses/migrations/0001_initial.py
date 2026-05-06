@@ -38,7 +38,6 @@ class Migration(migrations.Migration):
                 ('unit_count', models.IntegerField(default=1, verbose_name='Số lượng căn')),
                 ('room_count', models.IntegerField(default=1, verbose_name='Số lượng phòng')),
                 ('max_people', models.IntegerField(default=4, verbose_name='Số người ở tối đa')),
-                ('district', models.CharField(choices=[('q1', 'Quận 1'), ('q2', 'Quận 2'), ('q3', 'Quận 3'), ('q4', 'Quận 4'), ('q5', 'Quận 5'), ('q6', 'Quận 6'), ('q7', 'Quận 7'), ('q8', 'Quận 8'), ('q9', 'Quận 9'), ('q10', 'Quận 10'), ('q11', 'Quận 11'), ('q12', 'Quận 12'), ('qbt', 'Quận Bình Thạnh'), ('qtb', 'Quận Tân Bình'), ('qtp', 'Quận Tân Phú'), ('qp', 'Quận Phú Nhuận'), ('qgv', 'Quận Gò Vấp'), ('qbtan', 'Quận Bình Tân'), ('td', 'Thành phố Thủ Đức'), ('hbc', 'Huyện Bình Chánh'), ('hhm', 'Huyện Hóc Môn'), ('hcc', 'Huyện Củ Chi'), ('hnb', 'Huyện Nhà Bè'), ('hcg', 'Huyện Cần Giờ')], max_length=10, verbose_name='Khu vực Quận/Huyện')),
                 ('address', models.TextField(verbose_name='Địa chỉ chi tiết (Số nhà, Ngõ/Hẻm, Đường)')),
                 ('lat', models.FloatField(blank=True, null=True, verbose_name='Vĩ độ (Latitude)')),
                 ('lng', models.FloatField(blank=True, null=True, verbose_name='Kinh độ (Longitude)')),
