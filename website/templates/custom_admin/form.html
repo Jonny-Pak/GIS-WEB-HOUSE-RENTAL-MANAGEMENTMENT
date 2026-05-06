@@ -39,6 +39,8 @@
                 class="admin-nav-link {% if '/custom-admin/contracts/' in request.path %}active{% endif %}">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}"
                 class="admin-nav-link {% if '/custom-admin/furnitures/' in request.path %}active{% endif %}">Nội thất</a>
+            <a href="{% url 'custom_admin_pages' %}"
+                class="admin-nav-link {% if '/custom-admin/pages/' in request.path %}active{% endif %}">Trang tĩnh</a>
         </div>
     </nav>
 
@@ -153,6 +155,20 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endif %}
 
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var textareas = document.querySelectorAll('textarea.ckeditor-content');
+        textareas.forEach(function(textarea) {
+            CKEDITOR.replace(textarea.id, {
+                height: 400,
+                language: 'vi',
+                removePlugins: 'elementspath',
+                resize_enabled: false
+            });
+        });
+    });
+</script>
 <script src="{% static 'Js/form_helpers.js' %}?v=20260406e"></script>
 </body>
 

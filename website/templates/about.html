@@ -19,38 +19,44 @@
   <div class="row justify-content-center">
     <div class="col-lg-10">
       
-      <div class="intro-text-box shadow-sm mb-5">
-        <p class="mb-3">
-          <strong>Thuê Nhà Nhanh</strong> là nền tảng WebGIS giúp kết nối người thuê và chủ nhà một cách nhanh chóng, minh bạch và tiện lợi nhất tại TP.HCM.
-        </p>
-        <p class="mb-0">
-          Chúng tôi cung cấp giải pháp quản lý, tìm kiếm và đăng tin phòng trọ, nhà nguyên căn, căn hộ với bản đồ trực quan, hỗ trợ xác thực thông tin, bảo mật dữ liệu và trải nghiệm người dùng thân thiện.
-        </p>
-      </div>
+      {% if page and page.content %}
+        <div class="dynamic-content">
+          {{ page.content|safe }}
+        </div>
+      {% else %}
+        <div class="intro-text-box shadow-sm mb-5">
+          <p class="mb-3">
+            <strong>Thuê Nhà Nhanh</strong> là nền tảng WebGIS giúp kết nối người thuê và chủ nhà một cách nhanh chóng, minh bạch và tiện lợi nhất tại TP.HCM.
+          </p>
+          <p class="mb-0">
+            Chúng tôi cung cấp giải pháp quản lý, tìm kiếm và đăng tin phòng trọ, nhà nguyên căn, căn hộ với bản đồ trực quan, hỗ trợ xác thực thông tin, bảo mật dữ liệu và trải nghiệm người dùng thân thiện.
+          </p>
+        </div>
 
-      <div class="row g-4 about-section">
-        <div class="col-md-6">
-          <div class="about-card h-100">
-            <h3><i class="bi bi-rocket-takeoff-fill"></i> Sứ mệnh</h3>
-            <ul class="about-list">
-              <li><i class="bi bi-check-circle-fill"></i> Kết nối cộng đồng thuê và cho thuê nhà hiệu quả.</li>
-              <li><i class="bi bi-check-circle-fill"></i> Đảm bảo thông tin minh bạch, chính xác.</li>
-              <li><i class="bi bi-check-circle-fill"></i> Ứng dụng công nghệ GIS vào lĩnh vực bất động sản.</li>
-            </ul>
+        <div class="row g-4 about-section">
+          <div class="col-md-6">
+            <div class="about-card h-100">
+              <h3><i class="bi bi-rocket-takeoff-fill"></i> Sứ mệnh</h3>
+              <ul class="about-list">
+                <li><i class="bi bi-check-circle-fill"></i> Kết nối cộng đồng thuê và cho thuê nhà hiệu quả.</li>
+                <li><i class="bi bi-check-circle-fill"></i> Đảm bảo thông tin minh bạch, chính xác.</li>
+                <li><i class="bi bi-check-circle-fill"></i> Ứng dụng công nghệ GIS vào lĩnh vực bất động sản.</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="about-card h-100">
+              <h3><i class="bi bi-headset"></i> Liên hệ</h3>
+              <ul class="about-list contact-info">
+                <li><i class="bi bi-geo-alt-fill"></i> <span><strong>Địa chỉ:</strong> 43 Nguyễn Chí Thanh, Quận 5, TP.HCM</span></li>
+                <li><i class="bi bi-envelope-fill"></i> <span><strong>Email:</strong> admin@thuenha.com</span></li>
+                <li><i class="bi bi-telephone-fill"></i> <span><strong>Điện thoại:</strong> +84 123 456 789</span></li>
+              </ul>
+            </div>
           </div>
         </div>
-        
-        <div class="col-md-6">
-          <div class="about-card h-100">
-            <h3><i class="bi bi-headset"></i> Liên hệ</h3>
-            <ul class="about-list contact-info">
-              <li><i class="bi bi-geo-alt-fill"></i> <span><strong>Địa chỉ:</strong> 43 Nguyễn Chí Thanh, Quận 5, TP.HCM</span></li>
-              <li><i class="bi bi-envelope-fill"></i> <span><strong>Email:</strong> admin@thuenha.com</span></li>
-              <li><i class="bi bi-telephone-fill"></i> <span><strong>Điện thoại:</strong> +84 123 456 789</span></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      {% endif %}
 
     </div>
   </div>

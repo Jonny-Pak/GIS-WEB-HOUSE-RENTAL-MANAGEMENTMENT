@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from houses.models import House, Furniture
+from houses.models import House, Furniture, StaticPage
 
 
 User = get_user_model()
@@ -76,3 +76,12 @@ class AdminFurnitureForm(forms.ModelForm):
     class Meta:
         model = Furniture
         fields = "__all__"
+class AdminStaticPageForm(forms.ModelForm):
+    class Meta:
+        model = StaticPage
+        fields = ["slug", "title", "content"]
+        widgets = {
+            'slug': forms.Select(attrs={'class': 'form-select'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control ckeditor-content', 'rows': 15}),
+        }

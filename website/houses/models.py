@@ -86,3 +86,22 @@ class HouseImage(models.Model):
 
     def __str__(self):
         return f"Ảnh của {self.house.name}"
+
+class StaticPage(models.Model):
+    PAGE_CHOICES = [
+        ('about', 'Về chúng tôi'),
+        ('service_ky_gui', 'Dịch vụ ký gửi nhà cho thuê'),
+        ('terms', 'Điều khoản sử dụng'),
+    ]
+
+    slug = models.SlugField(max_length=50, unique=True, choices=PAGE_CHOICES, verbose_name="Mã trang")
+    title = models.CharField(max_length=200, verbose_name="Tiêu đề trang")
+    content = models.TextField(verbose_name="Nội dung", blank=True)
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Cập nhật lần cuối")
+
+    def __str__(self):
+        return self.get_slug_display()
+
+    class Meta:
+        verbose_name = "Trang tĩnh"
+        verbose_name_plural = "Trang tĩnh"

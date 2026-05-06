@@ -1,7 +1,14 @@
 /* Đẩy bộ lọc xuống dưới header (cao hơn để không bị che) */
 .home-discovery,
 .discovery-grid {
-    margin-top: 180px !important;
+    margin-top: 120px !important;
+}
+
+@media (max-width: 992px) {
+    .home-discovery,
+    .discovery-grid {
+        margin-top: 80px !important;
+    }
 }
 
 /* home.css - CSS dành riêng cho trang chủ (home.html) */
@@ -18,9 +25,11 @@
     border-radius: 12px;
     padding: 35px 32px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 40px;
+    gap: 32px;
     box-shadow: 0 10px 30px rgba(24, 20, 96, 0.15);
+    overflow: hidden;
 }
 
 .utility-main-title h3 {
@@ -28,16 +37,18 @@
     font-size: 1.6rem;
     font-weight: 700;
     margin: 0;
-    white-space: nowrap;
-    min-width: 180px;
+    white-space: normal;
+    min-width: 140px;
 }
 
 .utility-items-wrap {
     display: flex;
-    flex: 1;
-    justify-content: space-between;
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    justify-content: space-around;
     align-items: flex-start;
     gap: 20px;
+    min-width: 0;
 }
 
 .utilities-box .utility-item {

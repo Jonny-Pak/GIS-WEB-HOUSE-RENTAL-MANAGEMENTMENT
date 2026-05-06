@@ -33,6 +33,7 @@
             <a href="{% url 'custom_admin_tenants' %}" class="admin-nav-link">Khách thuê</a>
             <a href="{% url 'custom_admin_contracts' %}" class="admin-nav-link">Hợp đồng</a>
             <a href="{% url 'custom_admin_furnitures' %}" class="admin-nav-link">Nội thất</a>
+            <a href="{% url 'custom_admin_pages' %}" class="admin-nav-link">Trang tĩnh</a>
         </div>
     </nav>
 
@@ -95,6 +96,29 @@
                     </ul>
                 </article>
             </section>
+
+            <!-- Báo cáo & Thống kê -->
+            <section style="margin-top: 28px;">
+                <h2 style="font-size:1rem; font-weight:600; color:#1e293b; margin-bottom:14px;"> Báo cáo & Thống kê</h2>
+                <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                    <!-- Xuất Excel nhà chưa cho thuê -->
+                    <a href="{% url 'custom_admin_export_available' %}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px;
+                              background:#16a34a; color:#fff; border-radius:7px; text-decoration:none;
+                              font-size:0.9rem; font-weight:500; transition:background .2s;"
+                        onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+                        ⬇ Xuất Excel nhà chưa cho thuê
+                    </a>
+
+                    <!-- Lọc tin đăng theo ngày -->
+                    <a href="{% url 'custom_admin_filter_listings' %}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px;
+                              background:#3b82f6; color:#fff; border-radius:7px; text-decoration:none;
+                              font-size:0.9rem; font-weight:500; transition:background .2s;"
+                        onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+                        Lọc tin đăng theo ngày
+                    </a>
+                </div>
+            </section>
+
         </div>
     </main>
 </body>
