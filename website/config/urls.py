@@ -35,6 +35,8 @@ urlpatterns = [
     path('custom-admin/', include('custom_admin.urls.houses')),
     path('custom-admin/', include('custom_admin.urls.contracts')),
     path('custom-admin/', include('custom_admin.urls.furnitures')),
+    path('custom-admin/', include('custom_admin.urls.reports')),
+    path('custom-admin/', include('custom_admin.urls.pages')),
     
     # Houses
     path('', include('houses.urls.public')),

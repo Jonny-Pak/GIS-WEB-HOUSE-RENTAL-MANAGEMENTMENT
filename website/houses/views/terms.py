@@ -1,4 +1,7 @@
 from django.shortcuts import render
 
+from houses.models import StaticPage
+
 def terms_view(request):
-    return render(request, 'terms.html')
+    page = StaticPage.objects.filter(slug='terms').first()
+    return render(request, 'terms.html', {'page': page})
