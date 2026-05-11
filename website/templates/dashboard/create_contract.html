@@ -7,34 +7,7 @@
 {% block extra_css %}
 <!-- Choices.js CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-<style>
-    /* Tùy chỉnh nhẹ để hòa hợp với dashboard */
-    .choices__inner {
-        background-color: var(--bs-card-bg);
-        border-radius: 8px !important;
-        border: 1px solid #dee2e6 !important;
-        min-height: 40px !important;
-        padding: 4px 8px !important;
-    }
-    .choices__list--dropdown {
-        border-radius: 8px !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        border: 1px solid #eee !important;
-        z-index: 1000 !important;
-    }
-    /* Sửa lỗi bị mất chữ trong ô tìm kiếm */
-    .choices__list--dropdown .choices__input {
-        width: 100% !important;
-        background-color: #f8f9fa !important;
-        border-bottom: 1px solid #eee !important;
-        padding: 10px 15px !important;
-        margin-bottom: 0 !important;
-    }
-    .choices__item--selectable {
-        padding: 10px 15px !important;
-        font-size: 14px !important;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/create_contract.css' %}?v=20260511" />
 {% endblock %}
 
 {% block content %}
@@ -197,46 +170,5 @@
 {% block extra_js %}
 <!-- Choices.js JS -->
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tenantSelectEl = document.getElementById('existingTenantSelect');
-    if (tenantSelectEl) {
-        // 1. Khởi tạo Choices.js
-        const choices = new Choices(tenantSelectEl, {
-            searchEnabled: true,
-            searchPlaceholderValue: 'Tìm theo tên, SĐT...',
-            itemSelectText: 'Nhấn để chọn',
-            noResultsText: 'Không tìm thấy khách này',
-            noChoicesText: 'Danh sách trống',
-            shouldSort: false,
-        });
-
-        // 2. Lắng nghe sự kiện thay đổi qua Choices.js
-        tenantSelectEl.addEventListener('change', function(event) {
-            const selectedId = event.detail.value;
-            
-            if (!selectedId || selectedId === "") {
-                // Reset form
-                document.getElementsByName('full_name')[0].value = "";
-                document.getElementsByName('phone')[0].value = "";
-                document.getElementsByName('cccd')[0].value = "";
-                document.getElementsByName('gender')[0].value = "male";
-                document.getElementsByName('dob')[0].value = "";
-                document.getElementsByName('address')[0].value = "";
-            } else {
-                // Lấy option gốc để lấy data attributes
-                const option = Array.from(tenantSelectEl.options).find(opt => opt.value == selectedId);
-                if (option) {
-                    document.getElementsByName('full_name')[0].value = option.getAttribute('data-fullname') || "";
-                    document.getElementsByName('phone')[0].value = option.getAttribute('data-phone') || "";
-                    document.getElementsByName('cccd')[0].value = option.getAttribute('data-cccd') || "";
-                    document.getElementsByName('gender')[0].value = option.getAttribute('data-gender') || "male";
-                    document.getElementsByName('dob')[0].value = option.getAttribute('data-dob') || "";
-                    document.getElementsByName('address')[0].value = option.getAttribute('data-address') || "";
-                }
-            }
-        });
-    }
-});
-</script>
+<script src="{% static 'Js/create_contract.js' %}?v=20260511"></script>
 {% endblock %}

@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard quản trị</title>
     <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}?v=20260406b">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=20260511">
 </head>
 
 <body class="admin-page">
@@ -98,22 +99,16 @@
             </section>
 
             <!-- Báo cáo & Thống kê -->
-            <section style="margin-top: 28px;">
-                <h2 style="font-size:1rem; font-weight:600; color:#1e293b; margin-bottom:14px;"> Báo cáo & Thống kê</h2>
-                <div style="display:flex; flex-wrap:wrap; gap:12px;">
+            <section class="admin-stats-report">
+                <h2>Báo cáo & Thống kê</h2>
+                <div class="admin-report-actions">
                     <!-- Xuất Excel nhà chưa cho thuê -->
-                    <a href="{% url 'custom_admin_export_available' %}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px;
-                              background:#16a34a; color:#fff; border-radius:7px; text-decoration:none;
-                              font-size:0.9rem; font-weight:500; transition:background .2s;"
-                        onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+                    <a href="{% url 'custom_admin_export_available' %}" class="report-btn report-btn-success">
                         ⬇ Xuất Excel nhà chưa cho thuê
                     </a>
 
                     <!-- Lọc tin đăng theo ngày -->
-                    <a href="{% url 'custom_admin_filter_listings' %}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px;
-                              background:#3b82f6; color:#fff; border-radius:7px; text-decoration:none;
-                              font-size:0.9rem; font-weight:500; transition:background .2s;"
-                        onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+                    <a href="{% url 'custom_admin_filter_listings' %}" class="report-btn report-btn-primary">
                         Lọc tin đăng theo ngày
                     </a>
                 </div>
