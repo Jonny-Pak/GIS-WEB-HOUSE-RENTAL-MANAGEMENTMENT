@@ -5,28 +5,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/login.css' %}?v=20260411a">
-    <style>
-    .position-relative { position: relative; }
-    .toggle-password {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        z-index: 2;
-        color: #888;
-        font-size: 1.25rem;
-        padding: 0 14px;
-        border-radius: 0 4px 4px 0;
-        transition: background 0.2s;
-    }
-    .toggle-password:hover {
-        background: #f0f0f0;
-        color: #333;
-    }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/password_toggle.css' %}">
 {% endblock %}
 
 {% block extra_js %}

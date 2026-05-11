@@ -1,0 +1,38 @@
+.admin-stats-report {
+    margin-top: 28px;
+}
+.admin-stats-report h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 14px;
+}
+.admin-report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.report-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    color: #fff;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.report-btn-success {
+    background: #16a34a;
+}
+.report-btn-success:hover {
+    background: #15803d;
+}
+.report-btn-primary {
+    background: #3b82f6;
+}
+.report-btn-primary:hover {
+    background: #2563eb;
+}
